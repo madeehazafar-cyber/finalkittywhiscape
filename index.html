@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Kitty Whiscape</title>
-  <link rel="stylesheet" href="style.css?v=20260616-textonly1">
+  <link rel="stylesheet" href="style.css?v=20260616-menuimage1">
 </head>
 <body>
   <main class="shell">
@@ -36,16 +36,27 @@
           <span>Kitty</span>
         </div>
       </div>
-      <p class="tagline">Swing, pounce, collect, and escape through Nancy's haunted rooms.</p>
-      <div class="mode-panel">
-        <h2>Choose Version</h2>
-        <div class="mode-grid">
-          <button class="mode-card selected" data-mode="classic">Classic Story</button>
-          <button class="mode-card" data-mode="speedrun">Speedrun Mode</button>
-          <button class="mode-card" data-mode="endless">Endless Mansion</button>
+      <div class="menu-stage">
+        <div class="level-board" aria-label="Room preview board">
+          <button class="level-tile">1</button>
+          <button class="level-tile active">2</button>
+          <button class="level-tile active">3</button>
+          <button class="level-tile">4</button>
+          <button class="level-tile">5</button>
+          <button class="level-tile">6</button>
+          <button class="level-tile">7</button>
+          <button class="level-tile">8</button>
+        </div>
+        <div class="mode-panel">
+          <h2>Choose Version</h2>
+          <div class="mode-grid">
+            <button class="mode-card selected" data-mode="classic"><span>1</span>Classic Story</button>
+            <button class="mode-card" data-mode="speedrun"><span>2</span>Speedrun Mode</button>
+            <button class="mode-card" data-mode="endless"><span>3</span>Endless Mansion</button>
+          </div>
+          <button id="startButton" class="primary">Start Escape</button>
         </div>
       </div>
-      <button id="startButton" class="primary">Start Escape</button>
     </section>
 
     <section id="game" class="screen game" aria-label="Kitty Whiscape game">
@@ -89,7 +100,7 @@
       </div>
     </div>
   </main>
-  <script src="game.js?v=20260616-clean2"></script>
+  <script src="game.js?v=20260616-menuimage1"></script>
 </body>
 </html>
 

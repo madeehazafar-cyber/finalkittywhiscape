@@ -56,55 +56,63 @@
 
     const rooms = [
       {
-        name: "The Drafty Kitchen",
+        name: "The Cozy Escape",
         difficulty: "Easy",
-        palette: ["#171533", "#4b243c", "#7d4a55"],
+        palette: ["#1d1833", "#51304f", "#8d5d68"],
         start: [72, 448],
         exit: [980, 428],
-        platforms: [[0, 516, 1040, 69], [150, 450, 170, 22], [360, 390, 170, 22], [570, 330, 170, 22], [780, 390, 170, 22]],
-        enemies: [[365, 472, 90], [805, 346, 70]],
-        items: [["fish", 190, 412], ["star", 272, 412], ["mouse", 402, 352], ["star", 612, 292], ["yarn", 820, 352]],
-        spikes: [[555, 505, 86, 16]],
+        requiredStars: 2,
+        platforms: [[0, 516, 1040, 69], [145, 452, 190, 22], [375, 400, 190, 22], [610, 346, 180, 22], [820, 416, 150, 22]],
+        enemies: [[430, 472, 80]],
+        items: [["fish", 190, 414], ["star", 286, 414], ["mouse", 430, 362], ["star", 660, 308], ["yarn", 860, 378]],
+        spikes: [],
+        hazards: [],
         moving: [],
         disappearing: []
       },
       {
-        name: "The Grand Library",
+        name: "The Swinging Gallery",
         difficulty: "Medium",
-        palette: ["#14152e", "#2d2449", "#9b6b44"],
+        palette: ["#11142d", "#2d2449", "#a56a58"],
         start: [64, 448],
-        exit: [980, 344],
-        platforms: [[0, 516, 1040, 69], [150, 448, 170, 22], [360, 386, 170, 22], [570, 324, 170, 22], [780, 360, 170, 22]],
-        enemies: [[250, 404, 84], [540, 472, 120], [795, 316, 76]],
-        items: [["fish", 210, 410], ["star", 292, 410], ["mouse", 470, 348], ["yarn", 612, 286], ["star", 830, 322]],
-        spikes: [[370, 535, 92, 18]],
-        moving: [[612, 430, 110, 18, 90, 1.2]],
-        disappearing: []
-      },
-      {
-        name: "The Sleepwalking Ward",
-        difficulty: "Hard",
-        palette: ["#11253b", "#20445e", "#6b6b8e"],
-        start: [64, 448],
-        exit: [980, 404],
-        platforms: [[0, 516, 1040, 69], [130, 448, 160, 22], [330, 386, 160, 22], [530, 324, 160, 22], [730, 386, 170, 22]],
-        enemies: [[230, 472, 122, true], [396, 308, 86, true], [610, 472, 130, true], [780, 326, 86, true]],
-        items: [["mouse", 168, 410], ["star", 360, 348], ["fish", 390, 348], ["yarn", 570, 286], ["star", 786, 348]],
-        spikes: [[872, 505, 62, 16]],
+        exit: [980, 354],
+        requiredStars: 3,
+        platforms: [[0, 516, 238, 69], [318, 454, 138, 22], [560, 384, 126, 22], [805, 410, 160, 22], [220, 118, 80, 18], [505, 96, 80, 18], [775, 116, 80, 18]],
+        enemies: [[350, 410, 70], [840, 366, 72]],
+        items: [["star", 170, 478], ["fish", 350, 416], ["star", 606, 346], ["yarn", 528, 60], ["star", 858, 372], ["mouse", 925, 372]],
+        spikes: [],
+        hazards: [[490, 482, 18, 72, 1.6, "x"], [720, 350, 18, 82, 1.3, "y"]],
         moving: [],
         disappearing: []
       },
       {
-        name: "The Attic Maze",
-        difficulty: "Expert",
-        palette: ["#111733", "#28275a", "#6d486d"],
+        name: "Nancy's Haunted Vault",
+        difficulty: "Hard",
+        palette: ["#101b2e", "#28375a", "#71629b"],
         start: [64, 448],
-        exit: [976, 246],
-        platforms: [[0, 516, 230, 69], [260, 462, 150, 22], [470, 404, 150, 22], [680, 346, 150, 22], [850, 288, 150, 22]],
-        enemies: [[312, 418, 76], [520, 360, 70], [728, 302, 70], [892, 244, 62]],
-        items: [["fish", 302, 424], ["star", 350, 424], ["mouse", 502, 366], ["yarn", 712, 308], ["star", 892, 250]],
+        exit: [980, 244],
+        requiredStars: 4,
+        platforms: [[0, 516, 190, 69], [228, 454, 116, 20], [420, 390, 104, 20], [604, 324, 104, 20], [802, 268, 126, 20], [500, 172, 120, 18]],
+        enemies: [[250, 410, 72, true], [635, 280, 78, true]],
+        items: [["star", 250, 416], ["fish", 444, 352], ["star", 640, 286], ["mouse", 540, 134], ["star", 845, 230], ["yarn", 892, 230]],
+        spikes: [[356, 535, 104, 16], [708, 535, 146, 16]],
+        hazards: [[492, 356, 16, 110, 2.1, "x"], [744, 260, 16, 96, 1.8, "y"]],
+        moving: [[228, 454, 116, 20, 58, 1.2], [420, 390, 104, 20, 70, 1.45, "y"], [604, 324, 104, 20, 76, 1.55]],
+        disappearing: []
+      },
+      {
+        name: "The Endless Mansion Escalation",
+        difficulty: "Expert",
+        palette: ["#101126", "#2a214b", "#744a76"],
+        start: [64, 448],
+        exit: [976, 230],
+        requiredStars: 5,
+        platforms: [[0, 516, 184, 69], [252, 462, 118, 20], [458, 398, 104, 20], [658, 334, 100, 20], [850, 272, 112, 20], [330, 170, 90, 18], [720, 154, 88, 18]],
+        enemies: [[294, 418, 66], [494, 354, 58], [692, 290, 58], [884, 228, 54]],
+        items: [["star", 296, 424], ["fish", 334, 424], ["star", 492, 360], ["mouse", 362, 132], ["star", 694, 296], ["yarn", 754, 116], ["star", 894, 234]],
         spikes: [[196, 535, 72, 18], [578, 535, 292, 18]],
-        moving: [[380, 305, 110, 18, 130, 1.7]],
+        hazards: [[386, 424, 17, 100, 2.2, "x"], [612, 260, 17, 110, 2.4, "y"], [820, 228, 17, 82, 2.7, "x"]],
+        moving: [[252, 462, 118, 20, 88, 1.7], [458, 398, 104, 20, 88, 1.85, "y"], [658, 334, 100, 20, 100, 2.05]],
         disappearing: [[626, 224, 92, 18, 150]]
       },
       {
@@ -137,6 +145,7 @@
     let enemies = [];
     let items = [];
     let spikes = [];
+    let hazards = [];
     let projectiles = [];
     let shockwaves = [];
     let particles = [];
@@ -145,6 +154,7 @@
     let boss = null;
     let score = 0;
     let stars = 0;
+    let roomStars = 0;
     let roomNumber = 1;
     let timerStart = 0;
     let elapsed = 0;
@@ -157,6 +167,9 @@
     let noticeText = "";
     let noticeTimer = 0;
     let shop = null;
+    let roomClearTimer = 0;
+    let roomTransitioning = false;
+    let lastHud = { score: 0, stars: 0, room: 1, sense: "READY" };
 
     function showScreen(name) {
       Object.values(screens).forEach(screen => screen.classList.remove("active"));
@@ -231,9 +244,13 @@
       const base = JSON.parse(JSON.stringify(rooms[index % 4]));
       base.name = `Endless Room ${endlessDifficulty + 1}`;
       base.difficulty = `Endless +${endlessDifficulty}`;
+      base.requiredStars = Math.min(7, 3 + Math.floor(endlessDifficulty / 2));
       base.enemies.push([180 + (endlessDifficulty * 73) % 620, 472, 90]);
-      if (endlessDifficulty % 2 === 1) base.spikes.push([440, 505, 96, 16]);
+      if (endlessDifficulty % 2 === 1) base.spikes.push([440, 535, 96, 16]);
+      base.hazards = base.hazards || [];
+      base.hazards.push([420 + (endlessDifficulty * 67) % 330, 330, 16, 80, 1.6 + endlessDifficulty * 0.45, endlessDifficulty % 2 ? "y" : "x"]);
       base.items.push(["fish", 120 + (endlessDifficulty * 91) % 760, 250 + (endlessDifficulty * 31) % 180]);
+      base.items.push(["star", 260 + (endlessDifficulty * 83) % 580, 170 + (endlessDifficulty * 47) % 260]);
       return base;
     }
 
@@ -246,12 +263,17 @@
       player.vx = 0;
       player.vy = 0;
       player.web = null;
+      roomStars = 0;
+      roomTransitioning = false;
+      roomClearTimer = 0;
       platforms = currentRoom.platforms.map(p => ({ x: p[0], y: p[1], w: p[2], h: p[3], baseX: p[0], baseY: p[1], move: null, vanish: null, solid: true }));
-      currentRoom.moving.forEach(m => platforms.push({ x: m[0], y: m[1], w: m[2], h: m[3], baseX: m[0], baseY: m[1], move: { range: m[4], speed: m[5], t: 0 }, vanish: null, solid: true }));
+      currentRoom.moving.forEach(m => platforms.push({ x: m[0], y: m[1], w: m[2], h: m[3], baseX: m[0], baseY: m[1], move: { range: m[4], speed: m[5], axis: m[6] || "x", t: 0 }, vanish: null, solid: true }));
       currentRoom.disappearing.forEach(d => platforms.push({ x: d[0], y: d[1], w: d[2], h: d[3], baseX: d[0], baseY: d[1], move: null, vanish: { timer: d[4], phase: 0 }, solid: true }));
-      enemies = currentRoom.enemies.map(e => ({ x: e[0], y: e[1], w: 34, h: 34, baseX: e[0], patrol: e[2], vx: e[3] ? 0.65 : 1.05 + roomIndex * 0.15 + endlessDifficulty * 0.04, sleep: !!e[3], dead: false, wobble: Math.random() * 9 }));
+      const hazardSpeed = 1 + (roomNumber * 0.5);
+      enemies = currentRoom.enemies.map(e => ({ x: e[0], y: e[1], w: 34, h: 34, baseX: e[0], patrol: Math.max(36, e[2] - Math.max(0, roomNumber - 3) * 4), vx: e[3] ? 0.65 + roomNumber * 0.05 : 1.05 + roomIndex * 0.15 + endlessDifficulty * 0.04, sleep: !!e[3], dead: false, wobble: Math.random() * 9 }));
       items = currentRoom.items.map(i => ({ type: i[0], x: i[1], y: i[2], w: 24, h: 24, taken: false, bob: Math.random() * 8 }));
       spikes = currentRoom.spikes.map(s => ({ x: s[0], y: s[1], w: s[2], h: s[3] }));
+      hazards = (currentRoom.hazards || []).map(h => ({ x: h[0], y: h[1], r: h[2], baseX: h[0], baseY: h[1], range: h[3], speed: h[4] + hazardSpeed * 0.18, axis: h[5] || "x", t: Math.random() * 6 }));
       shop = roomIndex < rooms.length - 1 ? { x: 54, y: 392, w: 72, h: 88, used: false, item: roomIndex % 2 === 0 ? "Web Boots" : "Heart Charm" } : null;
       projectiles = [];
       shockwaves = [];
@@ -292,6 +314,15 @@
       hud.timerWrap.style.display = selectedMode === "speedrun" ? "inline" : "none";
     }
 
+    function startGameWithWipe() {
+      if (gameState !== "start") return;
+      fade.classList.add("wipe", "on");
+      setTimeout(() => {
+        startGame();
+        fade.classList.remove("wipe", "on");
+      }, 620);
+    }
+
     function transitionFade() {
       fade.classList.add("on");
       setTimeout(() => fade.classList.remove("on"), 360);
@@ -303,8 +334,15 @@
 
       const slow = slowMo > 0 ? 0.2 : 1;
       if (slowMo > 0) slowMo -= dt;
+      if (roomTransitioning) {
+        updateParticles(dt);
+        roomClearTimer = Math.max(0, roomClearTimer - dt);
+        shake = Math.max(0, shake - dt * 0.04);
+        return;
+      }
       updatePlayer(dt);
       updatePlatforms(dt);
+      updateHazards(dt * slow);
       enemies.forEach(enemy => updateEnemy(enemy, dt * slow));
       updateItems();
       updateShop();
@@ -312,6 +350,7 @@
       updateProjectiles(dt * slow);
       updateParticles(dt);
       checkRoomExit();
+      roomClearTimer = Math.max(0, roomClearTimer - dt);
       noticeTimer = Math.max(0, noticeTimer - dt);
       if (selectedMode === "speedrun") elapsed = (performance.now() - timerStart) / 1000;
       shake = Math.max(0, shake - dt * 0.04);
@@ -364,13 +403,9 @@
       player.grounded = false;
       platforms.forEach(p => collidePlatform(p));
       if (player.grounded) player.jumps = 0;
-      spikes.forEach(spike => { if (overlap(player, spike)) hurt(1); });
+      spikes.forEach(spike => { if (overlap(player, spike)) resetPlayer("Sharp trap!"); });
       if (player.y > canvas.height + 80) {
-        hurt(1);
-        player.x = currentRoom.start[0];
-        player.y = currentRoom.start[1];
-        player.vx = 0;
-        player.vy = 0;
+        resetPlayer("Back to the room start!");
       }
       player.invincible = Math.max(0, player.invincible - 1);
       player.flip *= 0.92;
@@ -401,11 +436,25 @@
       platforms.forEach(p => {
         if (p.move) {
           p.move.t += dt * 0.001 * p.move.speed;
-          p.x = p.baseX + Math.sin(p.move.t) * p.move.range;
+          const offset = Math.sin(p.move.t) * p.move.range;
+          if (p.move.axis === "y") p.y = p.baseY + offset;
+          else p.x = p.baseX + offset;
         }
         if (p.vanish) {
           p.vanish.phase += dt * 0.012;
           p.solid = Math.sin(p.vanish.phase / 28) > -0.55;
+        }
+      });
+    }
+
+    function updateHazards(dt) {
+      hazards.forEach(hazard => {
+        hazard.t += dt * 0.001 * hazard.speed;
+        const offset = Math.sin(hazard.t) * hazard.range;
+        if (hazard.axis === "y") hazard.y = hazard.baseY + offset;
+        else hazard.x = hazard.baseX + offset;
+        if (circleRect(hazard, player)) {
+          resetPlayer("Ghost hazard!");
         }
       });
     }
@@ -439,8 +488,10 @@
         }
         if (item.type === "star") {
           stars += 1;
+          roomStars += 1;
           score += 50;
-          showToast("+1 Star");
+          showToast(`Star ${roomStars}/${currentRoom.requiredStars || 0}`);
+          starBurst(item.x + 12, item.y + 12);
         }
         if (item.type === "mouse") {
           score += 130;
@@ -452,7 +503,7 @@
           player.webStamina = 100;
           showToast("Yarn: web stamina refilled");
         }
-        burst(item.x + 12, item.y + 12, item.type === "yarn" ? "#a98cff" : "#ffd166", 16);
+        burst(item.x + 12, item.y + 12, item.type === "yarn" ? "#a98cff" : "#ffd166", item.type === "star" ? 8 : 16);
       });
     }
 
@@ -482,6 +533,19 @@
       toast.classList.add("show");
       clearTimeout(showToast.timer);
       showToast.timer = setTimeout(() => toast.classList.remove("show"), 1300);
+    }
+
+    function resetPlayer(text = "Try again!") {
+      hurt(1);
+      player.x = currentRoom.start[0];
+      player.y = currentRoom.start[1];
+      player.vx = 0;
+      player.vy = 0;
+      player.web = null;
+      shake = 8;
+      noticeText = text;
+      noticeTimer = 900;
+      burst(player.x + 18, player.y + 18, "#ff5570", 18);
     }
 
     function updateBoss(dt) {
@@ -646,12 +710,24 @@
     }
 
     function checkRoomExit() {
+      if (roomTransitioning) return;
       if (player.x + player.w > currentRoom.exit[0] && player.y + player.h > currentRoom.exit[1] - 40) {
+        const needed = currentRoom.requiredStars || 0;
+        if (!currentRoom.boss && roomStars < needed) {
+          noticeText = `Collect ${needed - roomStars} more star${needed - roomStars === 1 ? "" : "s"} to open the portal`;
+          noticeTimer = 1000;
+          player.x = currentRoom.exit[0] - player.w - 16;
+          player.vx = -4;
+          shake = 4;
+          return;
+        }
         if (selectedMode === "endless") {
-          endlessDifficulty += 1;
-          loadRoom((roomIndex + 1) % 4);
+          beginRoomClear(() => {
+            endlessDifficulty += 1;
+            loadRoom((roomIndex + 1) % 4);
+          });
         } else if (roomIndex < rooms.length - 1) {
-          loadRoom(roomIndex + 1);
+          beginRoomClear(() => loadRoom(roomIndex + 1));
         } else if (boss && !boss.defeated) {
           noticeText = "Defeat Nancy first!";
           noticeTimer = 1200;
@@ -659,9 +735,22 @@
           player.vx = -3;
           shake = 5;
         } else {
-          showScreen("ending");
+          beginRoomClear(() => showScreen("ending"));
         }
       }
+    }
+
+    function beginRoomClear(next) {
+      roomTransitioning = true;
+      roomClearTimer = 900;
+      score += 100 + roomNumber * 25;
+      showToast("ROOM CLEAR!");
+      burst(currentRoom.exit[0] + 22, currentRoom.exit[1] + 44, "#7cf4a5", 36);
+      setTimeout(() => fade.classList.add("wipe", "on"), 320);
+      setTimeout(() => {
+        next();
+        fade.classList.remove("wipe", "on");
+      }, 900);
     }
 
     function draw() {
@@ -675,6 +764,7 @@
       drawRoom();
       drawPlatforms();
       drawSpikes();
+      drawHazards();
       drawItems();
       drawShop();
       enemies.forEach(drawEnemy);
@@ -690,6 +780,7 @@
       drawBossBar();
       drawStamina();
       drawNotice();
+      drawRoomClear();
     }
 
     function drawPrologue() {
@@ -1131,22 +1222,28 @@
         ctx.fillText("Shoot gold switches or web-dash Nancy's glasses", 354, 83);
       }
       const finalLocked = roomIndex === rooms.length - 1 && boss && !boss.defeated;
-      ctx.fillStyle = finalLocked ? "rgba(255,85,112,0.65)" : "rgba(124,244,165,0.85)";
+      const starLocked = !currentRoom.boss && roomStars < (currentRoom.requiredStars || 0);
+      ctx.fillStyle = finalLocked || starLocked ? "rgba(255,85,112,0.65)" : "rgba(124,244,165,0.85)";
       roundRect(currentRoom.exit[0], currentRoom.exit[1], 44, 88, 18);
       ctx.fill();
-      ctx.fillStyle = finalLocked ? "#fff6ff" : "#173820";
+      ctx.fillStyle = finalLocked || starLocked ? "#fff6ff" : "#173820";
       ctx.font = "bold 12px monospace";
-      ctx.fillText(finalLocked ? "LOCK" : "EXIT", currentRoom.exit[0] + 7, currentRoom.exit[1] + 48);
+      ctx.fillText(finalLocked || starLocked ? "LOCK" : "EXIT", currentRoom.exit[0] + 7, currentRoom.exit[1] + 48);
+      if (!currentRoom.boss) {
+        ctx.fillStyle = "#fff1b8";
+        ctx.font = "bold 12px Trebuchet MS";
+        ctx.fillText(`${roomStars}/${currentRoom.requiredStars || 0} stars`, currentRoom.exit[0] - 10, currentRoom.exit[1] - 10);
+      }
     }
 
     function drawRoomDecor(name) {
-      if (name.includes("Kitchen")) {
+      if (name.includes("Cozy") || name.includes("Kitchen")) {
         drawCounter(58, 420, 276); drawCounter(690, 420, 252); drawHangingPans();
-      } else if (name.includes("Library")) {
+      } else if (name.includes("Gallery") || name.includes("Library")) {
         for (let x = 60; x < 960; x += 150) drawBookshelf(x, 116);
-      } else if (name.includes("Sleepwalking")) {
+      } else if (name.includes("Vault") || name.includes("Sleepwalking")) {
         drawBeds(); drawCurtains(56, 86); drawCurtains(890, 86);
-      } else if (name.includes("Attic")) {
+      } else if (name.includes("Escalation") || name.includes("Attic") || name.includes("Endless")) {
         drawAtticBeams(); drawCrates(70, 448); drawCrates(850, 448);
       } else {
         drawCurtains(70, 82); drawCurtains(890, 82); drawNancyPortrait(); drawCandle(190, 410); drawCandle(720, 410);
@@ -1275,6 +1372,31 @@
         }
       });
     }
+
+    function drawHazards() {
+      hazards.forEach(hazard => {
+        const pulse = 0.65 + Math.sin(performance.now() / 120 + hazard.t) * 0.25;
+        ctx.save();
+        ctx.shadowBlur = 22;
+        ctx.shadowColor = "#ff8cc6";
+        ctx.fillStyle = `rgba(255, 140, 198, ${0.42 + pulse * 0.28})`;
+        ctx.beginPath();
+        ctx.arc(hazard.x, hazard.y, hazard.r + 6, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.shadowBlur = 0;
+        ctx.fillStyle = "#fff1f7";
+        ctx.beginPath();
+        ctx.arc(hazard.x, hazard.y, hazard.r, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = "#5d315f";
+        ctx.beginPath();
+        ctx.arc(hazard.x - 5, hazard.y - 3, 3, 0, Math.PI * 2);
+        ctx.arc(hazard.x + 5, hazard.y - 3, 3, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      });
+    }
+
     function drawItems() {
       items.forEach(item => {
         if (item.taken) return;
@@ -1407,18 +1529,62 @@
       ctx.textAlign = "left";
       ctx.restore();
     }
+
+    function drawRoomClear() {
+      if (gameState !== "game" || roomClearTimer <= 0) return;
+      const progress = 1 - roomClearTimer / 900;
+      const scale = 0.7 + Math.sin(progress * Math.PI) * 0.38;
+      ctx.save();
+      ctx.globalAlpha = Math.sin(progress * Math.PI);
+      ctx.translate(canvas.width / 2, canvas.height / 2);
+      ctx.scale(scale, scale);
+      ctx.fillStyle = "rgba(7,8,22,0.48)";
+      roundRect(-205, -54, 410, 108, 26);
+      ctx.fill();
+      ctx.strokeStyle = "rgba(124,244,165,0.72)";
+      ctx.lineWidth = 4;
+      roundRect(-205, -54, 410, 108, 26);
+      ctx.stroke();
+      ctx.fillStyle = "#fff1b8";
+      ctx.font = "900 46px Trebuchet MS";
+      ctx.textAlign = "center";
+      ctx.fillText("ROOM CLEAR!", 0, 15);
+      ctx.restore();
+    }
+
     function drawParticles() {
       particles.forEach(p => {
         ctx.globalAlpha = Math.max(0, p.life / p.max);
         ctx.fillStyle = p.color;
+        ctx.shadowBlur = p.glow || 0;
+        ctx.shadowColor = p.color;
         ctx.fillRect(p.x, p.y, p.size, p.size);
       });
+      ctx.shadowBlur = 0;
       ctx.globalAlpha = 1;
     }
 
     function burst(x, y, color, count) {
       for (let i = 0; i < count; i += 1) {
         particles.push({ x, y, vx: (Math.random() - 0.5) * 6, vy: (Math.random() - 0.8) * 6, life: 34, max: 34, color, size: 3 + Math.random() * 4 });
+      }
+    }
+
+    function starBurst(x, y) {
+      for (let i = 0; i < 28; i += 1) {
+        const angle = (Math.PI * 2 * i) / 28;
+        const speed = 2.2 + Math.random() * 4.6;
+        particles.push({
+          x,
+          y,
+          vx: Math.cos(angle) * speed,
+          vy: Math.sin(angle) * speed,
+          life: 38 + Math.random() * 16,
+          max: 54,
+          color: i % 3 === 0 ? "#fff1b8" : i % 3 === 1 ? "#ffd166" : "#7cf4a5",
+          size: 2 + Math.random() * 4,
+          glow: 14
+        });
       }
     }
     function updateParticles(dt) {
@@ -1433,13 +1599,33 @@
         span.textContent = i < player.health ? "HP" : "--";
         hud.hearts.appendChild(span);
       }
-      hud.score.textContent = score;
-      hud.stars.textContent = stars;
-      hud.room.textContent = roomNumber;
+      setHudValue(hud.score, score, "score");
+      setHudValue(hud.stars, `${stars} (${roomStars}/${currentRoom.requiredStars || 0})`, "stars");
+      setHudValue(hud.room, roomNumber, "room");
       hud.modeName.textContent = selectedMode === "classic" ? "Classic" : selectedMode === "speedrun" ? "Speedrun" : "Endless";
       hud.timer.textContent = elapsed.toFixed(3);
       hud.sense.textContent = `Spidey Sense: ${senseUsed ? "USED" : "READY"}`;
       hud.sense.className = `badge ${senseUsed ? "used" : "ready"}`;
+      const senseState = senseUsed ? "USED" : "READY";
+      if (lastHud.sense !== senseState) pulseHud(hud.sense);
+      lastHud.sense = senseState;
+    }
+
+    function setHudValue(el, value, key) {
+      const text = String(value);
+      if (String(lastHud[key]) !== text) {
+        el.textContent = text;
+        pulseHud(el);
+        lastHud[key] = text;
+      } else if (el.textContent !== text) {
+        el.textContent = text;
+      }
+    }
+
+    function pulseHud(el) {
+      el.classList.remove("hud-pop");
+      void el.offsetWidth;
+      el.classList.add("hud-pop");
     }
 
     function overlap(a, b) {
@@ -1462,7 +1648,7 @@
       requestAnimationFrame(loop);
     }
 
-    document.getElementById("startButton").addEventListener("click", startGame);
+    document.getElementById("startButton").addEventListener("click", startGameWithWipe);
     document.getElementById("continueEnding").addEventListener("click", () => {
       modal.classList.remove("show");
       showScreen("ending");
