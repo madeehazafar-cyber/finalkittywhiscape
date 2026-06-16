@@ -6,6 +6,12 @@ const ctx = canvas.getContext("2d");
 const menu = document.getElementById("menu");
 const playButton = document.getElementById("playButton");
 const editorButton = document.getElementById("editorButton");
+const levelSelect = document.getElementById("levelSelect");
+const levelMap = document.getElementById("levelMap");
+const backToMenu = document.getElementById("backToMenu");
+const pauseMenu = document.getElementById("pauseMenu");
+const continueButton = document.getElementById("continueButton");
+const quitButton = document.getElementById("quitButton");
 const levelEditor = document.getElementById("levelEditor");
 const closeEditor = document.getElementById("closeEditor");
 const levelJson = document.getElementById("levelJson");
@@ -30,7 +36,10 @@ let shake = 0;
 let message = "";
 let messageTimer = 0;
 let fishFound = new Set();
+let levelStartFishFound = new Set();
 let gameWon = false;
+let unlockedLevels = 1;
+let paused = false;
 
 const player = {
   x: 0,
@@ -60,76 +69,75 @@ const LEVELS = [
     id: "kitchen",
     name: "Kitchen Tutorial",
     theme: "kitchen",
-    width: 3200,
+    width: 3300,
     height: 1080,
-    start: [120, 770],
-    exit: [3020, 730],
-    prompt: "Collect yarn, look ahead for glowing yarn icons, then press E or Right Mouse to cross gaps.",
-    platforms: [
-      [0, 920, 760, 160], [860, 920, 470, 160], [1420, 920, 480, 160], [2000, 920, 500, 160], [2580, 920, 620, 160],
-      [420, 790, 260, 34], [820, 770, 210, 34], [1160, 740, 240, 34], [1510, 690, 260, 34], [1900, 760, 240, 34], [2250, 700, 260, 34], [2680, 780, 260, 34],
-      [980, 610, 190, 30], [1370, 520, 210, 30], [2380, 560, 210, 30]
+    start: [110, 770],
+    exit: [3120, 730],
+    prompt: "Follow the mansion notes: move, double jump, then grapple across the glowing yarn gaps.",
+    tutorials: [
+      { x: 150, text: "Press A/D to move." },
+      { x: 620, text: "Press W to jump. Press W again to double jump!" },
+      { x: 1260, text: "See the glowing yarn? Stand near it. Press E or Right Mouse Button to shoot your yarn and grapple across!" },
+      { x: 2080, text: "Practice: use yarn points to cross these safe gaps." }
     ],
-    stars: [[520, 742], [1540, 642], [2400, 512]],
-    yarn: [[230, 870], [720, 870], [940, 720], [1230, 690], [1790, 870], [2150, 710], [2500, 510], [2860, 730]],
-    fishCrates: [[580, 724], [2480, 514]],
-    enemies: [],
-    webPoints: [[720, 650], [980, 640], [1320, 600], [1680, 570], [2020, 610], [2380, 560], [2720, 650], [1580, 250, "chandelier"]]
+    platforms: [
+      [0, 920, 900, 160], [1080, 920, 420, 160], [1700, 920, 420, 160], [2320, 920, 420, 160], [2940, 920, 360, 160],
+      [380, 790, 280, 34], [780, 760, 240, 34], [1220, 720, 260, 34], [1820, 730, 260, 34], [2440, 740, 260, 34],
+      [1420, 590, 210, 30], [2040, 600, 210, 30], [2660, 610, 210, 30]
+    ],
+    stars: [[520, 742], [1430, 672], [2670, 562]],
+    yarn: [[250, 870], [760, 870], [1110, 870], [1360, 672], [1700, 870], [1980, 552], [2320, 870], [2600, 562], [2960, 870]],
+    fishCrates: [[580, 724], [2720, 564]],
+    enemies: [[2580, 884, 70]],
+    webPoints: [[1040, 670], [1320, 630], [1620, 650], [1940, 540], [2240, 650], [2560, 550], [2880, 650]]
+  },
+  {
+    id: "ballroom",
+    name: "Ballroom Timing",
+    theme: "ballroom",
+    width: 3600,
+    height: 1180,
+    start: [100, 860],
+    exit: [3400, 700],
+    prompt: "Ballroom: time your jumps around slow enemies, then use clear grapple shots to reach the balcony.",
+    platforms: [
+      [0, 1010, 680, 170], [820, 1010, 480, 170], [1460, 960, 460, 220], [2080, 900, 460, 280], [2720, 900, 420, 280], [3280, 840, 320, 340],
+      [420, 820, 270, 34], [900, 730, 270, 34], [1380, 650, 270, 34], [1880, 570, 270, 34], [2380, 620, 270, 34], [2880, 720, 270, 34]
+    ],
+    stars: [[440, 774], [1900, 524], [2920, 672]],
+    yarn: [[240, 960], [700, 960], [1000, 684], [1500, 604], [2000, 524], [2500, 574], [3000, 674], [3340, 790]],
+    fishCrates: [[1260, 964], [2860, 674]],
+    enemies: [[900, 974, 90], [2120, 864, 95], [2920, 864, 90]],
+    webPoints: [[760, 690], [1180, 600], [1640, 520], [2140, 470], [2640, 540], [3100, 640], [3380, 600]]
   },
   {
     id: "library",
     name: "Library of Shadow",
     theme: "library",
-    width: 3600,
+    width: 3900,
     height: 1280,
     start: [110, 970],
-    exit: [3400, 450],
-    prompt: "Library: use two clear grapple shots, then pull shelves down when Shadow's glowing eyes pass below.",
+    exit: [3700, 820],
+    prompt: "Shadow can only be beaten by dropping a bookshelf, then hitting the stunned boss with 3 yarn balls.",
     platforms: [
-      [0, 1120, 620, 160], [720, 1120, 470, 160], [1280, 1050, 430, 230], [1800, 980, 420, 300], [2320, 890, 400, 390], [2820, 760, 360, 520], [3260, 650, 340, 630],
-      [520, 930, 250, 34], [880, 840, 260, 34], [1240, 740, 260, 34], [1640, 640, 260, 34], [2040, 540, 260, 34], [2460, 600, 260, 34], [2880, 540, 250, 34], [3190, 470, 230, 34],
-      [1500, 990, 180, 30], [1960, 880, 190, 30], [2360, 780, 190, 30]
+      [0, 1120, 620, 160], [1120, 1120, 430, 160], [1980, 1120, 450, 160], [2820, 1120, 460, 160], [3500, 1040, 400, 240],
+      [520, 900, 240, 34], [1110, 780, 240, 34], [1480, 660, 240, 34], [1910, 790, 240, 34], [2320, 920, 240, 34],
+      [2840, 820, 250, 34], [3260, 720, 250, 34], [3600, 880, 230, 34],
+      [1480, 1000, 220, 30], [2040, 1000, 220, 30], [2600, 1000, 220, 30]
     ],
-    stars: [[560, 884], [1680, 594], [2910, 492]],
-    yarn: [[300, 1070], [760, 1070], [1010, 792], [1360, 692], [1780, 592], [2180, 492], [2580, 552], [3040, 492]],
-    fishCrates: [[1580, 944]],
-    enemies: [[1840, 944, 90], [2860, 724, 95]],
-    webPoints: [[660, 800], [980, 730], [1320, 640], [1700, 530], [2080, 450], [2480, 500], [2860, 430], [3220, 360], [3400, 350]],
-    shelves: [[1720, 450], [2200, 390], [2620, 500]],
+    stars: [[540, 854], [1500, 614], [3280, 674]],
+    yarn: [[280, 1070], [640, 854], [1040, 1070], [1210, 734], [1600, 614], [2040, 1070], [2260, 1070], [2880, 1070], [3160, 774], [3540, 990]],
+    fishCrates: [[1550, 954]],
+    enemies: [[2040, 1084, 85], [2920, 1084, 90]],
+    webPoints: [[850, 720], [1160, 650], [1420, 540], [1760, 660], [2180, 760], [2560, 840], [3060, 690], [3440, 610], [3700, 720]],
+    shelves: [[1500, 790], [2060, 790], [2620, 790]],
+    shelfWebPoints: [[1560, 700], [2120, 700], [2680, 700]],
     boss: {
       type: "shadow",
       name: "Shadow",
-      x: 2380,
-      y: 846,
-      arena: [1980, 360, 780, 560],
-      hp: 3
-    }
-  },
-  {
-    id: "ballroom",
-    name: "Duchess' Ballroom",
-    theme: "ballroom",
-    width: 3800,
-    height: 1180,
-    start: [100, 860],
-    exit: [3600, 650],
-    prompt: "Ballroom: land safely after each grapple, then lure Duchess near the mirror before smashing it.",
-    platforms: [
-      [0, 1010, 610, 170], [720, 1010, 460, 170], [1300, 950, 440, 230], [1840, 880, 430, 300], [2380, 830, 420, 350], [2920, 930, 360, 250], [3360, 820, 440, 360],
-      [360, 810, 260, 34], [760, 710, 260, 34], [1180, 610, 270, 34], [1620, 520, 270, 34], [2060, 500, 270, 34], [2480, 590, 270, 34], [2920, 700, 270, 34], [3260, 620, 260, 34]
-    ],
-    stars: [[420, 764], [1660, 474], [2940, 652]],
-    yarn: [[240, 960], [650, 960], [900, 664], [1320, 564], [1760, 474], [2180, 454], [2600, 544], [3060, 654], [3440, 774]],
-    fishCrates: [[1350, 884], [3260, 574]],
-    enemies: [[1880, 844, 85], [2920, 894, 80]],
-    webPoints: [[650, 680], [980, 600], [1360, 500], [1740, 420], [2160, 400], [2580, 480], [3000, 590], [3320, 510], [3580, 500]],
-    mirror: [3140, 690],
-    boss: {
-      type: "duchess",
-      name: "Duchess",
-      x: 2940,
-      y: 858,
-      arena: [2660, 470, 680, 500],
+      x: 3180,
+      y: 1066,
+      arena: [900, 760, 2500, 360],
       hp: 3
     }
   },
@@ -184,6 +192,79 @@ const LEVELS = [
 
 const TOTAL_FISH = LEVELS.reduce((sum, l) => sum + l.fishCrates.length, 0);
 let objects = {};
+unlockedLevels = readUnlockedLevels();
+
+function readUnlockedLevels() {
+  const saved = Number(localStorage.getItem("kittyWhiscapeUnlocked") || "1");
+  return Math.max(1, Math.min(LEVELS?.length || 5, Number.isFinite(saved) ? saved : 1));
+}
+
+function saveUnlockedLevels(count) {
+  unlockedLevels = Math.max(unlockedLevels, Math.min(LEVELS.length, count));
+  localStorage.setItem("kittyWhiscapeUnlocked", String(unlockedLevels));
+}
+
+function hidePanels() {
+  menu.hidden = true;
+  levelSelect.hidden = true;
+  pauseMenu.hidden = true;
+  levelEditor.hidden = true;
+}
+
+function showMainMenu() {
+  running = false;
+  paused = false;
+  hidePanels();
+  menu.hidden = false;
+}
+
+function showLevelSelect() {
+  running = false;
+  paused = false;
+  player.grapple = null;
+  hidePanels();
+  renderLevelSelect();
+  levelSelect.hidden = false;
+}
+
+function renderLevelSelect() {
+  levelMap.innerHTML = "";
+  LEVELS.forEach((room, index) => {
+    const button = document.createElement("button");
+    const unlocked = index < unlockedLevels;
+    button.type = "button";
+    button.className = `room-button ${unlocked ? "unlocked" : "locked"}`;
+    button.disabled = !unlocked;
+    button.innerHTML = `<strong>${index + 1}. ${room.name}</strong><span>${unlocked ? room.prompt : "Locked"}</span>`;
+    button.addEventListener("click", () => startLevel(index));
+    levelMap.appendChild(button);
+  });
+}
+
+function startLevel(index) {
+  if (index >= unlockedLevels) return;
+  hidePanels();
+  paused = false;
+  running = true;
+  levelStartFishFound = new Set(fishFound);
+  resetLevel(index);
+}
+
+function quitToLevelSelect() {
+  fishFound = new Set(levelStartFishFound);
+  showLevelSelect();
+}
+
+function setPaused(value) {
+  if (!running && !paused) return;
+  paused = value;
+  pauseMenu.hidden = !paused;
+  if (paused) {
+    keys.clear();
+    player.grapple = null;
+    say("Paused");
+  }
+}
 
 function cloneLevel(source) {
   return JSON.parse(JSON.stringify(source));
@@ -205,7 +286,10 @@ function resetLevel(index = levelIndex) {
       id: `${levelIndex}:${index}`
     })),
     enemies: level.enemies.map(([x, y, patrol]) => ({ x, y, w: 42, h: 36, baseX: x, patrol, vx: 1.3, alive: true })),
-    webPoints: level.webPoints.map(([x, y, kind = "normal"]) => ({ x, y, kind, used: false, glow: 0 })),
+    webPoints: [
+      ...level.webPoints.map(([x, y, kind = "normal"]) => ({ x, y, kind, used: false, glow: 0 })),
+      ...(level.shelfWebPoints || []).map(([x, y], index) => ({ x, y, kind: "shelf", shelfIndex: index, used: false, glow: 0 }))
+    ],
     shelves: (level.shelves || []).map(([x, y]) => ({ x, y, w: 120, h: 190, falling: false, vy: 0, spent: false })),
     crystals: (level.crystals || []).map(([x, y]) => ({ x, y, r: 24, charged: true })),
     projectiles: [],
@@ -250,6 +334,7 @@ function makeBoss(data) {
     defeated: false,
     chargeDir: -1,
     hits: 0,
+    shelfStuns: 0,
     visibleIndex: 0,
     orbTimer: 1.2
   };
@@ -445,10 +530,12 @@ function updateEnemies(dt) {
       shelf.vy += 0.9;
       shelf.y += shelf.vy;
       if (objects.boss && objects.boss.type === "shadow" && !objects.boss.defeated && rectsOverlap(shelf, objects.boss)) {
-        damageBoss(1, "The shelf crushed the real Shadow!");
+        objects.boss.stunned = 6;
+        objects.boss.shelfStuns += 1;
         shelf.spent = true;
         shelf.falling = false;
         puff(shelf.x + shelf.w / 2, shelf.y + shelf.h / 2, "#c084fc", 24);
+        say("Bookshelf slam! Shadow is stunned. Hit him with 3 yarn balls!");
       }
       if (shelf.y > level.height) shelf.spent = true;
     }
@@ -492,8 +579,29 @@ function updateWhiskers(boss, dt) {
 }
 
 function updateShadow(boss, dt) {
+  if (boss.stunned > 0) return;
+  const left = boss.arena[0];
+  const right = boss.arena[0] + boss.arena[2] - boss.w;
+  const playerInRange = player.x > left - 160 && player.x < right + 160;
+  if (playerInRange) {
+    const dir = player.x + player.w / 2 < boss.x + boss.w / 2 ? -1 : 1;
+    boss.vx += dir * 0.18;
+  } else {
+    boss.vx += (boss.chargeDir || 1) * 0.08;
+  }
+  boss.vx = Math.max(-4.1, Math.min(4.1, boss.vx));
   boss.x += boss.vx;
-  if (boss.x < boss.arena[0] || boss.x > boss.arena[0] + boss.arena[2] - boss.w) boss.vx *= -1;
+  boss.vx *= 0.94;
+  if (boss.x <= left) {
+    boss.x = left;
+    boss.chargeDir = 1;
+    boss.vx = Math.abs(boss.vx);
+  }
+  if (boss.x >= right) {
+    boss.x = right;
+    boss.chargeDir = -1;
+    boss.vx = -Math.abs(boss.vx);
+  }
   if (boss.timer <= 0) {
     boss.visibleIndex = (boss.visibleIndex + 1) % 3;
     boss.timer = 1.2;
@@ -548,7 +656,7 @@ function damageBoss(amount, text) {
 }
 
 function fireYarn() {
-  if (!running || gameWon) return;
+  if (!running || paused || gameWon) return;
   if (player.grapple) {
     player.grapple = null;
     return;
@@ -566,6 +674,10 @@ function fireYarn() {
   }
   player.yarn -= 1;
   if (target.type === "web") {
+    if (target.obj.kind === "shelf") {
+      dropShelf(objects.shelves[target.obj.shelfIndex]);
+      return;
+    }
     player.grapple = { point: target.obj, time: 2.2 };
     puff(target.obj.x, target.obj.y, "#ff9ecb", 14);
     if (target.obj.kind === "chandelier") dropWhiskersChandelier(target.obj);
@@ -575,6 +687,7 @@ function fireYarn() {
   if (target.type === "shelf") dropShelf(target.obj);
   if (target.type === "mirror") smashMirror();
   if (target.type === "duchess") hitDuchess();
+  if (target.type === "shadow") hitShadow();
   if (target.type === "crystal") reflectNancyOrb(target.obj);
 }
 
@@ -586,9 +699,6 @@ function nearestInteractive(px, py) {
   for (const crate of objects.crates) {
     if (!crate.broken) choices.push({ type: "crate", obj: crate, d: distance(px, py, crate.x + 22, crate.y + 22), limit: 230 });
   }
-  for (const shelf of objects.shelves) {
-    if (!shelf.spent) choices.push({ type: "shelf", obj: shelf, d: distance(px, py, shelf.x + shelf.w / 2, shelf.y + 20), limit: 420 });
-  }
   if (objects.mirror && !objects.mirror.broken) {
     const m = objects.mirror;
     choices.push({ type: "mirror", obj: m, d: distance(px, py, m.x + m.w / 2, m.y + m.h / 2), limit: 360 });
@@ -596,6 +706,10 @@ function nearestInteractive(px, py) {
   if (objects.boss && objects.boss.type === "duchess" && objects.boss.stunned > 0 && !objects.boss.defeated) {
     const b = objects.boss;
     choices.push({ type: "duchess", obj: b, d: distance(px, py, b.x + b.w / 2, b.y + b.h / 2), limit: 360 });
+  }
+  if (objects.boss && objects.boss.type === "shadow" && objects.boss.stunned > 0 && !objects.boss.defeated) {
+    const b = objects.boss;
+    choices.push({ type: "shadow", obj: b, d: distance(px, py, b.x + b.w / 2, b.y + b.h / 2), limit: 380 });
   }
   for (const crystal of objects.crystals) {
     if (crystal.charged) choices.push({ type: "crystal", obj: crystal, d: distance(px, py, crystal.x, crystal.y), limit: 420 });
@@ -619,9 +733,14 @@ function dropShelf(shelf) {
     say("That shelf rattled, but nothing happened.");
     return;
   }
+  if (!shelf || shelf.spent || shelf.falling) {
+    say("That bookshelf has already fallen.");
+    return;
+  }
   shelf.falling = true;
   shelf.vy = 2;
-  say("Shelf falling! Aim it at the real Shadow.");
+  puff(shelf.x + shelf.w / 2, shelf.y + 20, "#c084fc", 14);
+  say("Bookshelf falling! Lure Shadow directly underneath.");
 }
 
 function smashMirror() {
@@ -642,6 +761,17 @@ function hitDuchess() {
   if (objects.boss?.type === "duchess" && objects.boss.stunned > 0) {
     damageBoss(1, "Yarn hit!");
   }
+}
+
+function hitShadow() {
+  const boss = objects.boss;
+  if (!boss || boss.type !== "shadow" || boss.defeated) return;
+  if (boss.stunned <= 0) {
+    say("Shadow shrugs it off. Drop a bookshelf on him first!");
+    return;
+  }
+  damageBoss(1, "Yarn hit the stunned Shadow!");
+  boss.stunned = Math.max(boss.stunned, 2.2);
 }
 
 function reflectNancyOrb(crystal) {
@@ -685,7 +815,9 @@ function swingNancyChandelier(point) {
 
 function nextLevel() {
   if (levelIndex < LEVELS.length - 1) {
-    resetLevel(levelIndex + 1);
+    saveUnlockedLevels(levelIndex + 2);
+    say(`${LEVELS[levelIndex + 1].name} unlocked!`);
+    showLevelSelect();
   } else {
     winGame();
   }
@@ -694,6 +826,7 @@ function nextLevel() {
 function winGame() {
   gameWon = true;
   running = false;
+  saveUnlockedLevels(LEVELS.length);
   say(`Nancy defeated. Hidden fish found: ${fishFound.size}/${TOTAL_FISH}.`, 9);
 }
 
@@ -705,7 +838,7 @@ function updateCamera() {
 }
 
 function update(dt) {
-  if (!running) return;
+  if (!running || paused) return;
   messageTimer -= dt;
   shake = Math.max(0, shake - dt * 30);
   updatePlayer(dt);
@@ -775,6 +908,7 @@ function drawBackground() {
 
 function drawWorld() {
   drawRoomDecor();
+  drawTutorialPrompts();
   for (const p of objects.platforms) drawPlatform(p);
   drawExit();
   for (const crate of objects.crates) if (!crate.broken) drawCrate(crate);
@@ -795,6 +929,28 @@ function drawWorld() {
     ctx.fillRect(p.x, p.y, 5, 5);
     ctx.globalAlpha = 1;
   }
+}
+
+function drawTutorialPrompts() {
+  if (!level.tutorials) return;
+  ctx.font = "bold 19px Trebuchet MS";
+  ctx.textAlign = "center";
+  for (const note of level.tutorials) {
+    const visible = Math.abs((player.x + player.w / 2) - note.x) < 520;
+    ctx.globalAlpha = visible ? 1 : 0.38;
+    const w = Math.min(520, 90 + note.text.length * 8.6);
+    const x = note.x;
+    const y = 585;
+    ctx.fillStyle = "rgba(18, 10, 13, 0.78)";
+    ctx.fillRect(x - w / 2, y - 40, w, 54);
+    ctx.strokeStyle = "rgba(247, 199, 109, 0.72)";
+    ctx.lineWidth = 3;
+    ctx.strokeRect(x - w / 2, y - 40, w, 54);
+    ctx.fillStyle = "#fff4c2";
+    ctx.fillText(note.text, x, y - 8);
+  }
+  ctx.globalAlpha = 1;
+  ctx.textAlign = "left";
 }
 
 function drawRoomDecor() {
@@ -1065,13 +1221,15 @@ function loop(now) {
 }
 
 function startGame() {
-  menu.hidden = true;
+  hidePanels();
   fishFound = new Set();
-  running = true;
-  resetLevel(0);
+  showLevelSelect();
 }
 
 playButton.addEventListener("click", startGame);
+backToMenu.addEventListener("click", showMainMenu);
+continueButton.addEventListener("click", () => setPaused(false));
+quitButton.addEventListener("click", quitToLevelSelect);
 editorButton.addEventListener("click", () => {
   levelJson.value = JSON.stringify(LEVELS, null, 2);
   levelEditor.hidden = false;
@@ -1095,6 +1253,12 @@ window.addEventListener("mousedown", e => {
 });
 window.addEventListener("keydown", e => {
   const key = e.key.toLowerCase();
+  if (key === "escape") {
+    e.preventDefault();
+    if (running || paused) setPaused(!paused);
+    return;
+  }
+  if (paused) return;
   keys.add(key);
   if (["arrowup", "arrowdown", "arrowleft", "arrowright", " "].includes(e.key)) e.preventDefault();
   if (key === "w" || key === "arrowup" || key === " ") player.jumpBuffer = 0.16;
@@ -1106,4 +1270,5 @@ window.addEventListener("keyup", e => keys.delete(e.key.toLowerCase()));
 resizeCanvas();
 resetLevel(0);
 running = false;
+renderLevelSelect();
 requestAnimationFrame(loop);

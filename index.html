@@ -10,14 +10,29 @@
   <main class="app">
     <canvas id="gameCanvas" width="1280" height="720" aria-label="Kitty Whiscape canvas game"></canvas>
 
-    <section id="menu" class="panel menu">
+    <section id="menu" class="panel menu mansion-panel">
       <h1>Kitty Whiscape</h1>
-      <p>Nancy's mansion has grown into a maze of rooms, bosses, hidden fish, and glowing yarn anchors. Collect yarn balls, grapple to web points, and rescue Kitty from the attic.</p>
-      <button id="playButton" type="button">Play</button>
+      <p>Nancy's mansion waits in velvet shadows. Guide Kitty through locked rooms, haunted platforms, and yarn-lit secrets.</p>
+      <button id="playButton" type="button">Start Game</button>
       <button id="editorButton" type="button">Level Data</button>
     </section>
 
-    <section id="levelEditor" class="panel editor" hidden>
+    <section id="levelSelect" class="panel level-select mansion-panel" hidden>
+      <div class="editor-head">
+        <h2>Nancy's Mansion</h2>
+        <button id="backToMenu" type="button">Main Menu</button>
+      </div>
+      <p>Choose an unlocked room. Completing a room unlocks the next door.</p>
+      <div id="levelMap" class="level-map" aria-label="Nancy's mansion level map"></div>
+    </section>
+
+    <section id="pauseMenu" class="panel pause-menu mansion-panel" hidden>
+      <h2>Paused</h2>
+      <button id="continueButton" type="button">Continue</button>
+      <button id="quitButton" type="button">Quit to Level Select</button>
+    </section>
+
+    <section id="levelEditor" class="panel editor mansion-panel" hidden>
       <div class="editor-head">
         <h2>Editable Level JSON</h2>
         <button id="closeEditor" type="button">Close</button>
