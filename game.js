@@ -118,7 +118,7 @@ const LEVELS = [
     height: 1280,
     start: [110, 970],
     exit: [3700, 820],
-    prompt: "Shadow can only be beaten by dropping a bookshelf, then hitting the stunned boss with 3 yarn balls.",
+    prompt: "Shadow is the only real threat here. Lure him under each shelf and drop all three bookshelves to defeat him.",
     platforms: [
       [0, 1120, 620, 160], [1120, 1120, 430, 160], [1980, 1120, 450, 160], [2820, 1120, 460, 160], [3500, 1040, 400, 240],
       [520, 900, 240, 34], [1110, 780, 240, 34], [1480, 660, 240, 34], [1910, 790, 240, 34], [2320, 920, 240, 34],
@@ -290,7 +290,7 @@ function resetLevel(index = levelIndex) {
       ...level.webPoints.map(([x, y, kind = "normal"]) => ({ x, y, kind, used: false, glow: 0 })),
       ...(level.shelfWebPoints || []).map(([x, y], index) => ({ x, y, kind: "shelf", shelfIndex: index, used: false, glow: 0 }))
     ],
-    shelves: (level.shelves || []).map(([x, y]) => ({ x, y, w: 120, h: 190, falling: false, vy: 0, spent: false })),
+    shelves: (level.shelves || []).map(([x, y]) => ({ x, y, startY: y, w: 120, h: 190, falling: false, vy: 0, spent: false })),
     crystals: (level.crystals || []).map(([x, y]) => ({ x, y, r: 24, charged: true })),
     projectiles: [],
     particles: []
@@ -532,12 +532,24 @@ function updateEnemies(dt) {
       if (objects.boss && objects.boss.type === "shadow" && !objects.boss.defeated && rectsOverlap(shelf, objects.boss)) {
         objects.boss.stunned = 6;
         objects.boss.shelfStuns += 1;
+        objects.boss.hp -= 1;
         shelf.spent = true;
         shelf.falling = false;
         puff(shelf.x + shelf.w / 2, shelf.y + shelf.h / 2, "#c084fc", 24);
-        say("Bookshelf slam! Shadow is stunned. Hit him with 3 yarn balls!");
+        if (objects.boss.hp <= 0) {
+          objects.boss.defeated = true;
+          puff(objects.boss.x + objects.boss.w / 2, objects.boss.y + objects.boss.h / 2, "#fff2a8", 50);
+          say("All three bookshelves crushed Shadow! The exit is open.");
+        } else {
+          say(`Bookshelf slam! Shadow HP: ${objects.boss.hp}/3`);
+        }
       }
-      if (shelf.y > level.height) shelf.spent = true;
+      if (shelf.y > level.height) {
+        shelf.y = shelf.startY;
+        shelf.vy = 0;
+        shelf.falling = false;
+        say("The bookshelf missed. Try luring Shadow underneath again.");
+      }
     }
   }
   for (const p of objects.projectiles) {
@@ -687,13 +699,13 @@ function fireYarn() {
   if (target.type === "shelf") dropShelf(target.obj);
   if (target.type === "mirror") smashMirror();
   if (target.type === "duchess") hitDuchess();
-  if (target.type === "shadow") hitShadow();
   if (target.type === "crystal") reflectNancyOrb(target.obj);
 }
 
 function nearestInteractive(px, py) {
   const choices = [];
   for (const point of objects.webPoints) {
+    if (point.kind === "shelf" && (objects.shelves[point.shelfIndex]?.spent || objects.shelves[point.shelfIndex]?.falling)) continue;
     choices.push({ type: "web", obj: point, d: distance(px, py, point.x, point.y), limit: 370 });
   }
   for (const crate of objects.crates) {
@@ -706,10 +718,6 @@ function nearestInteractive(px, py) {
   if (objects.boss && objects.boss.type === "duchess" && objects.boss.stunned > 0 && !objects.boss.defeated) {
     const b = objects.boss;
     choices.push({ type: "duchess", obj: b, d: distance(px, py, b.x + b.w / 2, b.y + b.h / 2), limit: 360 });
-  }
-  if (objects.boss && objects.boss.type === "shadow" && objects.boss.stunned > 0 && !objects.boss.defeated) {
-    const b = objects.boss;
-    choices.push({ type: "shadow", obj: b, d: distance(px, py, b.x + b.w / 2, b.y + b.h / 2), limit: 380 });
   }
   for (const crystal of objects.crystals) {
     if (crystal.charged) choices.push({ type: "crystal", obj: crystal, d: distance(px, py, crystal.x, crystal.y), limit: 420 });
@@ -761,17 +769,6 @@ function hitDuchess() {
   if (objects.boss?.type === "duchess" && objects.boss.stunned > 0) {
     damageBoss(1, "Yarn hit!");
   }
-}
-
-function hitShadow() {
-  const boss = objects.boss;
-  if (!boss || boss.type !== "shadow" || boss.defeated) return;
-  if (boss.stunned <= 0) {
-    say("Shadow shrugs it off. Drop a bookshelf on him first!");
-    return;
-  }
-  damageBoss(1, "Yarn hit the stunned Shadow!");
-  boss.stunned = Math.max(boss.stunned, 2.2);
 }
 
 function reflectNancyOrb(crystal) {
@@ -1096,18 +1093,8 @@ function drawProjectile(p) {
 }
 
 function drawBoss(b) {
-  if (b.type === "shadow") {
-    for (let i = 0; i < 3; i++) {
-      const ghostX = b.arena[0] + 120 + i * 230 + Math.sin(performance.now() / 300 + i) * 20;
-      ctx.globalAlpha = i === b.visibleIndex ? 1 : 0.38;
-      drawBossBody({ ...b, x: i === b.visibleIndex ? b.x : ghostX, y: b.y }, i === b.visibleIndex ? "#0f172a" : "#1e293b", i === b.visibleIndex);
-    }
-    ctx.globalAlpha = 1;
-  } else {
-    const color = b.type === "whiskers" ? "#f97316" : b.type === "duchess" ? "#ec4899" : "#7c3aed";
-    drawBossBody(b, color, true);
-  }
-  drawBossBar(b);
+  const color = b.type === "shadow" ? "#0f172a" : b.type === "whiskers" ? "#f97316" : b.type === "duchess" ? "#ec4899" : "#7c3aed";
+  drawBossBody(b, color, true);
 }
 
 function drawBossBody(b, color, eyes) {
@@ -1124,15 +1111,19 @@ function drawBossBody(b, color, eyes) {
 
 function drawBossBar(b) {
   const max = b.type === "nancy" && b.phase === 2 ? 5 : b.type === "nancy" ? 8 : b.type === "whiskers" ? 1 : 3;
-  const x = b.arena[0] + 20;
-  const y = b.arena[1] + 20;
+  const x = 34;
+  const y = 108;
+  const label = b.type === "shadow" ? `Shadow HP: ${Math.max(0, b.hp)}/3 bookshelves` : `${b.name}${b.type === "nancy" ? ` Phase ${b.phase}` : ""} HP`;
   ctx.fillStyle = "rgba(0,0,0,0.5)";
-  ctx.fillRect(x, y, 260, 20);
+  ctx.fillRect(x, y, 330, 22);
   ctx.fillStyle = "#ff5d73";
-  ctx.fillRect(x, y, 260 * Math.max(0, b.hp / max), 20);
+  ctx.fillRect(x, y, 330 * Math.max(0, b.hp / max), 22);
+  ctx.strokeStyle = "rgba(255, 248, 232, 0.55)";
+  ctx.lineWidth = 2;
+  ctx.strokeRect(x, y, 330, 22);
   ctx.fillStyle = "#fff8e8";
   ctx.font = "bold 16px Trebuchet MS";
-  ctx.fillText(`${b.name}${b.type === "nancy" ? ` Phase ${b.phase}` : ""}`, x, y - 8);
+  ctx.fillText(label, x, y - 8);
 }
 
 function drawPlayer() {
@@ -1169,7 +1160,8 @@ function drawGrapple() {
 
 function drawHud() {
   ctx.fillStyle = "rgba(5,8,13,0.66)";
-  ctx.fillRect(18, 18, 660, 82);
+  const boss = objects.boss && !objects.boss.defeated ? objects.boss : null;
+  ctx.fillRect(18, 18, 700, boss ? 126 : 82);
   ctx.fillStyle = "#fff8e8";
   ctx.font = "bold 23px Trebuchet MS";
   ctx.fillText(`${"❤️".repeat(player.hearts)}${"♡".repeat(3 - player.hearts)}`, 34, 52);
@@ -1177,6 +1169,7 @@ function drawHud() {
   ctx.fillText(`🧶 ${player.yarn}`, 270, 52);
   ctx.fillText(`🐟 ${fishFound.size}/${TOTAL_FISH}`, 350, 52);
   ctx.fillText(`Room ${levelIndex + 1}/${LEVELS.length}: ${level.name}`, 34, 86);
+  if (boss) drawBossBar(boss);
   ctx.font = "bold 18px Trebuchet MS";
   ctx.fillStyle = "#dbeafe";
   ctx.fillText("Move A/D or Arrows | Double Jump W/Space | Grapple E or Right Mouse | Restart R", VIEW_W - 745, 50);
