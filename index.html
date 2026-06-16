@@ -1,0 +1,95 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kitty Whiscape</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="shell">
+    <section id="loader" class="screen loader active" aria-label="Loading Kitty Whiscape">
+      <div class="stars"></div>
+      <div class="load-card">
+        <div class="load-cat"></div>
+        <h1>Kitty Whiscape</h1>
+        <div class="load-bar"><span></span></div>
+        <p>Loading Nancy's mansion...</p>
+      </div>
+    </section>
+
+    <section id="prologue" class="screen prologue" aria-label="Kitty Whiscape prologue">
+      <canvas id="storyCanvas" width="1280" height="720"></canvas>
+      <article class="story-box">
+        <span id="storyMeta" class="story-meta">Scene 1 / 4</span>
+        <p id="storyText" class="story-text"></p>
+        <button id="storyNext" class="primary">Next</button>
+      </article>
+    </section>
+
+    <section id="start" class="screen start" aria-label="Kitty Whiscape start screen">
+      <div class="stars"></div>
+      <h1 id="title" class="title" aria-label="Kitty Whiscape"></h1>
+      <div class="runway">
+        <div class="avatar-card">
+          <div class="css-cat"></div>
+          <span>Kitty</span>
+        </div>
+      </div>
+      <p class="tagline">Swing, pounce, collect, and escape through Nancy's haunted rooms.</p>
+      <div class="mode-panel">
+        <h2>Choose Version</h2>
+        <div class="mode-grid">
+          <button class="mode-card selected" data-mode="classic">Classic Story</button>
+          <button class="mode-card" data-mode="speedrun">Speedrun Mode</button>
+          <button class="mode-card" data-mode="endless">Endless Mansion</button>
+        </div>
+      </div>
+      <button id="startButton" class="primary">Start Escape</button>
+    </section>
+
+    <section id="game" class="screen game" aria-label="Kitty Whiscape game">
+      <div class="hud">
+        <div id="hearts" class="hearts"></div>
+        <span>Score <strong id="score">0</strong></span>
+        <span>Stars <strong id="stars">0</strong></span>
+        <span>Room <strong id="room">1</strong></span>
+        <span>Mode <strong id="modeName">Classic</strong></span>
+        <span id="timerWrap">Time <strong id="timer">0.000</strong></span>
+        <span id="senseBadge" class="badge ready">Spidey Sense: READY</span>
+      </div>
+      <canvas id="gameCanvas" width="1040" height="585"></canvas>
+      <div class="controls">
+        <span>A/D or Arrows: Move</span>
+        <span>W/Up: Jump + Double Jump</span>
+        <span>S/Down: Fast Fall</span>
+        <span>Mouse: Aim Web</span>
+        <span>Click: Shoot Web</span>
+        <span>Shift: Spidey Sense</span>
+      </div>
+    </section>
+
+    <section id="ending" class="screen ending" aria-label="Kitty Whiscape ending">
+      <h2>continues her journey</h2>
+      <div class="ending-world">
+        <div class="sunset"></div>
+        <div class="magic-land"></div>
+        <div class="ending-cat css-cat"></div>
+      </div>
+      <h3>To Be Continued</h3>
+    </section>
+
+    <div id="fade" class="fade"></div>
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+    <div id="webOverlay" class="web-overlay"></div>
+    <div id="modal" class="modal">
+      <div class="modal-card">
+        <h2>Nancy Defeated</h2>
+        <button id="continueEnding" class="primary">Continue</button>
+      </div>
+    </div>
+  </main>
+  <script src="game.js"></script>
+</body>
+</html>
+
