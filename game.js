@@ -182,12 +182,13 @@
 
     function renderStory(reset = false) {
       if (reset) {
-        typingIndex = 0;
+        typingIndex = storyScenes[storyIndex].length;
         typingTimer = 0;
         storySceneStart = performance.now();
       }
       storyMeta.textContent = `Scene ${storyIndex + 1} / ${storyScenes.length}`;
       storyNext.textContent = storyIndex === storyScenes.length - 1 ? "Enter Mansion" : "Next";
+      storyText.textContent = storyScenes[storyIndex];
       prologue.classList.remove("scene-1", "scene-2", "scene-3", "scene-4", "jump");
       prologue.classList.add(`scene-${storyIndex + 1}`);
       if (storyIndex === 2) prologue.classList.add("jump");
@@ -318,12 +319,7 @@
     }
 
     function updateTyping(dt) {
-      typingTimer += dt;
-      if (typingTimer > 22 && typingIndex < storyScenes[storyIndex].length) {
-        typingTimer = 0;
-        typingIndex += 2;
-        storyText.textContent = visibleStoryText();
-      }
+      storyText.textContent = storyScenes[storyIndex];
     }
 
     function visibleStoryText() {
