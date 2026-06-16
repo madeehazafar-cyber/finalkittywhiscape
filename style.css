@@ -593,6 +593,22 @@
     .badge.ready { color: var(--mint); }
     .badge.used { color: #cfc7d6; }
 
+    .music-toggle {
+      border: 1px solid rgba(255, 209, 102, 0.38);
+      border-radius: 999px;
+      padding: 5px 10px;
+      color: #fff1b8;
+      font-weight: 900;
+      background: rgba(255,255,255,0.08);
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .music-toggle:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 18px rgba(255, 209, 102, 0.22);
+    }
+
     .toast {
       position: fixed;
       left: 50%;

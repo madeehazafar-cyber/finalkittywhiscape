@@ -24,7 +24,8 @@
       modeName: document.getElementById("modeName"),
       timer: document.getElementById("timer"),
       timerWrap: document.getElementById("timerWrap"),
-      sense: document.getElementById("senseBadge")
+      sense: document.getElementById("senseBadge"),
+      musicToggle: document.getElementById("musicToggle")
     };
 
     const storyMeta = document.getElementById("storyMeta");
@@ -34,6 +35,18 @@
     const toast = document.getElementById("toast");
     const keys = new Set();
     const mouse = { x: 0, y: 0, down: false };
+
+    const music = {
+      ctx: null,
+      master: null,
+      compressor: null,
+      nextStep: 0,
+      step: 0,
+      bpm: 168,
+      playing: true,
+      started: false,
+      timer: null
+    };
 
     const storyScenes = [
       "Kitty was abandoned by Peter and sent to Nancy's creepy mansion.",
@@ -61,12 +74,13 @@
         palette: ["#1d1833", "#51304f", "#8d5d68"],
         start: [72, 448],
         exit: [980, 428],
-        requiredStars: 2,
-        platforms: [[0, 516, 1040, 69], [145, 452, 190, 22], [375, 400, 190, 22], [610, 346, 180, 22], [820, 416, 150, 22]],
+        requiredStars: 3,
+        platforms: [[0, 516, 1040, 69], [145, 452, 170, 22], [385, 402, 160, 22], [625, 350, 150, 22], [830, 416, 130, 22]],
         enemies: [[430, 472, 80]],
-        items: [["fish", 190, 414], ["star", 286, 414], ["mouse", 430, 362], ["star", 660, 308], ["yarn", 860, 378]],
-        spikes: [],
-        hazards: [],
+        items: [["star", 255, 414], ["star", 472, 364], ["star", 892, 378], ["yarn", 720, 312]],
+        spikes: [[548, 535, 118, 18]],
+        hazards: [[760, 384, 16, 52, 1.1, "x"]],
+        traps: [],
         moving: [],
         disappearing: []
       },
@@ -77,11 +91,12 @@
         start: [64, 448],
         exit: [980, 354],
         requiredStars: 3,
-        platforms: [[0, 516, 238, 69], [318, 454, 138, 22], [560, 384, 126, 22], [805, 410, 160, 22], [220, 118, 80, 18], [505, 96, 80, 18], [775, 116, 80, 18]],
+        platforms: [[0, 516, 182, 69], [318, 454, 118, 22], [568, 384, 106, 22], [824, 410, 126, 22], [220, 118, 80, 18], [505, 96, 80, 18], [775, 116, 80, 18]],
         enemies: [[350, 410, 70], [840, 366, 72]],
-        items: [["star", 170, 478], ["fish", 350, 416], ["star", 606, 346], ["yarn", 528, 60], ["star", 858, 372], ["mouse", 925, 372]],
-        spikes: [],
+        items: [["star", 174, 476], ["star", 606, 346], ["star", 858, 372], ["yarn", 528, 60]],
+        spikes: [[190, 535, 124, 18], [448, 535, 116, 18], [686, 535, 118, 18]],
         hazards: [[490, 482, 18, 72, 1.6, "x"], [720, 350, 18, 82, 1.3, "y"]],
+        traps: [[260, 438, 18, 62, "right", 7.2, 1150], [936, 354, 18, 72, "left", 7.6, 980]],
         moving: [],
         disappearing: []
       },
@@ -91,12 +106,13 @@
         palette: ["#101b2e", "#28375a", "#71629b"],
         start: [64, 448],
         exit: [980, 244],
-        requiredStars: 4,
-        platforms: [[0, 516, 190, 69], [228, 454, 116, 20], [420, 390, 104, 20], [604, 324, 104, 20], [802, 268, 126, 20], [500, 172, 120, 18]],
+        requiredStars: 3,
+        platforms: [[0, 516, 170, 69], [238, 454, 104, 20], [430, 390, 94, 20], [616, 324, 92, 20], [820, 268, 104, 20], [500, 172, 92, 18]],
         enemies: [[250, 410, 72, true], [635, 280, 78, true]],
-        items: [["star", 250, 416], ["fish", 444, 352], ["star", 640, 286], ["mouse", 540, 134], ["star", 845, 230], ["yarn", 892, 230]],
-        spikes: [[356, 535, 104, 16], [708, 535, 146, 16]],
-        hazards: [[492, 356, 16, 110, 2.1, "x"], [744, 260, 16, 96, 1.8, "y"]],
+        items: [["star", 250, 416], ["star", 640, 286], ["star", 845, 230], ["yarn", 892, 230]],
+        spikes: [[176, 535, 164, 16], [356, 535, 150, 16], [708, 535, 196, 16]],
+        hazards: [[492, 356, 16, 132, 2.1, "x"], [744, 260, 16, 118, 1.8, "y"], [600, 486, 14, 180, 2.2, "x"]],
+        traps: [[360, 390, 18, 64, "right", 8.8, 820], [930, 250, 18, 62, "left", 9.2, 780]],
         moving: [[228, 454, 116, 20, 58, 1.2], [420, 390, 104, 20, 70, 1.45, "y"], [604, 324, 104, 20, 76, 1.55]],
         disappearing: []
       },
@@ -106,12 +122,13 @@
         palette: ["#101126", "#2a214b", "#744a76"],
         start: [64, 448],
         exit: [976, 230],
-        requiredStars: 5,
-        platforms: [[0, 516, 184, 69], [252, 462, 118, 20], [458, 398, 104, 20], [658, 334, 100, 20], [850, 272, 112, 20], [330, 170, 90, 18], [720, 154, 88, 18]],
+        requiredStars: 3,
+        platforms: [[0, 516, 150, 69], [262, 462, 94, 20], [468, 398, 86, 20], [670, 334, 82, 20], [860, 272, 88, 20], [330, 170, 76, 18], [720, 154, 72, 18]],
         enemies: [[294, 418, 66], [494, 354, 58], [692, 290, 58], [884, 228, 54]],
-        items: [["star", 296, 424], ["fish", 334, 424], ["star", 492, 360], ["mouse", 362, 132], ["star", 694, 296], ["yarn", 754, 116], ["star", 894, 234]],
-        spikes: [[196, 535, 72, 18], [578, 535, 292, 18]],
+        items: [["star", 296, 424], ["star", 492, 360], ["star", 754, 116], ["yarn", 894, 234]],
+        spikes: [[156, 535, 96, 18], [368, 535, 186, 18], [578, 535, 318, 18]],
         hazards: [[386, 424, 17, 100, 2.2, "x"], [612, 260, 17, 110, 2.4, "y"], [820, 228, 17, 82, 2.7, "x"]],
+        traps: [[210, 462, 18, 58, "right", 9.4, 680], [808, 154, 18, 82, "down", 9.8, 640], [954, 230, 18, 72, "left", 10.2, 620]],
         moving: [[252, 462, 118, 20, 88, 1.7], [458, 398, 104, 20, 88, 1.85, "y"], [658, 334, 100, 20, 100, 2.05]],
         disappearing: [[626, 224, 92, 18, 150]]
       },
@@ -146,6 +163,7 @@
     let items = [];
     let spikes = [];
     let hazards = [];
+    let traps = [];
     let projectiles = [];
     let shockwaves = [];
     let particles = [];
@@ -170,6 +188,8 @@
     let roomClearTimer = 0;
     let roomTransitioning = false;
     let lastHud = { score: 0, stars: 0, room: 1, sense: "READY" };
+    let deathShakeTimer = 0;
+    let attemptStarSnapshots = [];
 
     function showScreen(name) {
       Object.values(screens).forEach(screen => screen.classList.remove("active"));
@@ -244,13 +264,18 @@
       const base = JSON.parse(JSON.stringify(rooms[index % 4]));
       base.name = `Endless Room ${endlessDifficulty + 1}`;
       base.difficulty = `Endless +${endlessDifficulty}`;
-      base.requiredStars = Math.min(7, 3 + Math.floor(endlessDifficulty / 2));
+      base.requiredStars = 3;
       base.enemies.push([180 + (endlessDifficulty * 73) % 620, 472, 90]);
       if (endlessDifficulty % 2 === 1) base.spikes.push([440, 535, 96, 16]);
       base.hazards = base.hazards || [];
       base.hazards.push([420 + (endlessDifficulty * 67) % 330, 330, 16, 80, 1.6 + endlessDifficulty * 0.45, endlessDifficulty % 2 ? "y" : "x"]);
-      base.items.push(["fish", 120 + (endlessDifficulty * 91) % 760, 250 + (endlessDifficulty * 31) % 180]);
-      base.items.push(["star", 260 + (endlessDifficulty * 83) % 580, 170 + (endlessDifficulty * 47) % 260]);
+      base.traps = base.traps || [];
+      base.traps.push([280 + (endlessDifficulty * 71) % 460, 250, 18, 90, endlessDifficulty % 2 ? "left" : "right", 9 + endlessDifficulty * 0.65, 620]);
+      base.items = base.items.filter(item => item[0] !== "star").concat([
+        ["star", 250 + (endlessDifficulty * 83) % 520, 410],
+        ["star", 520 + (endlessDifficulty * 47) % 260, 300],
+        ["star", 760 + (endlessDifficulty * 61) % 160, 180]
+      ]);
       return base;
     }
 
@@ -266,14 +291,20 @@
       roomStars = 0;
       roomTransitioning = false;
       roomClearTimer = 0;
-      platforms = currentRoom.platforms.map(p => ({ x: p[0], y: p[1], w: p[2], h: p[3], baseX: p[0], baseY: p[1], move: null, vanish: null, solid: true }));
-      currentRoom.moving.forEach(m => platforms.push({ x: m[0], y: m[1], w: m[2], h: m[3], baseX: m[0], baseY: m[1], move: { range: m[4], speed: m[5], axis: m[6] || "x", t: 0 }, vanish: null, solid: true }));
-      currentRoom.disappearing.forEach(d => platforms.push({ x: d[0], y: d[1], w: d[2], h: d[3], baseX: d[0], baseY: d[1], move: null, vanish: { timer: d[4], phase: 0 }, solid: true }));
-      const hazardSpeed = 1 + (roomNumber * 0.5);
+      const currentLevel = Math.max(1, roomNumber);
+      const baseSpeed = 1;
+      const hazardSpeed = baseSpeed * (1 + currentLevel * 0.45);
+      const minWidth = currentLevel >= 3 ? 72 : 92;
+      const scaledWidth = w => Math.max(minWidth, w - currentLevel * 10);
+      platforms = currentRoom.platforms.map(p => ({ x: p[0], y: p[1], w: p[2] > 600 ? p[2] : scaledWidth(p[2]), h: p[3], baseX: p[0], baseY: p[1], move: null, vanish: null, dissolve: null, solid: true }));
+      currentRoom.moving.forEach(m => platforms.push({ x: m[0], y: m[1], w: scaledWidth(m[2]), h: m[3], baseX: m[0], baseY: m[1], move: { range: m[4] + currentLevel * 4, speed: m[5] * hazardSpeed, axis: m[6] || "x", t: 0 }, vanish: null, dissolve: null, solid: true }));
+      currentRoom.disappearing.forEach(d => platforms.push({ x: d[0], y: d[1], w: scaledWidth(d[2]), h: d[3], baseX: d[0], baseY: d[1], move: null, vanish: { timer: d[4], phase: 0 }, dissolve: null, solid: true }));
       enemies = currentRoom.enemies.map(e => ({ x: e[0], y: e[1], w: 34, h: 34, baseX: e[0], patrol: Math.max(36, e[2] - Math.max(0, roomNumber - 3) * 4), vx: e[3] ? 0.65 + roomNumber * 0.05 : 1.05 + roomIndex * 0.15 + endlessDifficulty * 0.04, sleep: !!e[3], dead: false, wobble: Math.random() * 9 }));
       items = currentRoom.items.map(i => ({ type: i[0], x: i[1], y: i[2], w: 24, h: 24, taken: false, bob: Math.random() * 8 }));
+      attemptStarSnapshots = [];
       spikes = currentRoom.spikes.map(s => ({ x: s[0], y: s[1], w: s[2], h: s[3] }));
-      hazards = (currentRoom.hazards || []).map(h => ({ x: h[0], y: h[1], r: h[2], baseX: h[0], baseY: h[1], range: h[3], speed: h[4] + hazardSpeed * 0.18, axis: h[5] || "x", t: Math.random() * 6 }));
+      hazards = (currentRoom.hazards || []).map(h => ({ x: h[0], y: h[1], w: h[2] * 2, h: h[2] * 2, r: h[2], baseX: h[0], baseY: h[1], range: h[3], speed: h[4] * hazardSpeed, axis: h[5] || "x", t: Math.random() * 6, near: false }));
+      traps = (currentRoom.traps || []).map(t => ({ x: t[0], y: t[1], w: t[2], h: t[3], dir: t[4], speed: t[5] * hazardSpeed, cooldown: t[6], timer: 260 + Math.random() * 500, armed: false }));
       shop = roomIndex < rooms.length - 1 ? { x: 54, y: 392, w: 72, h: 88, used: false, item: roomIndex % 2 === 0 ? "Web Boots" : "Heart Charm" } : null;
       projectiles = [];
       shockwaves = [];
@@ -316,6 +347,7 @@
 
     function startGameWithWipe() {
       if (gameState !== "start") return;
+      resumeMusic();
       fade.classList.add("wipe", "on");
       setTimeout(() => {
         startGame();
@@ -343,6 +375,7 @@
       updatePlayer(dt);
       updatePlatforms(dt);
       updateHazards(dt * slow);
+      updateTraps(dt * slow);
       enemies.forEach(enemy => updateEnemy(enemy, dt * slow));
       updateItems();
       updateShop();
@@ -354,6 +387,7 @@
       noticeTimer = Math.max(0, noticeTimer - dt);
       if (selectedMode === "speedrun") elapsed = (performance.now() - timerStart) / 1000;
       shake = Math.max(0, shake - dt * 0.04);
+      deathShakeTimer = Math.max(0, deathShakeTimer - dt);
       updateHud();
     }
 
@@ -403,9 +437,9 @@
       player.grounded = false;
       platforms.forEach(p => collidePlatform(p));
       if (player.grounded) player.jumps = 0;
-      spikes.forEach(spike => { if (overlap(player, spike)) resetPlayer("Sharp trap!"); });
+      spikes.forEach(spike => { if (overlap(player, spike)) resetAttempt("Spike reset!"); });
       if (player.y > canvas.height + 80) {
-        resetPlayer("Back to the room start!");
+        resetAttempt("Bottomless gap!");
       }
       player.invincible = Math.max(0, player.invincible - 1);
       player.flip *= 0.92;
@@ -429,6 +463,7 @@
         player.vy = 0;
         player.grounded = true;
         if (p.vanish) p.vanish.phase += 2;
+        if (roomNumber >= 3 && p.w < 300 && !p.dissolve) p.dissolve = { timer: 1500, respawn: 0 };
       }
     }
 
@@ -444,6 +479,21 @@
           p.vanish.phase += dt * 0.012;
           p.solid = Math.sin(p.vanish.phase / 28) > -0.55;
         }
+        if (p.dissolve) {
+          if (p.solid) {
+            p.dissolve.timer -= dt;
+            if (p.dissolve.timer <= 0) {
+              p.solid = false;
+              p.dissolve.respawn = 1600;
+            }
+          } else {
+            p.dissolve.respawn -= dt;
+            if (p.dissolve.respawn <= 0) {
+              p.solid = true;
+              p.dissolve = null;
+            }
+          }
+        }
       });
     }
 
@@ -453,10 +503,44 @@
         const offset = Math.sin(hazard.t) * hazard.range;
         if (hazard.axis === "y") hazard.y = hazard.baseY + offset;
         else hazard.x = hazard.baseX + offset;
-        if (circleRect(hazard, player)) {
-          resetPlayer("Ghost hazard!");
+        hazard.w = hazard.r * 2;
+        hazard.h = hazard.r * 2;
+        const hitbox = { x: hazard.x - hazard.r, y: hazard.y - hazard.r, w: hazard.w, h: hazard.h };
+        if (overlap(player, hitbox)) {
+          resetAttempt("Ghost hazard!");
+        } else if (!hazard.near && rectDistance(player, hitbox) < 20) {
+          hazard.near = true;
+          violentShake(5);
+        } else if (rectDistance(player, hitbox) >= 32) {
+          hazard.near = false;
         }
       });
+    }
+
+    function updateTraps(dt) {
+      traps.forEach(trap => {
+        const crossedX = player.x + player.w > trap.x && player.x < trap.x + trap.w;
+        const crossedY = player.y + player.h > trap.y && player.y < trap.y + trap.h;
+        trap.armed = trap.dir === "left" || trap.dir === "right" ? crossedY : crossedX;
+        trap.timer -= dt;
+        if (trap.armed && trap.timer <= 0) {
+          fireTrap(trap);
+          trap.timer = trap.cooldown;
+        }
+      });
+    }
+
+    function fireTrap(trap) {
+      const speed = trap.speed;
+      const dirs = {
+        left: [-speed, 0],
+        right: [speed, 0],
+        up: [0, -speed],
+        down: [0, speed]
+      };
+      const [vx, vy] = dirs[trap.dir] || dirs.right;
+      projectiles.push({ x: trap.x + trap.w / 2, y: trap.y + trap.h / 2, vx, vy, r: 7, life: 145, lethal: true, color: "#ff5570" });
+      burst(trap.x + trap.w / 2, trap.y + trap.h / 2, "#ff5570", 8);
     }
 
     function updateEnemy(enemy, dt) {
@@ -535,6 +619,147 @@
       showToast.timer = setTimeout(() => toast.classList.remove("show"), 1300);
     }
 
+    function initMusic() {
+      if (music.started) return;
+      const AudioContext = window.AudioContext || window.webkitAudioContext;
+      if (!AudioContext) return;
+      music.ctx = new AudioContext();
+      music.compressor = music.ctx.createDynamicsCompressor();
+      music.compressor.threshold.value = -18;
+      music.compressor.knee.value = 18;
+      music.compressor.ratio.value = 5;
+      music.master = music.ctx.createGain();
+      music.master.gain.value = 0.18;
+      music.master.connect(music.compressor);
+      music.compressor.connect(music.ctx.destination);
+      music.nextStep = music.ctx.currentTime + 0.05;
+      music.started = true;
+      music.timer = setInterval(scheduleMusic, 25);
+    }
+
+    function resumeMusic() {
+      initMusic();
+      if (music.ctx && music.ctx.state === "suspended") music.ctx.resume();
+    }
+
+    function toggleMusic() {
+      music.playing = !music.playing;
+      if (hud.musicToggle) hud.musicToggle.textContent = `Music: ${music.playing ? "ON" : "OFF"}`;
+      if (music.playing) resumeMusic();
+      else if (music.master) music.master.gain.setTargetAtTime(0.0001, music.ctx.currentTime, 0.03);
+    }
+
+    function scheduleMusic() {
+      if (!music.ctx || !music.playing) return;
+      music.master.gain.setTargetAtTime(0.18, music.ctx.currentTime, 0.08);
+      const stepDur = 60 / music.bpm / 4;
+      while (music.nextStep < music.ctx.currentTime + 0.14) {
+        playMusicStep(music.step, music.nextStep);
+        music.nextStep += stepDur;
+        music.step = (music.step + 1) % 32;
+      }
+    }
+
+    function playMusicStep(step, time) {
+      const bass = [55, 55, 65.41, 55, 82.41, 73.42, 65.41, 55];
+      if (step % 2 === 0) bitSynth(bass[(step / 2) % bass.length], time, 0.09, 0.16);
+      if (step % 8 === 0) kick(time);
+      if (step % 8 === 4) snare(time);
+      if (step % 2 === 1) tick(time, step % 4 === 1 ? 1500 : 980);
+      if (step % 16 === 0) gothicOrgan([110, 130.81, 164.81, 220], time, 0.75);
+      if (step % 16 === 8) gothicOrgan([98, 123.47, 146.83, 196], time, 0.75);
+      if (step % 7 === 0) glitchStab(time);
+    }
+
+    function makeGain(time, level, decay) {
+      const gain = music.ctx.createGain();
+      gain.gain.setValueAtTime(level, time);
+      gain.gain.exponentialRampToValueAtTime(0.0001, time + decay);
+      gain.connect(music.master);
+      return gain;
+    }
+
+    function bitSynth(freq, time, decay, level) {
+      const osc = music.ctx.createOscillator();
+      const shaper = music.ctx.createWaveShaper();
+      shaper.curve = distortionCurve(280);
+      osc.type = "sawtooth";
+      osc.frequency.setValueAtTime(freq, time);
+      osc.frequency.linearRampToValueAtTime(freq * 0.5, time + decay);
+      osc.connect(shaper);
+      shaper.connect(makeGain(time, level, decay));
+      osc.start(time);
+      osc.stop(time + decay + 0.02);
+    }
+
+    function gothicOrgan(freqs, time, decay) {
+      const gain = makeGain(time, 0.07, decay);
+      freqs.forEach((freq, i) => {
+        const osc = music.ctx.createOscillator();
+        osc.type = i % 2 ? "triangle" : "square";
+        osc.frequency.setValueAtTime(freq, time);
+        osc.detune.value = (i - 1.5) * 5;
+        osc.connect(gain);
+        osc.start(time);
+        osc.stop(time + decay);
+      });
+    }
+
+    function kick(time) {
+      const osc = music.ctx.createOscillator();
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(120, time);
+      osc.frequency.exponentialRampToValueAtTime(38, time + 0.12);
+      osc.connect(makeGain(time, 0.34, 0.16));
+      osc.start(time);
+      osc.stop(time + 0.18);
+    }
+
+    function snare(time) {
+      noiseHit(time, 0.13, 0.18, 900);
+      bitSynth(180, time, 0.08, 0.05);
+    }
+
+    function tick(time, freq) {
+      const osc = music.ctx.createOscillator();
+      osc.type = "square";
+      osc.frequency.setValueAtTime(freq, time);
+      osc.connect(makeGain(time, 0.055, 0.035));
+      osc.start(time);
+      osc.stop(time + 0.04);
+    }
+
+    function glitchStab(time) {
+      bitSynth(220 + Math.random() * 180, time, 0.045, 0.08);
+      noiseHit(time, 0.04, 0.06, 2200);
+    }
+
+    function noiseHit(time, decay, level, filterFreq) {
+      const length = Math.max(1, Math.floor(music.ctx.sampleRate * decay));
+      const buffer = music.ctx.createBuffer(1, length, music.ctx.sampleRate);
+      const data = buffer.getChannelData(0);
+      for (let i = 0; i < length; i += 1) data[i] = (Math.random() * 2 - 1) * (1 - i / length);
+      const source = music.ctx.createBufferSource();
+      const filter = music.ctx.createBiquadFilter();
+      filter.type = "bandpass";
+      filter.frequency.value = filterFreq;
+      filter.Q.value = 0.9;
+      source.buffer = buffer;
+      source.connect(filter);
+      filter.connect(makeGain(time, level, decay));
+      source.start(time);
+    }
+
+    function distortionCurve(amount) {
+      const n = 256;
+      const curve = new Float32Array(n);
+      for (let i = 0; i < n; i += 1) {
+        const x = (i * 2) / n - 1;
+        curve[i] = Math.max(-0.75, Math.min(0.75, ((3 + amount) * x * 20 * Math.PI / 180) / (Math.PI + amount * Math.abs(x))));
+      }
+      return curve;
+    }
+
     function resetPlayer(text = "Try again!") {
       hurt(1);
       player.x = currentRoom.start[0];
@@ -546,6 +771,31 @@
       noticeText = text;
       noticeTimer = 900;
       burst(player.x + 18, player.y + 18, "#ff5570", 18);
+    }
+
+    function resetAttempt(text = "Instant reset!") {
+      if (deathShakeTimer > 0 || roomTransitioning || frozen) return;
+      roomStars = 0;
+      items.forEach(item => {
+        if (item.type === "star") item.taken = false;
+      });
+      projectiles = projectiles.filter(p => !p.lethal);
+      player.x = currentRoom.start[0];
+      player.y = currentRoom.start[1];
+      player.vx = 0;
+      player.vy = 0;
+      player.web = null;
+      player.invincible = 50;
+      violentShake(14);
+      noticeText = text;
+      noticeTimer = 950;
+      showToast("Attempt reset: collect all 3 stars again");
+      burst(player.x + 18, player.y + 18, "#ff5570", 32);
+    }
+
+    function violentShake(amount = 14) {
+      shake = Math.max(shake, amount);
+      deathShakeTimer = 200;
     }
 
     function updateBoss(dt) {
@@ -627,7 +877,7 @@
         p.life -= 1;
         if (circleRect(p, player)) {
           p.life = 0;
-          hurt(1);
+          resetAttempt(p.lethal ? "Trap shot!" : "Yarn hit!");
         }
       });
       projectiles = projectiles.filter(p => p.life > 0);
@@ -765,6 +1015,7 @@
       drawPlatforms();
       drawSpikes();
       drawHazards();
+      drawTraps();
       drawItems();
       drawShop();
       enemies.forEach(drawEnemy);
@@ -1307,7 +1558,7 @@
     function drawPlatforms() {
       platforms.forEach(p => {
         if (!p.solid) return;
-        ctx.globalAlpha = p.vanish ? 0.58 + Math.sin(p.vanish.phase / 16) * 0.35 : 1;
+        ctx.globalAlpha = p.dissolve ? Math.max(0.24, p.dissolve.timer / 1500) : p.vanish ? 0.58 + Math.sin(p.vanish.phase / 16) * 0.35 : 1;
         drawThemedPlatform(p);
         ctx.globalAlpha = 1;
       });
@@ -1321,7 +1572,7 @@
         ctx.fillRect(p.x, p.y, p.w, 10);
         return;
       }
-      if (name.includes("Kitchen")) {
+      if (name.includes("Cozy") || name.includes("Kitchen")) {
         ctx.fillStyle = "#7a4f5f";
         roundRect(p.x, p.y - 10, p.w, p.h + 20, 10);
         ctx.fill();
@@ -1329,7 +1580,7 @@
         ctx.fillRect(p.x - 6, p.y - 14, p.w + 12, 10);
         ctx.fillStyle = "#2c1b2f";
         for (let x = p.x + 18; x < p.x + p.w - 20; x += 42) ctx.fillRect(x, p.y + 8, 24, 20);
-      } else if (name.includes("Library")) {
+      } else if (name.includes("Gallery") || name.includes("Library")) {
         ctx.fillStyle = "#5a342f";
         roundRect(p.x, p.y - 8, p.w, p.h + 28, 8);
         ctx.fill();
@@ -1339,13 +1590,13 @@
           ctx.fillStyle = ["#ff8cc6", "#7cf4a5", "#ffd166", "#a98cff"][Math.floor(x) % 4];
           ctx.fillRect(x, p.y + 3, 10, 22);
         }
-      } else if (name.includes("Sleepwalking")) {
+      } else if (name.includes("Vault") || name.includes("Sleepwalking")) {
         ctx.fillStyle = "#b8d8ff";
         roundRect(p.x, p.y - 10, p.w, p.h + 18, 14);
         ctx.fill();
         ctx.fillStyle = "#281d36";
         ctx.fillRect(p.x, p.y + 12, p.w, 12);
-      } else if (name.includes("Attic")) {
+      } else if (name.includes("Escalation") || name.includes("Attic") || name.includes("Endless")) {
         ctx.fillStyle = "#7d4a36";
         roundRect(p.x, p.y - 8, p.w, p.h + 18, 6);
         ctx.fill();
@@ -1392,6 +1643,41 @@
         ctx.beginPath();
         ctx.arc(hazard.x - 5, hazard.y - 3, 3, 0, Math.PI * 2);
         ctx.arc(hazard.x + 5, hazard.y - 3, 3, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      });
+    }
+
+    function drawTraps() {
+      traps.forEach(trap => {
+        const charged = trap.timer < 180;
+        ctx.save();
+        ctx.fillStyle = charged ? "rgba(255,85,112,0.9)" : "rgba(80,32,48,0.86)";
+        ctx.strokeStyle = charged ? "#fff1b8" : "rgba(255,209,102,0.45)";
+        ctx.lineWidth = 2;
+        roundRect(trap.x, trap.y, trap.w, trap.h, 6);
+        ctx.fill();
+        ctx.stroke();
+        ctx.fillStyle = "#ffd166";
+        ctx.beginPath();
+        if (trap.dir === "left") {
+          ctx.moveTo(trap.x + 4, trap.y + trap.h / 2);
+          ctx.lineTo(trap.x + trap.w - 4, trap.y + 8);
+          ctx.lineTo(trap.x + trap.w - 4, trap.y + trap.h - 8);
+        } else if (trap.dir === "right") {
+          ctx.moveTo(trap.x + trap.w - 4, trap.y + trap.h / 2);
+          ctx.lineTo(trap.x + 4, trap.y + 8);
+          ctx.lineTo(trap.x + 4, trap.y + trap.h - 8);
+        } else if (trap.dir === "down") {
+          ctx.moveTo(trap.x + trap.w / 2, trap.y + trap.h - 4);
+          ctx.lineTo(trap.x + 4, trap.y + 6);
+          ctx.lineTo(trap.x + trap.w - 4, trap.y + 6);
+        } else {
+          ctx.moveTo(trap.x + trap.w / 2, trap.y + 4);
+          ctx.lineTo(trap.x + 4, trap.y + trap.h - 6);
+          ctx.lineTo(trap.x + trap.w - 4, trap.y + trap.h - 6);
+        }
+        ctx.closePath();
         ctx.fill();
         ctx.restore();
       });
@@ -1490,7 +1776,16 @@
       });
     }
     function drawProjectiles() {
-      projectiles.forEach(p => { ctx.fillStyle = "#a98cff"; ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2); ctx.fill(); });
+      projectiles.forEach(p => {
+        ctx.save();
+        ctx.shadowBlur = p.lethal ? 18 : 8;
+        ctx.shadowColor = p.color || "#a98cff";
+        ctx.fillStyle = p.color || "#a98cff";
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      });
       shockwaves.forEach(w => { ctx.fillStyle = "#ffcf5c"; roundRect(w.x, w.y, w.w, w.h, 8); ctx.fill(); });
     }
     function drawWeb() {
@@ -1649,6 +1944,7 @@
     }
 
     document.getElementById("startButton").addEventListener("click", startGameWithWipe);
+    if (hud.musicToggle) hud.musicToggle.addEventListener("click", toggleMusic);
     document.getElementById("continueEnding").addEventListener("click", () => {
       modal.classList.remove("show");
       showScreen("ending");
@@ -1664,6 +1960,7 @@
     });
 
     window.addEventListener("keydown", event => {
+      if (gameState === "game" || gameState === "start") resumeMusic();
       keys.add(event.key.length === 1 ? event.key.toLowerCase() : event.key);
       if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", " "].includes(event.key)) event.preventDefault();
       if ((event.key === " " || event.key === "Spacebar") && gameState === "prologue") advanceStory();
