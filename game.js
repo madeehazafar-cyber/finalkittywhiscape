@@ -32,6 +32,7 @@
     const storyText = document.getElementById("storyText");
     const storyNext = document.getElementById("storyNext");
     const storyBox = document.querySelector(".story-box");
+    const storyIcon = document.getElementById("storyIcon");
     const toast = document.getElementById("toast");
     const keys = new Set();
     const mouse = { x: 0, y: 0, down: false };
@@ -49,10 +50,26 @@
     };
 
     const storyScenes = [
-      "Kitty was abandoned by Peter and sent to Nancy's creepy mansion.",
-      "An old street cat whispered about the legendary Magical Cat Land. Kitty made a vow: tonight, she would escape.",
-      "Kitty crept toward the front door. The handle shook. The moon blinked. Something huge moved behind the glass.",
-      "Controls: move with A/D or arrows, jump with W/Up, fast-fall with S/Down, aim with the mouse, click to web-grapple, and press Shift once for Spidey Sense. Help Kitty escape!"
+      {
+        label: "The Abandonment",
+        icon: "",
+        text: "Hello, I'm Kitty. I was abandoned by my only friend, Peter..."
+      },
+      {
+        label: "The Heartbreak",
+        icon: "Peter -> Nancy",
+        text: "...He even threw away Nancy into these haunted rooms!"
+      },
+      {
+        label: "The Rumor",
+        icon: "Magic Cat Clan",
+        text: "Psst... Have you heard? Deep within this mansion lies a portal to the legendary Magic Cat Clan land!"
+      },
+      {
+        label: "The Vow",
+        icon: "",
+        text: "I've made a vow. I am going to escape this nightmare and reach the Magic Cat Clan land!"
+      }
     ];
 
     const rain = Array.from({ length: 180 }, () => ({
@@ -209,31 +226,38 @@
     }
 
     function beginPrologue() {
+      storyIndex = 0;
       showScreen("prologue");
       renderStory(true);
     }
 
     function renderStory(reset = false) {
+      const scene = storyScenes[storyIndex];
       if (reset) {
-        typingIndex = storyScenes[storyIndex].length;
+        typingIndex = 0;
         typingTimer = 0;
         storySceneStart = performance.now();
       }
-      storyMeta.textContent = `Scene ${storyIndex + 1} / ${storyScenes.length}`;
+      storyMeta.textContent = `${storyIndex + 1} / ${storyScenes.length} - ${scene.label}`;
       storyNext.textContent = storyIndex === storyScenes.length - 1 ? "Enter Mansion" : "Next";
-      storyText.textContent = storyScenes[storyIndex];
+      storyText.textContent = "";
+      storyIcon.textContent = scene.icon;
       prologue.classList.remove("scene-1", "scene-2", "scene-3", "scene-4", "jump");
       prologue.classList.add(`scene-${storyIndex + 1}`);
       if (storyIndex === 2) prologue.classList.add("jump");
     }
 
     function advanceStory() {
-      if (typingIndex < storyScenes[storyIndex].length) {
-        typingIndex = storyScenes[storyIndex].length;
-        storyText.textContent = storyScenes[storyIndex];
+      const scene = storyScenes[storyIndex];
+      if (typingIndex < scene.text.length) {
+        typingIndex = scene.text.length;
+        storyText.textContent = scene.text;
         return;
       }
       if (storyIndex < storyScenes.length - 1) {
+        storyBox.classList.remove("ripple");
+        void storyBox.offsetWidth;
+        storyBox.classList.add("ripple");
         storyBox.classList.add("fading");
         setTimeout(() => {
           storyIndex += 1;
@@ -244,7 +268,11 @@
           storyBox.classList.remove("fading");
         }, 230);
       } else {
-        showScreen("start");
+        prologue.classList.add("zoom-away");
+        setTimeout(() => {
+          prologue.classList.remove("zoom-away");
+          showScreen("start");
+        }, 680);
       }
     }
 
@@ -392,11 +420,21 @@
     }
 
     function updateTyping(dt) {
-      storyText.textContent = storyScenes[storyIndex];
+      const line = storyScenes[storyIndex].text;
+      if (typingIndex >= line.length) {
+        storyText.textContent = line;
+        return;
+      }
+      typingTimer += dt;
+      while (typingTimer > 22 && typingIndex < line.length) {
+        typingIndex += 1;
+        typingTimer -= 22;
+      }
+      storyText.textContent = line.slice(0, typingIndex);
     }
 
     function visibleStoryText() {
-      const line = storyScenes[storyIndex];
+      const line = storyScenes[storyIndex].text;
       if (typingIndex >= line.length) return line;
       const partial = line.slice(0, typingIndex);
       const lastSpace = partial.lastIndexOf(" ");
@@ -1037,14 +1075,67 @@
     function drawPrologue() {
       const time = (performance.now() - storySceneStart) / 1000;
       sctx.clearRect(0, 0, storyCanvas.width, storyCanvas.height);
-      if (storyIndex === 0) drawAbandonment(time);
-      if (storyIndex === 1) drawWhisper(time);
-      if (storyIndex === 2) drawJumpScare(time);
-      if (storyIndex === 3) drawInstructionsScene(time);
+      if (storyIndex === 0) {
+        sctx.fillStyle = "#000";
+        sctx.fillRect(0, 0, storyCanvas.width, storyCanvas.height);
+      } else {
+        const gradient = sctx.createRadialGradient(640, 390, 80, 640, 390, 760);
+        gradient.addColorStop(0, storyIndex === 1 ? "#241426" : "#101730");
+        gradient.addColorStop(0.54, "#080915");
+        gradient.addColorStop(1, "#000");
+        sctx.fillStyle = gradient;
+        sctx.fillRect(0, 0, storyCanvas.width, storyCanvas.height);
+        drawCutsceneDust(time);
+        drawCutsceneMansionLines();
+      }
+      if (storyIndex === 3) drawElderPuff(time);
       if (storyFade > 0) {
         sctx.fillStyle = `rgba(2,2,10,${storyFade})`;
         sctx.fillRect(0, 0, storyCanvas.width, storyCanvas.height);
         storyFade = Math.max(0, storyFade - 0.045);
+      }
+    }
+
+    function drawCutsceneDust(t) {
+      for (let i = 0; i < 70; i += 1) {
+        const x = (i * 173 + Math.sin(t + i) * 18) % 1280;
+        const y = (i * 91 + t * 22) % 720;
+        sctx.fillStyle = i % 3 ? "rgba(255,209,102,0.22)" : "rgba(124,244,165,0.2)";
+        sctx.beginPath();
+        sctx.arc(x, y, 1.5 + (i % 4) * 0.5, 0, Math.PI * 2);
+        sctx.fill();
+      }
+    }
+
+    function drawCutsceneMansionLines() {
+      sctx.strokeStyle = "rgba(255,255,255,0.07)";
+      sctx.lineWidth = 1;
+      for (let x = 0; x < 1280; x += 64) {
+        sctx.beginPath();
+        sctx.moveTo(x, 0);
+        sctx.lineTo(x, 720);
+        sctx.stroke();
+      }
+      for (let y = 0; y < 720; y += 64) {
+        sctx.beginPath();
+        sctx.moveTo(0, y);
+        sctx.lineTo(1280, y);
+        sctx.stroke();
+      }
+    }
+
+    function drawElderPuff(t) {
+      if (t > 1.2) return;
+      const alpha = Math.max(0, 1 - t / 1.2);
+      for (let i = 0; i < 38; i += 1) {
+        const angle = (Math.PI * 2 * i) / 38;
+        const dist = 30 + t * 160 + (i % 5) * 8;
+        const x = 1040 + Math.cos(angle) * dist;
+        const y = 450 + Math.sin(angle) * dist * 0.6;
+        sctx.fillStyle = `rgba(184,216,255,${alpha * 0.5})`;
+        sctx.beginPath();
+        sctx.arc(x, y, 4 + (i % 4), 0, Math.PI * 2);
+        sctx.fill();
       }
     }
 
@@ -1962,8 +2053,8 @@
     window.addEventListener("keydown", event => {
       if (gameState === "game" || gameState === "start") resumeMusic();
       keys.add(event.key.length === 1 ? event.key.toLowerCase() : event.key);
-      if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", " "].includes(event.key)) event.preventDefault();
-      if ((event.key === " " || event.key === "Spacebar") && gameState === "prologue") advanceStory();
+      if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", " ", "Enter"].includes(event.key)) event.preventDefault();
+      if ((event.key === "Enter" || event.key === " " || event.key === "Spacebar") && gameState === "prologue") advanceStory();
       if ((event.key === "w" || event.key === "ArrowUp") && gameState === "game") jump();
       if (event.key === "Shift") activateSense();
     });
