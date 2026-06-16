@@ -203,6 +203,7 @@
     }
 
     .story-meta {
+      display: none;
       color: var(--gold);
       font-weight: 900;
       letter-spacing: 0;
@@ -226,9 +227,14 @@
       align-self: center;
       white-space: normal;
       max-width: 100%;
-      padding: 8px 18px;
+      padding: 2px 8px;
       font-size: 0.82rem;
-      box-shadow: 0 10px 26px rgba(0,0,0,0.32), 0 0 18px rgba(255,209,102,0.26);
+      color: #fff1b8;
+      background: transparent;
+      border: 0;
+      box-shadow: none;
+      text-decoration: underline;
+      text-underline-offset: 5px;
     }
 
     .start {
