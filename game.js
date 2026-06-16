@@ -404,7 +404,7 @@ function handleInput() {
   if (fastFall && !player.grounded) player.vy += 0.52;
 
   const canGroundJump = player.grounded || player.coyote > 0;
-  const canAirJump = !canGroundJump && player.jumpsUsed < player.maxJumps - 1;
+  const canAirJump = !canGroundJump && player.jumpsUsed < player.maxJumps;
   if (player.jumpBuffer > 0 && (canGroundJump || canAirJump)) {
     player.vy = -14.4;
     player.grounded = false;
