@@ -41,6 +41,8 @@ const player = {
   vy: 0,
   face: 1,
   grounded: false,
+  jumpsUsed: 0,
+  maxJumps: 2,
   coyote: 0,
   jumpBuffer: 0,
   hearts: 3,
@@ -62,25 +64,17 @@ const LEVELS = [
     height: 1080,
     start: [120, 770],
     exit: [3020, 730],
-    prompt: "Collect yarn balls, stand near glowing yarn icons, then press E or Right Mouse to grapple.",
+    prompt: "Collect yarn, look ahead for glowing yarn icons, then press E or Right Mouse to cross gaps.",
     platforms: [
-      [0, 920, 660, 160], [820, 920, 380, 160], [1380, 920, 420, 160], [1980, 920, 360, 160], [2600, 920, 600, 160],
-      [420, 770, 210, 34], [1040, 730, 220, 34], [1490, 640, 220, 34], [1860, 760, 210, 34], [2260, 650, 220, 34], [2700, 760, 220, 34],
-      [880, 560, 160, 28], [1300, 420, 170, 28], [2460, 460, 180, 28]
+      [0, 920, 760, 160], [860, 920, 470, 160], [1420, 920, 480, 160], [2000, 920, 500, 160], [2580, 920, 620, 160],
+      [420, 790, 260, 34], [820, 770, 210, 34], [1160, 740, 240, 34], [1510, 690, 260, 34], [1900, 760, 240, 34], [2250, 700, 260, 34], [2680, 780, 260, 34],
+      [980, 610, 190, 30], [1370, 520, 210, 30], [2380, 560, 210, 30]
     ],
-    stars: [[510, 724], [1510, 590], [2740, 714]],
-    yarn: [[230, 870], [930, 510], [1210, 670], [2080, 870], [2490, 410]],
-    fishCrates: [[580, 724], [2520, 414]],
-    enemies: [[1090, 884, 130], [2140, 884, 150]],
-    webPoints: [[760, 640], [1270, 520], [1810, 570], [2380, 520], [2850, 620], [1580, 250, "chandelier"]],
-    boss: {
-      type: "whiskers",
-      name: "Whiskers",
-      x: 1540,
-      y: 852,
-      arena: [1320, 310, 620, 650],
-      hp: 1
-    }
+    stars: [[520, 742], [1540, 642], [2400, 512]],
+    yarn: [[230, 870], [720, 870], [940, 720], [1230, 690], [1790, 870], [2150, 710], [2500, 510], [2860, 730]],
+    fishCrates: [[580, 724], [2480, 514]],
+    enemies: [],
+    webPoints: [[720, 650], [980, 640], [1320, 600], [1680, 570], [2020, 610], [2380, 560], [2720, 650], [1580, 250, "chandelier"]]
   },
   {
     id: "library",
@@ -90,24 +84,24 @@ const LEVELS = [
     height: 1280,
     start: [110, 970],
     exit: [3400, 450],
-    prompt: "The real Shadow has glowing eyes. Pull shelves down with yarn when he is underneath.",
+    prompt: "Library: use two clear grapple shots, then pull shelves down when Shadow's glowing eyes pass below.",
     platforms: [
-      [0, 1120, 540, 160], [700, 1120, 360, 160], [1220, 1040, 360, 240], [1720, 960, 320, 320], [2220, 850, 320, 430], [2720, 700, 300, 580], [3180, 600, 420, 680],
-      [500, 900, 220, 34], [920, 780, 230, 34], [1350, 660, 220, 34], [1710, 540, 220, 34], [2150, 420, 220, 34], [2600, 520, 220, 34], [3010, 420, 200, 34],
-      [1600, 1060, 120, 28], [2100, 920, 120, 28]
+      [0, 1120, 620, 160], [720, 1120, 470, 160], [1280, 1050, 430, 230], [1800, 980, 420, 300], [2320, 890, 400, 390], [2820, 760, 360, 520], [3260, 650, 340, 630],
+      [520, 930, 250, 34], [880, 840, 260, 34], [1240, 740, 260, 34], [1640, 640, 260, 34], [2040, 540, 260, 34], [2460, 600, 260, 34], [2880, 540, 250, 34], [3190, 470, 230, 34],
+      [1500, 990, 180, 30], [1960, 880, 190, 30], [2360, 780, 190, 30]
     ],
-    stars: [[930, 734], [2160, 374], [3040, 374]],
-    yarn: [[300, 1070], [990, 730], [1450, 610], [2340, 802], [3060, 372]],
-    fishCrates: [[1660, 1014]],
-    enemies: [[760, 1084, 130], [1800, 924, 130], [2780, 664, 120]],
-    webPoints: [[640, 760], [1210, 610], [1630, 430], [2070, 330], [2480, 430], [2920, 360], [3300, 320]],
-    shelves: [[1510, 480], [2050, 360], [2570, 460]],
+    stars: [[560, 884], [1680, 594], [2910, 492]],
+    yarn: [[300, 1070], [760, 1070], [1010, 792], [1360, 692], [1780, 592], [2180, 492], [2580, 552], [3040, 492]],
+    fishCrates: [[1580, 944]],
+    enemies: [[1840, 944, 90], [2860, 724, 95]],
+    webPoints: [[660, 800], [980, 730], [1320, 640], [1700, 530], [2080, 450], [2480, 500], [2860, 430], [3220, 360], [3400, 350]],
+    shelves: [[1720, 450], [2200, 390], [2620, 500]],
     boss: {
       type: "shadow",
       name: "Shadow",
-      x: 2360,
-      y: 806,
-      arena: [1960, 280, 860, 640],
+      x: 2380,
+      y: 846,
+      arena: [1980, 360, 780, 560],
       hp: 3
     }
   },
@@ -119,23 +113,23 @@ const LEVELS = [
     height: 1180,
     start: [100, 860],
     exit: [3600, 650],
-    prompt: "Lure Duchess to the mirror, smash it with yarn, then hit her three times while stunned.",
+    prompt: "Ballroom: land safely after each grapple, then lure Duchess near the mirror before smashing it.",
     platforms: [
-      [0, 1010, 500, 170], [680, 1010, 360, 170], [1220, 930, 360, 250], [1740, 850, 360, 330], [2260, 780, 320, 400], [2760, 900, 320, 280], [3320, 800, 480, 380],
-      [360, 780, 220, 34], [820, 650, 220, 34], [1320, 540, 220, 34], [1850, 440, 220, 34], [2350, 540, 220, 34], [2850, 650, 220, 34], [3240, 560, 230, 34]
+      [0, 1010, 610, 170], [720, 1010, 460, 170], [1300, 950, 440, 230], [1840, 880, 430, 300], [2380, 830, 420, 350], [2920, 930, 360, 250], [3360, 820, 440, 360],
+      [360, 810, 260, 34], [760, 710, 260, 34], [1180, 610, 270, 34], [1620, 520, 270, 34], [2060, 500, 270, 34], [2480, 590, 270, 34], [2920, 700, 270, 34], [3260, 620, 260, 34]
     ],
-    stars: [[850, 604], [1880, 394], [3300, 512]],
-    yarn: [[240, 960], [930, 604], [1450, 494], [2390, 494], [2960, 604], [3440, 754]],
-    fishCrates: [[1350, 884], [3200, 514]],
-    enemies: [[720, 974, 120], [1780, 814, 120], [2800, 864, 120]],
-    webPoints: [[610, 650], [1130, 520], [1660, 380], [2200, 400], [2700, 520], [3160, 480], [3500, 440]],
-    mirror: [3040, 690],
+    stars: [[420, 764], [1660, 474], [2940, 652]],
+    yarn: [[240, 960], [650, 960], [900, 664], [1320, 564], [1760, 474], [2180, 454], [2600, 544], [3060, 654], [3440, 774]],
+    fishCrates: [[1350, 884], [3260, 574]],
+    enemies: [[1880, 844, 85], [2920, 894, 80]],
+    webPoints: [[650, 680], [980, 600], [1360, 500], [1740, 420], [2160, 400], [2580, 480], [3000, 590], [3320, 510], [3580, 500]],
+    mirror: [3140, 690],
     boss: {
       type: "duchess",
       name: "Duchess",
-      x: 2860,
+      x: 2940,
       y: 858,
-      arena: [2580, 450, 700, 520],
+      arena: [2660, 470, 680, 500],
       hp: 3
     }
   },
@@ -147,16 +141,16 @@ const LEVELS = [
     height: 1680,
     start: [120, 310],
     exit: [3100, 1400],
-    prompt: "This room drops downward. Watch the camera, collect every star, and chain grapple shots.",
+    prompt: "Dungeon: descend in readable steps. Each long drop has a visible web point and recovery ledge.",
     platforms: [
-      [0, 460, 460, 120], [620, 560, 320, 80], [1080, 700, 300, 80], [1520, 860, 300, 80], [1920, 1040, 300, 80], [2360, 1220, 320, 80], [2840, 1500, 560, 180],
-      [430, 800, 180, 30], [870, 960, 180, 30], [1300, 1140, 180, 30], [1730, 1320, 180, 30], [2160, 1450, 180, 30]
+      [0, 460, 560, 120], [650, 560, 420, 90], [1160, 690, 410, 90], [1660, 840, 410, 90], [2120, 1010, 420, 90], [2540, 1200, 420, 90], [2920, 1500, 480, 180],
+      [480, 680, 220, 32], [850, 800, 220, 32], [1240, 940, 220, 32], [1640, 1080, 220, 32], [2020, 1230, 220, 32], [2400, 1370, 220, 32], [2760, 1430, 220, 32]
     ],
-    stars: [[710, 512], [1620, 812], [2940, 1452]],
-    yarn: [[300, 410], [720, 510], [1220, 652], [1640, 812], [2020, 992], [2460, 1172]],
-    fishCrates: [[950, 914]],
-    enemies: [[1130, 664, 120], [1970, 1004, 120], [2920, 1464, 120]],
-    webPoints: [[520, 360], [980, 480], [1430, 630], [1830, 800], [2250, 970], [2700, 1170], [3080, 1320]]
+    stars: [[300, 410], [1280, 642], [2780, 1384]],
+    yarn: [[220, 410], [620, 632], [900, 752], [1320, 642], [1740, 792], [2180, 962], [2600, 1152], [2960, 1452]],
+    fishCrates: [[900, 754]],
+    enemies: [[1710, 804, 90], [2960, 1464, 90]],
+    webPoints: [[560, 390], [820, 520], [1120, 610], [1500, 720], [1900, 880], [2320, 1040], [2700, 1220], [3040, 1340], [3200, 1320]]
   },
   {
     id: "attic",
@@ -166,17 +160,17 @@ const LEVELS = [
     height: 1040,
     start: [110, 750],
     exit: [3180, 680],
-    prompt: "Final boss: reflect Nancy's orbs with crystals, then swing the chandelier into her five times.",
+    prompt: "Attic finale: platforms are wide, crystals are reachable, and the chandelier has extra setup web points.",
     platforms: [
-      [0, 900, 640, 140], [800, 900, 440, 140], [1400, 900, 520, 140], [2080, 900, 440, 140], [2680, 900, 720, 140],
-      [520, 700, 200, 34], [980, 560, 220, 34], [1510, 460, 220, 34], [2050, 560, 220, 34], [2550, 700, 220, 34]
+      [0, 900, 720, 140], [840, 900, 520, 140], [1480, 900, 560, 140], [2160, 900, 520, 140], [2800, 900, 600, 140],
+      [520, 720, 250, 34], [900, 620, 260, 34], [1320, 540, 260, 34], [1740, 500, 280, 34], [2160, 580, 260, 34], [2580, 700, 260, 34]
     ],
-    stars: [[1010, 514], [1540, 414], [2580, 654]],
-    yarn: [[250, 850], [900, 850], [1130, 512], [1640, 412], [2160, 512], [2780, 850], [3060, 850]],
+    stars: [[560, 674], [1360, 494], [2580, 654]],
+    yarn: [[250, 850], [760, 850], [1010, 574], [1440, 494], [1860, 454], [2240, 534], [2680, 654], [2920, 850], [3160, 850]],
     fishCrates: [[580, 654], [2310, 854]],
-    enemies: [[850, 864, 130], [2140, 864, 130]],
-    webPoints: [[740, 600], [1280, 430], [1860, 330], [2420, 500], [2920, 640], [2200, 260, "nancyChandelier"]],
-    crystals: [[1790, 800], [1980, 800], [2170, 800]],
+    enemies: [[2240, 864, 80]],
+    webPoints: [[760, 610], [1120, 520], [1500, 430], [1860, 360], [2220, 460], [2600, 580], [2960, 650], [2020, 250], [2200, 260, "nancyChandelier"]],
+    crystals: [[1760, 800], [1980, 800], [2200, 800]],
     boss: {
       type: "nancy",
       name: "Nancy",
@@ -232,6 +226,7 @@ function resetLevel(index = levelIndex) {
   player.stars = 0;
   player.fish = 0;
   player.grapple = null;
+  player.jumpsUsed = 0;
   player.invuln = 0;
   gameWon = false;
   camera.x = 0;
@@ -323,11 +318,14 @@ function handleInput() {
   player.vx = Math.max(-7.2, Math.min(7.2, player.vx));
   if (fastFall && !player.grounded) player.vy += 0.52;
 
-  if (player.jumpBuffer > 0 && (player.grounded || player.coyote > 0)) {
+  const canGroundJump = player.grounded || player.coyote > 0;
+  const canAirJump = !canGroundJump && player.jumpsUsed < player.maxJumps - 1;
+  if (player.jumpBuffer > 0 && (canGroundJump || canAirJump)) {
     player.vy = -14.4;
     player.grounded = false;
     player.jumpBuffer = 0;
     player.coyote = 0;
+    player.jumpsUsed = canGroundJump ? 1 : player.jumpsUsed + 1;
     puff(player.x + player.w / 2, player.y + player.h, "#fff5cf", 8);
   }
 }
@@ -360,7 +358,10 @@ function updatePlayer(dt) {
   player.grounded = false;
   collideAxis("y");
   player.vx *= player.grounded ? FRICTION : AIR_FRICTION;
-  if (player.grounded) player.coyote = 0.12;
+  if (player.grounded) {
+    player.coyote = 0.12;
+    player.jumpsUsed = 0;
+  }
 
   if (player.y > level.height + 160) hurtPlayer("Kitty fell. Restarting the room.");
 
@@ -429,6 +430,7 @@ function hurtPlayer(text) {
     player.y = player.spawnY;
     player.vx = 0;
     player.vy = 0;
+    player.jumpsUsed = 0;
   }
 }
 
@@ -1021,7 +1023,7 @@ function drawHud() {
   ctx.fillText(`Room ${levelIndex + 1}/${LEVELS.length}: ${level.name}`, 34, 86);
   ctx.font = "bold 18px Trebuchet MS";
   ctx.fillStyle = "#dbeafe";
-  ctx.fillText("Move A/D or Arrows | Jump W/Space | Grapple E or Right Mouse | Restart R", VIEW_W - 690, 50);
+  ctx.fillText("Move A/D or Arrows | Double Jump W/Space | Grapple E or Right Mouse | Restart R", VIEW_W - 745, 50);
   if (messageTimer > 0 && message) {
     ctx.fillStyle = "rgba(5,8,13,0.72)";
     ctx.fillRect(330, VIEW_H - 86, 620, 46);
