@@ -1659,6 +1659,7 @@
       button.addEventListener("click", () => {
         document.querySelectorAll(".mode-card").forEach(card => card.classList.remove("selected"));
         button.classList.add("selected");
+        startGameWithWipe();
       });
     });
 

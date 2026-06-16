@@ -866,3 +866,126 @@
       }
       .story-text { font-size: clamp(0.68rem, 2.7vw, 0.9rem); }
     }
+
+    /* Image-accurate main menu: keep Kitty's provided art visible, use controls as hit areas. */
+    .start {
+      justify-content: center;
+      background:
+        linear-gradient(rgba(0,0,0,0.02), rgba(0,0,0,0.02)),
+        url("kitttty.png") center / cover no-repeat,
+        #070907;
+    }
+
+    .start::before {
+      inset: 0;
+      background: radial-gradient(circle at 50% 50%, transparent 58%, rgba(0,0,0,0.24));
+      opacity: 1;
+    }
+
+    .start::after,
+    .start > .stars,
+    .start .title,
+    .start .runway,
+    .start .level-board::before,
+    .start .level-tile {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .menu-stage {
+      position: absolute;
+      left: 13.4vw;
+      right: 11.7vw;
+      bottom: 7.2vh;
+      width: auto;
+      height: 40vh;
+      grid-template-columns: 2.12fr 0.98fr;
+      gap: 2.5vw;
+      margin: 0;
+    }
+
+    .level-board {
+      min-height: 0;
+      height: 100%;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      box-shadow: none;
+      transform: rotate(-3deg);
+      pointer-events: none;
+    }
+
+    .mode-panel {
+      align-self: start;
+      height: 88%;
+      margin-top: 1vh;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      box-shadow: none;
+      animation: none;
+    }
+
+    .mode-panel h2 {
+      height: 23%;
+      margin: 0;
+      padding: 0;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .mode-grid {
+      height: 54%;
+      display: grid;
+      grid-template-rows: repeat(3, 1fr);
+      gap: 0;
+    }
+
+    .mode-card {
+      min-height: 0;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      color: transparent;
+      text-shadow: none;
+      box-shadow: none;
+      font-size: 0;
+    }
+
+    .mode-card span,
+    .mode-card::before {
+      display: none;
+    }
+
+    .mode-card:hover,
+    .mode-card.selected {
+      background: rgba(255, 224, 151, 0.08);
+      box-shadow: inset 0 0 28px rgba(255, 224, 151, 0.12);
+      transform: scale(1.02);
+    }
+
+    #startButton {
+      height: 22%;
+      margin: 0;
+      padding: 0;
+      border: 0;
+      color: transparent;
+      background: transparent;
+      box-shadow: none;
+      animation: none;
+    }
+
+    #startButton:hover {
+      background: rgba(124, 244, 165, 0.08);
+      box-shadow: inset 0 0 34px rgba(124, 244, 165, 0.16);
+    }
+
+    @media (max-aspect-ratio: 16/9) {
+      .start { background-size: contain; background-color: #070907; }
+      .menu-stage {
+        left: calc(50vw - 42.6vh);
+        right: calc(50vw - 43.6vh);
+        bottom: 7.2vh;
+        height: 40vh;
+      }
+    }
