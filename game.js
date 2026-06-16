@@ -371,21 +371,18 @@
       showScreen("game");
       loadRoom(0);
       hud.timerWrap.style.display = selectedMode === "speedrun" ? "inline" : "none";
+      draw();
     }
 
     function startGameWithWipe() {
       if (gameState !== "start") return;
       resumeMusic();
-      fade.classList.add("wipe", "on");
-      setTimeout(() => {
-        startGame();
-        fade.classList.remove("wipe", "on");
-      }, 620);
+      fade.classList.remove("wipe", "on");
+      startGame();
     }
 
     function transitionFade() {
-      fade.classList.add("on");
-      setTimeout(() => fade.classList.remove("on"), 360);
+      fade.classList.remove("wipe", "on");
     }
 
     function update(dt) {
@@ -2029,8 +2026,15 @@
     function loop(time) {
       const dt = Math.min(34, time - lastTime || 16.67);
       lastTime = time;
-      update(dt);
-      draw();
+      try {
+        update(dt);
+        draw();
+      } catch (error) {
+        console.error(error);
+        fade.classList.remove("wipe", "on");
+        showToast("Game fixed itself: press PLAY again");
+        showScreen("start");
+      }
       requestAnimationFrame(loop);
     }
 
