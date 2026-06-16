@@ -19,6 +19,7 @@ const quitButton = document.getElementById("quitButton");
 const levelEditor = document.getElementById("levelEditor");
 const closeEditor = document.getElementById("closeEditor");
 const levelJson = document.getElementById("levelJson");
+const transitionFade = document.getElementById("transitionFade");
 const toast = document.getElementById("toast");
 
 const VIEW_W = 1280;
@@ -50,11 +51,12 @@ let storyTypingTimer = 0;
 let storyTypingIndex = 0;
 let classicStoryCompleted = false;
 let speedrunModeUnlocked = false;
+let selectedMode = "classic";
 
 const STORY_SCENES = [
-  "Hello, I'm Kitty. I was abandoned by my only friend, Peter... He even threw Nancy into these haunted rooms!",
-  "Psst... Have you heard? Deep within this mansion lies a portal to the legendary Magic Cat Clan land!",
-  "I've made a vow. I am going to reach the Magic Cat Clan land!"
+  "Hello, I'm Kitty. My owner Peter abandoned me and sent me to Nancy's mansion.",
+  "Nancy owns one hundred cats. Every cat loves her except me, because Nancy treats me badly.",
+  "A mysterious cat told me about a magical cat land beyond the mansion. Tonight, I escape."
 ];
 
 const player = {
@@ -236,11 +238,23 @@ function showMainMenu() {
 }
 
 function updateMenuLocks() {
+  document.querySelectorAll(".level-hotspot").forEach(button => {
+    const levelNumber = Number(button.dataset.level);
+    const unlocked = levelNumber < unlockedLevels;
+    button.classList.toggle("locked", !unlocked);
+    button.classList.toggle("unlocked", unlocked);
+    button.setAttribute("aria-disabled", String(!unlocked));
+  });
+
   document.querySelectorAll("[data-locked='true']").forEach(button => {
     const mode = button.dataset.mode;
     const unlocked = mode === "speedrun" ? speedrunModeUnlocked : classicStoryCompleted;
     button.classList.toggle("locked", !unlocked);
     button.setAttribute("aria-disabled", String(!unlocked));
+  });
+
+  document.querySelectorAll(".version-hotspot").forEach(button => {
+    button.classList.toggle("active", button.dataset.mode === selectedMode);
   });
 }
 
@@ -311,6 +325,19 @@ function startLevel(index) {
   running = true;
   levelStartFishFound = new Set(fishFound);
   resetLevel(index);
+}
+
+function startLevelWithFade(index) {
+  if (index >= unlockedLevels) {
+    showLockedFeedback(document.querySelector(`.level-hotspot[data-level="${index}"]`));
+    return;
+  }
+  playMenuSound("start");
+  transitionFade.classList.add("active");
+  window.setTimeout(() => {
+    startLevel(index);
+    transitionFade.classList.remove("active");
+  }, 360);
 }
 
 function quitToLevelSelect() {
@@ -410,6 +437,21 @@ function say(text, seconds = 2.5) {
   toast.classList.add("show");
   clearTimeout(say.hideTimer);
   say.hideTimer = setTimeout(() => toast.classList.remove("show"), seconds * 1000);
+}
+
+function showLockedFeedback(button) {
+  playMenuSound("locked");
+  if (button) {
+    button.classList.remove("bump");
+    void button.offsetWidth;
+    button.classList.add("bump");
+  }
+  say("Locked. Complete the previous room first.", 1.5);
+}
+
+function playMenuSound(name) {
+  // Sound placeholder: connect real click, locked, and unlock sounds here later.
+  void name;
 }
 
 function resizeCanvas() {
@@ -876,6 +918,7 @@ function swingNancyChandelier(point) {
 function nextLevel() {
   if (levelIndex < LEVELS.length - 1) {
     saveUnlockedLevels(levelIndex + 2);
+    updateMenuLocks();
     say(`${LEVELS[levelIndex + 1].name} unlocked!`);
     showLevelSelect();
   } else {
@@ -1281,28 +1324,38 @@ function loop(now) {
 
 function startGame() {
   speedrunModeUnlocked = true;
+  selectedMode = "classic";
+  playMenuSound("select");
   updateMenuLocks();
-  hidePanels();
   fishFound = new Set();
-  startLevel(0);
+  startLevelWithFade(0);
 }
 
 playButton.addEventListener("click", startGame);
 roomsButton.addEventListener("click", showLevelSelect);
 storyNext.addEventListener("click", advanceStory);
+document.querySelectorAll(".level-hotspot").forEach(button => {
+  button.addEventListener("click", () => {
+    startLevelWithFade(Number(button.dataset.level));
+  });
+});
 document.querySelectorAll("[data-locked='true']").forEach(button => {
   button.addEventListener("click", () => {
     if (button.classList.contains("locked")) {
-      say("Locked. Press PLAY to begin Classic Story first.", 1.5);
+      showLockedFeedback(button);
       return;
     }
-    document.querySelectorAll(".version-option").forEach(option => option.classList.remove("active"));
-    button.classList.add("active");
+    selectedMode = button.dataset.mode;
+    playMenuSound("select");
+    updateMenuLocks();
+    say(`${button.getAttribute("aria-label")} selected.`, 1.2);
   });
 });
-document.querySelector("[data-mode='classic']").addEventListener("click", () => {
-  document.querySelectorAll(".version-option").forEach(option => option.classList.remove("active"));
-  document.querySelector("[data-mode='classic']").classList.add("active");
+document.querySelector("[data-mode='classic']").addEventListener("click", event => {
+  selectedMode = "classic";
+  playMenuSound("select");
+  updateMenuLocks();
+  if (event.currentTarget.id !== "playButton") say("Classic Story selected.", 1.2);
 });
 backToMenu.addEventListener("click", showMainMenu);
 continueButton.addEventListener("click", () => setPaused(false));

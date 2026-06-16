@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Kitty Whiscape</title>
-  <link rel="stylesheet" href="style.css?v=20260616-menu1">
+  <link rel="stylesheet" href="style.css?v=20260616-image-menu1">
 </head>
 <body>
   <main class="app">
@@ -23,27 +23,30 @@
       </div>
     </section>
 
-    <section id="menu" class="menu-screen" hidden>
-      <h1 class="menu-title">Kitty Whiscape</h1>
-      <div class="filigree-window" aria-hidden="true">
-        <div class="web-lines"></div>
-        <div class="runner-cat"></div>
-      </div>
+    <section id="menu" class="image-menu" hidden aria-label="Kitty Whiscape main menu">
+      <div class="menu-art" aria-label="Kitty Whiscape level and version selection">
+        <img src="kitttty.png" alt="Kitty Whiscape haunted mansion menu">
 
-      <div class="menu-layout">
-        <button id="roomsButton" class="number-board" type="button" aria-label="Choose room">
-          <span>1</span><span class="lit">2</span><span class="lit">3</span><span>4</span>
-          <span>5</span><span>6</span><span>7</span><span>8</span>
-        </button>
+        <div class="title-letter-layer" aria-hidden="true">
+          <span>K</span><span>i</span><span>t</span><span>t</span><span>y</span>
+          <span>&nbsp;</span>
+          <span>W</span><span>h</span><span>i</span><span>s</span><span>c</span><span>a</span><span>p</span><span>e</span>
+        </div>
 
-        <aside class="version-board" aria-label="Choose Version">
-          <h2><span class="check-mark">✓</span>Choose Version</h2>
-          <button class="version-option active" type="button" data-mode="classic"><small>1</small><span>Classic Story</span></button>
-          <button class="version-option locked" type="button" data-mode="speedrun" data-locked="true"><small>2</small><span>Speedrun Mode</span></button>
-          <button class="version-option locked" type="button" data-mode="endless" data-locked="true"><small>3</small><span>Endless Mansion</span></button>
-          <button id="playButton" class="play-button" type="button"><span>PLAY</span></button>
-          <button id="editorButton" class="editor-link" type="button">Level Data</button>
-        </aside>
+        <div class="menu-runner" aria-hidden="true"></div>
+
+        <button class="menu-hotspot level-hotspot level-1 unlocked" type="button" data-level="0" aria-label="Start Level 1"></button>
+        <button class="menu-hotspot level-hotspot level-2 locked" type="button" data-level="1" aria-label="Start Level 2"></button>
+        <button class="menu-hotspot level-hotspot level-3 locked" type="button" data-level="2" aria-label="Start Level 3"></button>
+        <button class="menu-hotspot level-hotspot level-4 locked" type="button" data-level="3" aria-label="Start Level 4"></button>
+        <button class="menu-hotspot level-hotspot level-5 locked" type="button" data-level="4" aria-label="Start Level 5"></button>
+
+        <button id="playButton" class="menu-hotspot version-hotspot classic active" type="button" data-mode="classic" aria-label="Classic Story"></button>
+        <button class="menu-hotspot version-hotspot speedrun locked" type="button" data-mode="speedrun" data-locked="true" aria-label="Speedrun Mode"></button>
+        <button class="menu-hotspot version-hotspot endless locked" type="button" data-mode="endless" data-locked="true" aria-label="Endless Mansion"></button>
+
+        <button id="roomsButton" class="menu-hotspot choose-hotspot" type="button" aria-label="Choose room list"></button>
+        <button id="editorButton" class="menu-hotspot editor-hotspot" type="button" aria-label="Level Data"></button>
       </div>
     </section>
 
@@ -71,9 +74,10 @@
       <textarea id="levelJson" spellcheck="false"></textarea>
     </section>
 
+    <div id="transitionFade" class="transition-fade"></div>
     <div id="toast" class="toast" role="status" aria-live="polite"></div>
   </main>
 
-  <script src="game.js?v=20260616-menu1"></script>
+  <script src="game.js?v=20260616-image-menu1"></script>
 </body>
 </html>

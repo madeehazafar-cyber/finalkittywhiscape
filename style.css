@@ -746,3 +746,228 @@ button {
   .level-map { grid-template-columns: 1fr; }
   .room-button { min-height: 94px; }
 }
+
+/* Image-based main menu. The artwork stays intact; invisible hotspots sit on top. */
+.image-menu {
+  position: absolute;
+  z-index: 4;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  background: #050504;
+  animation: menuFadeIn 640ms ease both;
+}
+
+.image-menu[hidden] { display: none !important; }
+
+.menu-art {
+  position: relative;
+  width: min(100vw, calc(100vh * 1.7786458333));
+  aspect-ratio: 1366 / 768;
+  max-width: 100vw;
+  max-height: 100vh;
+  overflow: hidden;
+  background: #050504;
+  box-shadow: 0 0 80px rgba(0, 0, 0, 0.75);
+}
+
+.menu-art img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center;
+  user-select: none;
+  pointer-events: none;
+}
+
+.menu-hotspot {
+  position: absolute;
+  z-index: 3;
+  border: 1px solid transparent;
+  border-radius: 12px;
+  background: transparent;
+  opacity: 1;
+  transition:
+    box-shadow 240ms ease,
+    background 240ms ease,
+    filter 240ms ease,
+    transform 240ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.menu-hotspot:hover,
+.menu-hotspot:focus-visible {
+  outline: none;
+  background: rgba(255, 221, 126, 0.08);
+  box-shadow: 0 0 28px rgba(255, 224, 145, 0.72), inset 0 0 22px rgba(255, 224, 145, 0.2);
+}
+
+.menu-hotspot.locked {
+  cursor: not-allowed;
+  filter: grayscale(1);
+}
+
+.menu-hotspot.locked:hover,
+.menu-hotspot.locked:focus-visible {
+  background: rgba(180, 180, 180, 0.05);
+  box-shadow: 0 0 18px rgba(170, 170, 170, 0.28), inset 0 0 16px rgba(170, 170, 170, 0.12);
+}
+
+.menu-hotspot.locked.bump {
+  animation: lockedShake 220ms ease;
+}
+
+.menu-hotspot.active {
+  box-shadow: 0 0 22px rgba(255, 229, 158, 0.56), inset 0 0 18px rgba(255, 229, 158, 0.16);
+}
+
+.level-hotspot {
+  width: 8.8%;
+  height: 10.8%;
+}
+
+.level-1 { left: 19.1%; top: 58.6%; }
+.level-2 { left: 31.0%; top: 55.8%; }
+.level-3 { left: 42.0%; top: 55.4%; }
+.level-4 { left: 52.5%; top: 58.2%; }
+.level-5 { left: 19.3%; top: 74.3%; }
+
+.version-hotspot {
+  left: 69.2%;
+  width: 18.1%;
+  height: 6.9%;
+  border-radius: 8px;
+}
+
+.version-hotspot.classic { top: 66.5%; }
+.version-hotspot.speedrun { top: 74.0%; }
+.version-hotspot.endless { top: 81.4%; }
+
+.choose-hotspot {
+  left: 67.4%;
+  top: 50.0%;
+  width: 20.3%;
+  height: 7.0%;
+  border-radius: 8px;
+}
+
+.editor-hotspot {
+  right: 1.6%;
+  bottom: 2.2%;
+  width: 5.5%;
+  height: 8.4%;
+  border-radius: 999px;
+}
+
+.title-letter-layer {
+  position: absolute;
+  z-index: 2;
+  left: 25.2%;
+  top: 9.5%;
+  width: 51.5%;
+  display: flex;
+  justify-content: center;
+  pointer-events: none;
+  color: transparent;
+}
+
+.title-letter-layer span {
+  display: inline-block;
+  animation:
+    titlePop 520ms cubic-bezier(0.34, 1.56, 0.64, 1) both,
+    titleFloat 3.1s ease-in-out infinite;
+}
+
+.title-letter-layer span:nth-child(1) { animation-delay: 0ms, 0ms; }
+.title-letter-layer span:nth-child(2) { animation-delay: 60ms, 90ms; }
+.title-letter-layer span:nth-child(3) { animation-delay: 120ms, 180ms; }
+.title-letter-layer span:nth-child(4) { animation-delay: 180ms, 270ms; }
+.title-letter-layer span:nth-child(5) { animation-delay: 240ms, 360ms; }
+.title-letter-layer span:nth-child(6) { animation-delay: 300ms, 450ms; }
+.title-letter-layer span:nth-child(7) { animation-delay: 360ms, 540ms; }
+.title-letter-layer span:nth-child(8) { animation-delay: 420ms, 630ms; }
+.title-letter-layer span:nth-child(9) { animation-delay: 480ms, 720ms; }
+.title-letter-layer span:nth-child(10) { animation-delay: 540ms, 810ms; }
+.title-letter-layer span:nth-child(11) { animation-delay: 600ms, 900ms; }
+.title-letter-layer span:nth-child(12) { animation-delay: 660ms, 990ms; }
+.title-letter-layer span:nth-child(13) { animation-delay: 720ms, 1080ms; }
+.title-letter-layer span:nth-child(14) { animation-delay: 780ms, 1170ms; }
+
+.menu-runner {
+  position: absolute;
+  z-index: 2;
+  left: 13.4%;
+  top: 28.2%;
+  width: 4.2%;
+  height: 5.2%;
+  border-radius: 50% 54% 44% 42%;
+  background: #efd5a6;
+  filter: drop-shadow(0 0 12px rgba(255, 232, 160, 0.42));
+  pointer-events: none;
+  animation: menuCatTravel 8s linear infinite;
+}
+
+.menu-runner::before,
+.menu-runner::after {
+  content: "";
+  position: absolute;
+}
+
+.menu-runner::before {
+  right: -12%;
+  top: -45%;
+  width: 54%;
+  height: 72%;
+  background: #efd5a6;
+  clip-path: polygon(0 100%, 18% 15%, 42% 42%, 66% 42%, 88% 15%, 100% 100%);
+}
+
+.menu-runner::after {
+  left: -42%;
+  top: 28%;
+  width: 48%;
+  height: 26%;
+  border-top: 0.38rem solid #efd5a6;
+  border-radius: 999px;
+  transform: rotate(-24deg);
+}
+
+.transition-fade {
+  position: absolute;
+  z-index: 10;
+  inset: 0;
+  pointer-events: none;
+  background: #020202;
+  opacity: 0;
+  transition: opacity 420ms ease;
+}
+
+.transition-fade.active {
+  opacity: 1;
+}
+
+@keyframes menuFadeIn {
+  from { opacity: 0; filter: brightness(0.75); }
+  to { opacity: 1; filter: brightness(1); }
+}
+
+@keyframes titlePop {
+  from { transform: translateY(18px) scale(0.7); opacity: 0; }
+  to { transform: translateY(0) scale(1); opacity: 1; }
+}
+
+@keyframes titleFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}
+
+@keyframes menuCatTravel {
+  0% { transform: translateX(0) translateY(0); opacity: 0; }
+  5% { opacity: 1; }
+  48% { transform: translateX(1650%) translateY(-2px); opacity: 1; }
+  52% { transform: translateX(1700%) translateY(-2px); opacity: 0; }
+  53% { transform: translateX(0); opacity: 0; }
+  58%, 100% { opacity: 1; }
+}
