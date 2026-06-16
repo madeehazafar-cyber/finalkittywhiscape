@@ -981,19 +981,31 @@
     }
 
     #startButton {
-      height: 22%;
-      margin: 0;
-      padding: 0;
-      border: 0;
-      color: transparent;
-      background: transparent;
-      box-shadow: none;
-      animation: none;
+      height: auto;
+      margin: 14px auto 0;
+      padding: 12px 34px;
+      display: block;
+      width: min(220px, 78%);
+      border: 2px solid rgba(245, 224, 158, 0.72);
+      color: #2a180f;
+      font-size: clamp(1.05rem, 2vw, 1.35rem);
+      letter-spacing: 0.08em;
+      background: linear-gradient(120deg, #f3df9d, #b98a48, #79a66c, #f3df9d);
+      background-size: 220% 100%;
+      box-shadow:
+        0 10px 26px rgba(0,0,0,0.48),
+        0 0 24px rgba(245, 224, 158, 0.26),
+        inset 0 1px 0 rgba(255,255,255,0.55);
+      animation: ctaShift 4s ease-in-out infinite, ctaPulse 2.3s ease-in-out infinite;
     }
 
     #startButton:hover {
-      background: rgba(124, 244, 165, 0.08);
-      box-shadow: inset 0 0 34px rgba(124, 244, 165, 0.16);
+      color: #160d08;
+      background-position: 100% 50%;
+      box-shadow:
+        0 14px 34px rgba(0,0,0,0.55),
+        0 0 34px rgba(245, 224, 158, 0.44),
+        inset 0 1px 0 rgba(255,255,255,0.7);
     }
 
     @media (max-aspect-ratio: 16/9) {
