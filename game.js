@@ -2067,5 +2067,6 @@
     canvas.addEventListener("mousedown", shootWeb);
 
     buildTitle();
-    setTimeout(beginPrologue, 2100);
+    // Keep the game immediately playable: load straight into the menu.
+    setTimeout(() => showScreen("start"), 900);
     requestAnimationFrame(loop);
