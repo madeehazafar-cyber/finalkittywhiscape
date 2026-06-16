@@ -4,6 +4,9 @@
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 const menu = document.getElementById("menu");
+const storyIntro = document.getElementById("storyIntro");
+const storyText = document.getElementById("storyText");
+const storyNext = document.getElementById("storyNext");
 const playButton = document.getElementById("playButton");
 const roomsButton = document.getElementById("roomsButton");
 const editorButton = document.getElementById("editorButton");
@@ -41,6 +44,18 @@ let levelStartFishFound = new Set();
 let gameWon = false;
 let unlockedLevels = 1;
 let paused = false;
+let storyActive = true;
+let storyIndex = 0;
+let storyTypingTimer = 0;
+let storyTypingIndex = 0;
+let classicStoryCompleted = false;
+let speedrunModeUnlocked = false;
+
+const STORY_SCENES = [
+  "Hello, I'm Kitty. I was abandoned by my only friend, Peter... He even threw Nancy into these haunted rooms!",
+  "Psst... Have you heard? Deep within this mansion lies a portal to the legendary Magic Cat Clan land!",
+  "I've made a vow. I am going to reach the Magic Cat Clan land!"
+];
 
 const player = {
   x: 0,
@@ -216,7 +231,54 @@ function showMainMenu() {
   running = false;
   paused = false;
   hidePanels();
+  updateMenuLocks();
   menu.hidden = false;
+}
+
+function updateMenuLocks() {
+  document.querySelectorAll("[data-locked='true']").forEach(button => {
+    const mode = button.dataset.mode;
+    const unlocked = mode === "speedrun" ? speedrunModeUnlocked : classicStoryCompleted;
+    button.classList.toggle("locked", !unlocked);
+    button.setAttribute("aria-disabled", String(!unlocked));
+  });
+}
+
+function typeStoryScene(reset = false) {
+  const text = STORY_SCENES[storyIndex];
+  if (reset) {
+    storyTypingIndex = 0;
+    storyText.textContent = "";
+    storyIntro.classList.remove("scene-rumor", "scene-vow");
+    if (storyIndex === 1) storyIntro.classList.add("scene-rumor");
+    if (storyIndex === 2) storyIntro.classList.add("scene-vow");
+    storyNext.textContent = storyIndex === STORY_SCENES.length - 1 ? "Enter Mansion" : "Next";
+  }
+  if (storyTypingIndex < text.length) {
+    storyTypingIndex += 1;
+    storyText.textContent = text.slice(0, storyTypingIndex);
+  }
+}
+
+function advanceStory() {
+  const text = STORY_SCENES[storyIndex];
+  if (storyTypingIndex < text.length) {
+    storyTypingIndex = text.length;
+    storyText.textContent = text;
+    return;
+  }
+  if (storyIndex < STORY_SCENES.length - 1) {
+    storyIndex += 1;
+    typeStoryScene(true);
+    return;
+  }
+  storyActive = false;
+  storyIntro.classList.add("leaving");
+  window.setTimeout(() => {
+    storyIntro.classList.remove("active");
+    storyIntro.hidden = true;
+    showMainMenu();
+  }, 680);
 }
 
 function showLevelSelect() {
@@ -824,6 +886,9 @@ function nextLevel() {
 function winGame() {
   gameWon = true;
   running = false;
+  classicStoryCompleted = true;
+  speedrunModeUnlocked = true;
+  updateMenuLocks();
   saveUnlockedLevels(LEVELS.length);
   say(`Nancy defeated. Hidden fish found: ${fishFound.size}/${TOTAL_FISH}.`, 9);
 }
@@ -1215,6 +1280,8 @@ function loop(now) {
 }
 
 function startGame() {
+  speedrunModeUnlocked = true;
+  updateMenuLocks();
   hidePanels();
   fishFound = new Set();
   startLevel(0);
@@ -1222,6 +1289,21 @@ function startGame() {
 
 playButton.addEventListener("click", startGame);
 roomsButton.addEventListener("click", showLevelSelect);
+storyNext.addEventListener("click", advanceStory);
+document.querySelectorAll("[data-locked='true']").forEach(button => {
+  button.addEventListener("click", () => {
+    if (button.classList.contains("locked")) {
+      say("Locked. Press PLAY to begin Classic Story first.", 1.5);
+      return;
+    }
+    document.querySelectorAll(".version-option").forEach(option => option.classList.remove("active"));
+    button.classList.add("active");
+  });
+});
+document.querySelector("[data-mode='classic']").addEventListener("click", () => {
+  document.querySelectorAll(".version-option").forEach(option => option.classList.remove("active"));
+  document.querySelector("[data-mode='classic']").classList.add("active");
+});
 backToMenu.addEventListener("click", showMainMenu);
 continueButton.addEventListener("click", () => setPaused(false));
 quitButton.addEventListener("click", quitToLevelSelect);
@@ -1248,6 +1330,13 @@ window.addEventListener("mousedown", e => {
 });
 window.addEventListener("keydown", e => {
   const key = e.key.toLowerCase();
+  if (storyActive) {
+    if (key === "enter" || key === " ") {
+      e.preventDefault();
+      advanceStory();
+    }
+    return;
+  }
   if (key === "escape") {
     e.preventDefault();
     if (running || paused) setPaused(!paused);
@@ -1266,4 +1355,9 @@ resizeCanvas();
 resetLevel(0);
 running = false;
 renderLevelSelect();
+updateMenuLocks();
+typeStoryScene(true);
+window.setInterval(() => {
+  if (storyActive) typeStoryScene(false);
+}, 26);
 requestAnimationFrame(loop);

@@ -4,18 +4,47 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Kitty Whiscape</title>
-  <link rel="stylesheet" href="style.css?v=20260616-workinggame1">
+  <link rel="stylesheet" href="style.css?v=20260616-menu1">
 </head>
 <body>
   <main class="app">
     <canvas id="gameCanvas" width="1280" height="720" aria-label="Kitty Whiscape canvas game"></canvas>
 
-    <section id="menu" class="panel menu mansion-panel">
-      <h1>Kitty Whiscape</h1>
-      <p>Nancy's mansion waits in velvet shadows. Guide Kitty through locked rooms, haunted platforms, and yarn-lit secrets.</p>
-      <button id="playButton" type="button">PLAY</button>
-      <button id="roomsButton" type="button">Choose Room</button>
-      <button id="editorButton" type="button">Level Data</button>
+    <section id="storyIntro" class="story-intro active" aria-label="Kitty Whiscape story intro">
+      <div class="story-stage">
+        <div id="introKitty" class="story-cat kitty-pop">
+          <span></span><span></span>
+        </div>
+        <div id="introElder" class="story-cat elder-cat" aria-hidden="true"></div>
+        <article class="speech-bubble">
+          <p id="storyText"></p>
+          <button id="storyNext" type="button">Next</button>
+        </article>
+      </div>
+    </section>
+
+    <section id="menu" class="menu-screen" hidden>
+      <h1 class="menu-title">Kitty Whiscape</h1>
+      <div class="filigree-window" aria-hidden="true">
+        <div class="web-lines"></div>
+        <div class="runner-cat"></div>
+      </div>
+
+      <div class="menu-layout">
+        <button id="roomsButton" class="number-board" type="button" aria-label="Choose room">
+          <span>1</span><span class="lit">2</span><span class="lit">3</span><span>4</span>
+          <span>5</span><span>6</span><span>7</span><span>8</span>
+        </button>
+
+        <aside class="version-board" aria-label="Choose Version">
+          <h2><span class="check-mark">✓</span>Choose Version</h2>
+          <button class="version-option active" type="button" data-mode="classic"><small>1</small><span>Classic Story</span></button>
+          <button class="version-option locked" type="button" data-mode="speedrun" data-locked="true"><small>2</small><span>Speedrun Mode</span></button>
+          <button class="version-option locked" type="button" data-mode="endless" data-locked="true"><small>3</small><span>Endless Mansion</span></button>
+          <button id="playButton" class="play-button" type="button"><span>PLAY</span></button>
+          <button id="editorButton" class="editor-link" type="button">Level Data</button>
+        </aside>
+      </div>
     </section>
 
     <section id="levelSelect" class="panel level-select mansion-panel" hidden>
@@ -45,6 +74,6 @@
     <div id="toast" class="toast" role="status" aria-live="polite"></div>
   </main>
 
-  <script src="game.js?v=20260616-workinggame1"></script>
+  <script src="game.js?v=20260616-menu1"></script>
 </body>
 </html>
