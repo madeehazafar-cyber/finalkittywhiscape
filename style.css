@@ -636,6 +636,7 @@
 
     #gameCanvas {
       width: min(1040px, 100%);
+      max-height: calc(100vh - 154px);
       aspect-ratio: 16 / 9;
       border-radius: 18px;
       background: #111326;
@@ -674,6 +675,7 @@
       inset: 0;
       z-index: 15;
       pointer-events: none;
+      display: none;
       opacity: 0;
       background:
         linear-gradient(30deg, transparent 49.4%, rgba(255,255,255,0.26) 49.8% 50.2%, transparent 50.6%),
@@ -682,7 +684,10 @@
       mix-blend-mode: screen;
     }
 
-    .web-overlay.show { animation: webFlash 5s ease forwards; }
+    .web-overlay.show {
+      display: block;
+      animation: webFlash 5s ease forwards;
+    }
 
     .modal {
       position: fixed;

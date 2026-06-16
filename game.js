@@ -1047,6 +1047,7 @@
       ctx.translate(sx, sy);
       if (slowMo > 0) ctx.filter = "grayscale(1) contrast(1.15)";
       drawRoom();
+      drawGameplayGuide();
       drawPlatforms();
       drawSpikes();
       drawHazards();
@@ -1537,9 +1538,15 @@
 
     function drawRoom() {
       const [base, wall, trim] = currentRoom.palette;
-      ctx.fillStyle = base;
+      ctx.fillStyle = base || "#171533";
       ctx.fillRect(0, 0, canvas.width, canvas.height);
-      ctx.fillStyle = wall;
+      const roomGlow = ctx.createRadialGradient(520, 260, 60, 520, 260, 650);
+      roomGlow.addColorStop(0, "rgba(255, 209, 102, 0.13)");
+      roomGlow.addColorStop(0.45, "rgba(169, 140, 255, 0.08)");
+      roomGlow.addColorStop(1, "rgba(0,0,0,0)");
+      ctx.fillStyle = wall || "#4b243c";
+      ctx.fillRect(28, 62, 984, 454);
+      ctx.fillStyle = roomGlow;
       ctx.fillRect(28, 62, 984, 454);
       ctx.fillStyle = trim;
       for (let x = 64; x < 980; x += 112) {
@@ -1573,6 +1580,25 @@
         ctx.font = "bold 12px Trebuchet MS";
         ctx.fillText(`${roomStars}/${currentRoom.requiredStars || 0} stars`, currentRoom.exit[0] - 10, currentRoom.exit[1] - 10);
       }
+    }
+
+    function drawGameplayGuide() {
+      if (!player || roomNumber !== 1) return;
+      ctx.save();
+      ctx.fillStyle = "rgba(255, 241, 184, 0.94)";
+      ctx.font = "bold 16px Trebuchet MS";
+      ctx.textAlign = "center";
+      ctx.fillText("Collect all 3 stars, then reach EXIT", 520, 74);
+      ctx.fillText("A/D move  |  W jump  |  Click platforms to web-grapple", 520, 96);
+      ctx.strokeStyle = "rgba(255, 241, 184, 0.55)";
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(player.x + 18, player.y - 42);
+      ctx.lineTo(player.x + 18, player.y - 10);
+      ctx.stroke();
+      ctx.fillStyle = "#fff1b8";
+      ctx.fillText("KITTY", player.x + 20, player.y - 48);
+      ctx.restore();
     }
 
     function drawRoomDecor(name) {
@@ -1654,10 +1680,13 @@
     function drawThemedPlatform(p) {
       const name = currentRoom.name;
       if (p.h > 40) {
-        ctx.fillStyle = "#20172a";
+        ctx.fillStyle = "#34213f";
         ctx.fillRect(p.x, p.y, p.w, p.h);
-        ctx.fillStyle = "#55384d";
+        ctx.fillStyle = "#ffd166";
         ctx.fillRect(p.x, p.y, p.w, 10);
+        ctx.strokeStyle = "rgba(255,241,184,0.36)";
+        ctx.lineWidth = 2;
+        ctx.strokeRect(p.x, p.y, p.w, p.h);
         return;
       }
       if (name.includes("Cozy") || name.includes("Kitchen")) {
@@ -1834,7 +1863,10 @@
       if (player.invincible > 0 && Math.floor(player.invincible / 5) % 2) ctx.globalAlpha = 0.45;
       ctx.translate(player.x + player.w / 2, player.y + player.h / 2);
       ctx.rotate(player.flip);
+      ctx.shadowBlur = 18;
+      ctx.shadowColor = "#fff1b8";
       drawCat(-player.w / 2, -player.h / 2, player.w, "#fff0d0", player.facing, false);
+      ctx.shadowBlur = 0;
       ctx.restore();
     }
     function drawCat(x, y, size, color, facing, sleepy) {
