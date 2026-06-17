@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kitty Whiscape</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="app">
+    <canvas id="gameCanvas" width="1280" height="720" aria-label="Kitty Whiscape canvas game"></canvas>
+
+    <!-- ── Main menu ── -->
+    <section id="menu" class="panel menu">
+      <h1>Kitty Whiscape</h1>
+      <p>Nancy's mansion waits in velvet shadows. Guide Kitty through locked rooms, haunted platforms, and yarn-lit secrets.</p>
+      <button id="playButton" type="button">Start Game</button>
+      <button id="editorButton" type="button">Level Data</button>
+    </section>
+
+    <!-- ── Level select ── -->
+    <section id="levelSelect" class="panel level-select" hidden>
+      <div class="editor-head">
+        <h2>Nancy's Mansion</h2>
+        <button id="backToMenu" type="button">Main Menu</button>
+      </div>
+      <p>Choose an unlocked room. Completing a room unlocks the next door.</p>
+      <div id="levelMap" class="level-map" aria-label="Nancy's mansion level map"></div>
+    </section>
+
+    <!-- ── Pause menu ── -->
+    <section id="pauseMenu" class="panel pause-menu" hidden>
+      <h2>Paused</h2>
+      <button id="continueButton" type="button">Continue</button>
+      <button id="quitButton" type="button">Quit to Level Select</button>
+    </section>
+
+    <!-- ── Level editor ── -->
+    <section id="levelEditor" class="panel editor" hidden>
+      <div class="editor-head">
+        <h2>Editable Level JSON</h2>
+        <button id="closeEditor" type="button">Close</button>
+      </div>
+      <p>Copy this structure to add rooms, platforms, stars, fish, yarn, web points, enemies, bosses, and breakable props.</p>
+      <textarea id="levelJson" spellcheck="false"></textarea>
+    </section>
+
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  </main>
+
+  <script src="game.js"></script>
+
+  <script>
+    /*
+     * Visual enhancement: inject rune decorations into room buttons
+     * after game.js has populated the level map.
+     * game.js calls buildLevelMap() or similar — we hook in afterwards.
+     */
+    const RUNES = ['ᚠ ᚢ ᚦ', 'ᚱ ᚾ ᛞ', 'ᛁ ᚹ ᚺ', 'ᛏ ᛒ ᛖ', 'ᛗ ᛚ ᛜ'];
+
+    function decorateRoomButtons() {
+      document.querySelectorAll('.room-button').forEach((btn, i) => {
+        const rune = RUNES[i % RUNES.length];
+        const top = document.createElement('span');
+        top.className = 'rune-row';
+        top.textContent = rune;
+        const bot = document.createElement('span');
+        bot.className = 'rune-row';
+        bot.textContent = rune;
+        btn.prepend(top);
+        btn.appendChild(bot);
+      });
+    }
+
+    /* Run after game.js has had a chance to render the map */
+    window.addEventListener('load', () => {
+      setTimeout(decorateRoomButtons, 0);
+    });
+
+    /* Also watch for dynamic insertion */
+    const observer = new MutationObserver(decorateRoomButtons);
+    observer.observe(document.getElementById('levelMap'), { childList: true });
+  </script>
+</body>
+</html>
