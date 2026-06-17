@@ -24,6 +24,17 @@ const transitionFade = document.getElementById("transitionFade");
 const unlockBurst = document.getElementById("unlockBurst");
 const modeDescription = document.getElementById("modeDescription");
 const toast = document.getElementById("toast");
+const menuKitty = document.getElementById("menuKitty");
+
+const HOTSPOT_COORDS = [
+  { left: 13, bottom: 27 },
+  { left: 30, bottom: 45 },
+  { left: 50, bottom: 33 },
+  { left: 67, bottom: 51 },
+  { left: 82, bottom: 35 }
+];
+
+let pawPrintInterval = null;
 
 const VIEW_W = 1280;
 const VIEW_H = 720;
@@ -294,6 +305,7 @@ function updateMenuLocks() {
     button.classList.toggle("active", button.dataset.mode === selectedMode);
   });
 
+  updateMenuKittyPosition();
 }
 
 function typeStoryScene(reset = false) {
@@ -1789,4 +1801,188 @@ renderLevelSelect();
 updateMenuLocks();
 showMainMenu();
 if (playButton) playButton.classList.add("important-sparkle");
+
+// Initialize Visual & Animation Redesign Features
+initMenuParallax();
+initMenuFireflies();
+initClickParticles();
+
 requestAnimationFrame(loop);
+
+/* ---- NEW INDIE GAME VISUAL UPGRADES ---- */
+
+function updateMenuKittyPosition() {
+  if (!menuKitty) return;
+  const target = HOTSPOT_COORDS[selectedLevel];
+  if (!target) return;
+
+  const currentLeft = parseFloat(menuKitty.style.left) || 11;
+  const isMoving = Math.abs(currentLeft - target.left) > 0.5;
+
+  if (target.left > currentLeft) {
+    menuKitty.style.transform = "scaleX(1)";
+  } else if (target.left < currentLeft) {
+    menuKitty.style.transform = "scaleX(-1)";
+  }
+
+  if (isMoving) {
+    menuKitty.classList.add("walking");
+    startPawPrintTrail();
+  }
+
+  menuKitty.style.left = `${target.left}%`;
+  menuKitty.style.bottom = `${target.bottom}%`;
+
+  if (menuKitty._walkTimer) clearTimeout(menuKitty._walkTimer);
+  menuKitty._walkTimer = setTimeout(() => {
+    menuKitty.classList.remove("walking");
+    stopPawPrintTrail();
+  }, 800);
+}
+
+function startPawPrintTrail() {
+  if (pawPrintInterval) return;
+  pawPrintInterval = setInterval(() => {
+    if (!menuKitty || !menuKitty.classList.contains("walking")) {
+      stopPawPrintTrail();
+      return;
+    }
+
+    const parent = menuKitty.parentElement;
+    if (!parent) return;
+
+    const print = document.createElement("div");
+    print.className = "paw-print";
+
+    const kRect = menuKitty.getBoundingClientRect();
+    const pRect = parent.getBoundingClientRect();
+
+    const x = kRect.left - pRect.left + kRect.width / 2 + (Math.random() - 0.5) * 6;
+    const y = kRect.top - pRect.top + kRect.height - 3;
+
+    print.style.left = `${x}px`;
+    print.style.top = `${y}px`;
+
+    parent.appendChild(print);
+
+    setTimeout(() => print.remove(), 1600);
+  }, 140);
+}
+
+function stopPawPrintTrail() {
+  if (pawPrintInterval) {
+    clearInterval(pawPrintInterval);
+    pawPrintInterval = null;
+  }
+}
+
+function initMenuParallax() {
+  const visualCanvas = document.querySelector(".visual-canvas");
+  if (!visualCanvas) return;
+
+  visualCanvas.addEventListener("mousemove", (e) => {
+    if (menu.hidden || running) return;
+
+    const rect = visualCanvas.getBoundingClientRect();
+    const mouseX = (e.clientX - rect.left) / rect.width - 0.5;
+    const mouseY = (e.clientY - rect.top) / rect.height - 0.5;
+
+    const layers = [
+      { selector: ".moon", factor: 6 },
+      { selector: ".menu-clouds", factor: 12 },
+      { selector: ".mansion-silhouette", factor: -14 },
+      { selector: ".purple-woods", factor: -22 },
+      { selector: ".gate-bars", factor: -32 }
+    ];
+
+    layers.forEach(l => {
+      const el = visualCanvas.querySelector(l.selector);
+      if (el) {
+        el.style.transform = `translate3d(${mouseX * l.factor}px, ${mouseY * l.factor}px, 0)`;
+      }
+    });
+  });
+
+  visualCanvas.addEventListener("mouseleave", () => {
+    const selectors = [".moon", ".menu-clouds", ".mansion-silhouette", ".purple-woods", ".gate-bars"];
+    selectors.forEach(sel => {
+      const el = visualCanvas.querySelector(sel);
+      if (el) el.style.transform = "";
+    });
+  });
+}
+
+function initMenuFireflies() {
+  const visualCanvas = document.querySelector(".visual-canvas");
+  if (!visualCanvas) return;
+
+  // Remove existing
+  visualCanvas.querySelectorAll(".menu-firefly").forEach(el => el.remove());
+
+  for (let i = 0; i < 18; i++) {
+    const firefly = document.createElement("div");
+    firefly.className = "menu-firefly";
+
+    firefly.style.left = `${Math.random() * 95}%`;
+    firefly.style.top = `${15 + Math.random() * 75}%`;
+
+    const duration = 6 + Math.random() * 6;
+    const delay = Math.random() * 5;
+    firefly.style.animationDuration = `${duration}s`;
+    firefly.style.animationDelay = `${delay}s`;
+
+    const dx = (Math.random() - 0.5) * 80;
+    const dy = (Math.random() - 0.5) * 60;
+    firefly.style.setProperty("--dx", `${dx}px`);
+    firefly.style.setProperty("--dy", `${dy}px`);
+
+    visualCanvas.appendChild(firefly);
+  }
+}
+
+function initClickParticles() {
+  document.addEventListener("click", (e) => {
+    const button = e.target.closest("button, .version-hotspot, .play-cta, .secondary-cta");
+    if (!button) return;
+
+    let x = e.clientX;
+    let y = e.clientY;
+
+    if (x === 0 && y === 0) {
+      const rect = button.getBoundingClientRect();
+      x = rect.left + rect.width / 2;
+      y = rect.top + rect.height / 2;
+    }
+
+    createClickParticles(x, y);
+  });
+}
+
+function createClickParticles(clientX, clientY) {
+  const count = 12 + Math.floor(Math.random() * 6);
+  for (let i = 0; i < count; i++) {
+    const p = document.createElement("div");
+    p.className = "click-particle";
+
+    p.style.left = `${clientX + window.scrollX - 3}px`;
+    p.style.top = `${clientY + window.scrollY - 3}px`;
+
+    const angle = Math.random() * Math.PI * 2;
+    const speed = 25 + Math.random() * 50;
+    const tx = Math.cos(angle) * speed;
+    const ty = Math.sin(angle) * speed;
+
+    p.style.setProperty("--tx", `${tx}px`);
+    p.style.setProperty("--ty", `${ty}px`);
+
+    p.style.animationDuration = `${0.45 + Math.random() * 0.35}s`;
+    const scale = 0.5 + Math.random() * 0.6;
+    p.style.transform = `scale(${scale})`;
+
+    const colors = ["#facc15", "#eab308", "#fef08a", "#fffbeb", "#f59e0b"];
+    p.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+
+    document.body.appendChild(p);
+    setTimeout(() => p.remove(), 800);
+  }
+}
