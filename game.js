@@ -45,7 +45,7 @@ let levelStartFishFound = new Set();
 let gameWon = false;
 let unlockedLevels = 1;
 let paused = false;
-let storyActive = true;
+let storyActive = false;
 let storyIndex = 0;
 let storyTypingTimer = 0;
 let storyTypingIndex = 0;
@@ -1409,8 +1409,5 @@ resetLevel(0);
 running = false;
 renderLevelSelect();
 updateMenuLocks();
-typeStoryScene(true);
-window.setInterval(() => {
-  if (storyActive) typeStoryScene(false);
-}, 26);
+showMainMenu();
 requestAnimationFrame(loop);

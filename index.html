@@ -4,13 +4,13 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Kitty Whiscape</title>
-  <link rel="stylesheet" href="style.css?v=20260616-image-menu1">
+  <link rel="stylesheet" href="style.css?v=20260616-image-menu2">
 </head>
 <body>
   <main class="app">
     <canvas id="gameCanvas" width="1280" height="720" aria-label="Kitty Whiscape canvas game"></canvas>
 
-    <section id="storyIntro" class="story-intro active" aria-label="Kitty Whiscape story intro">
+    <section id="storyIntro" class="story-intro" hidden aria-label="Kitty Whiscape story intro">
       <div class="story-stage">
         <div id="introKitty" class="story-cat kitty-pop">
           <span></span><span></span>
@@ -23,7 +23,7 @@
       </div>
     </section>
 
-    <section id="menu" class="image-menu" hidden aria-label="Kitty Whiscape main menu">
+    <section id="menu" class="image-menu" aria-label="Kitty Whiscape main menu">
       <div class="menu-art" aria-label="Kitty Whiscape level and version selection">
         <img src="kitttty.png" alt="Kitty Whiscape haunted mansion menu">
 
@@ -78,6 +78,6 @@
     <div id="toast" class="toast" role="status" aria-live="polite"></div>
   </main>
 
-  <script src="game.js?v=20260616-image-menu1"></script>
+  <script src="game.js?v=20260616-image-menu2"></script>
 </body>
 </html>
