@@ -5,6 +5,7 @@ const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 const menu = document.getElementById("menu");
 const storyIntro = document.getElementById("storyIntro");
+const storyStage = document.getElementById("storyStage");
 const storyText = document.getElementById("storyText");
 const storyNext = document.getElementById("storyNext");
 const playButton = document.getElementById("playButton");
@@ -54,6 +55,8 @@ let classicStoryCompleted = false;
 let speedrunModeUnlocked = false;
 let selectedMode = "classic";
 let selectedLevel = 0;
+let pendingIntroLevel = null;
+let storyTimer = null;
 
 const MODE_DESCRIPTIONS = {
   classic: "Play the full story of Kitty escaping Nancy's mansion.",
@@ -62,9 +65,10 @@ const MODE_DESCRIPTIONS = {
 };
 
 const STORY_SCENES = [
-  "Hello, I'm Kitty. My owner Peter abandoned me and sent me to Nancy's mansion.",
-  "Nancy owns one hundred cats. Every cat loves her except me, because Nancy treats me badly.",
-  "A mysterious cat told me about a magical cat land beyond the mansion. Tonight, I escape."
+  "Peter abandoned me... wahhh!",
+  "A cat tells Kitty about a magical cat land beyond the mansion.",
+  "The cat vanishes into soft clouds. Kitty dreams of castles, mice, and sunset skies.",
+  "Kitty reaches Nancy's mansion. A giant shadow appears. Nancy says: Uh oh... I'm gonna escape today."
 ];
 
 const player = {
@@ -266,7 +270,6 @@ function updateMenuLocks() {
     button.classList.toggle("active", button.dataset.mode === selectedMode);
   });
 
-  if (modeDescription) modeDescription.textContent = MODE_DESCRIPTIONS[selectedMode] || MODE_DESCRIPTIONS.classic;
 }
 
 function typeStoryScene(reset = false) {
@@ -274,9 +277,8 @@ function typeStoryScene(reset = false) {
   if (reset) {
     storyTypingIndex = 0;
     storyText.textContent = "";
-    storyIntro.classList.remove("scene-rumor", "scene-vow");
-    if (storyIndex === 1) storyIntro.classList.add("scene-rumor");
-    if (storyIndex === 2) storyIntro.classList.add("scene-vow");
+    storyStage.classList.remove("scene-1", "scene-2", "scene-3", "scene-4");
+    storyStage.classList.add(`scene-${storyIndex + 1}`);
     storyNext.textContent = storyIndex === STORY_SCENES.length - 1 ? "Enter Mansion" : "Next";
   }
   if (storyTypingIndex < text.length) {
@@ -299,11 +301,30 @@ function advanceStory() {
   }
   storyActive = false;
   storyIntro.classList.add("leaving");
+  clearInterval(storyTimer);
   window.setTimeout(() => {
     storyIntro.classList.remove("active");
+    storyIntro.classList.remove("leaving");
     storyIntro.hidden = true;
-    showMainMenu();
+    const levelToStart = pendingIntroLevel ?? 0;
+    pendingIntroLevel = null;
+    startLevelWithFade(levelToStart, true);
   }, 680);
+}
+
+function playIntroBeforeLevel(index) {
+  pendingIntroLevel = index;
+  storyIndex = 0;
+  storyActive = true;
+  hidePanels();
+  storyIntro.hidden = false;
+  storyIntro.classList.add("active");
+  storyIntro.classList.remove("leaving");
+  typeStoryScene(true);
+  clearInterval(storyTimer);
+  storyTimer = window.setInterval(() => {
+    if (storyActive) typeStoryScene(false);
+  }, 28);
 }
 
 function showLevelSelect() {
@@ -338,13 +359,17 @@ function startLevel(index) {
   resetLevel(index);
 }
 
-function startLevelWithFade(index) {
+function startLevelWithFade(index, skipIntro = false) {
   if (index >= unlockedLevels) {
     showLockedFeedback(document.querySelector(`.level-hotspot[data-level="${index}"]`));
     return;
   }
   selectedLevel = index;
   updateMenuLocks();
+  if (index === 0 && !skipIntro) {
+    playIntroBeforeLevel(index);
+    return;
+  }
   playMenuSound("start");
   const button = document.querySelector(`.level-hotspot[data-level="${index}"]`);
   if (button) {
@@ -465,7 +490,7 @@ function showLockedFeedback(button) {
     void button.offsetWidth;
     button.classList.add("bump");
   }
-  say("Locked. Complete the previous room first.", 1.5);
+  say("This door is locked.", 1.5);
 }
 
 function playMenuSound(name) {
@@ -1364,10 +1389,10 @@ document.querySelectorAll(".level-hotspot").forEach(button => {
 });
 document.querySelectorAll(".version-hotspot").forEach(button => {
   button.addEventListener("mouseenter", () => {
-    modeDescription.textContent = MODE_DESCRIPTIONS[button.dataset.mode] || MODE_DESCRIPTIONS.classic;
+    if (modeDescription) modeDescription.textContent = MODE_DESCRIPTIONS[button.dataset.mode] || MODE_DESCRIPTIONS.classic;
   });
   button.addEventListener("mouseleave", () => {
-    modeDescription.textContent = MODE_DESCRIPTIONS[selectedMode] || MODE_DESCRIPTIONS.classic;
+    if (modeDescription) modeDescription.textContent = MODE_DESCRIPTIONS[selectedMode] || MODE_DESCRIPTIONS.classic;
   });
 });
 document.querySelectorAll("[data-locked='true']").forEach(button => {

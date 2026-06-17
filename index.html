@@ -4,17 +4,27 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Kitty Whiscape</title>
-  <link rel="stylesheet" href="style.css?v=20260616-visible-buttons1">
+  <link rel="stylesheet" href="style.css?v=20260616-clean-menu1">
 </head>
 <body>
   <main class="app">
     <canvas id="gameCanvas" width="1280" height="720" aria-label="Kitty Whiscape canvas game"></canvas>
 
-    <section id="storyIntro" class="story-intro" hidden aria-label="Kitty Whiscape story intro">
-      <div class="story-stage">
-        <div id="introKitty" class="story-cat kitty-pop">
-          <span></span><span></span>
+    <section id="storyIntro" class="story-intro" hidden aria-label="Kitty Whiscape intro">
+      <div id="storyStage" class="story-stage scene-1">
+        <div class="intro-moon"></div>
+        <div class="intro-mansion"></div>
+        <div class="intro-door"></div>
+        <div class="intro-shadow"></div>
+        <div class="dream-bubble">
+          <div class="dream-sun"></div>
+          <div class="dream-castle"></div>
+          <div class="dream-cloud cloud-a"></div>
+          <div class="dream-cloud cloud-b"></div>
+          <div class="dream-mouse mouse-a"></div>
+          <div class="dream-mouse mouse-b"></div>
         </div>
+        <div id="introKitty" class="story-cat kitty-pop"><span></span><span></span></div>
         <div id="introElder" class="story-cat elder-cat" aria-hidden="true"></div>
         <article class="speech-bubble">
           <p id="storyText"></p>
@@ -46,8 +56,6 @@
         <div class="glowing-eyes eyes-b" aria-hidden="true"></div>
         <div class="web-shimmer web-a" aria-hidden="true"></div>
         <div class="web-shimmer web-b" aria-hidden="true"></div>
-        <div id="modeDescription" class="mode-description" aria-live="polite">Play the full story of Kitty escaping Nancy's mansion.</div>
-
         <button class="menu-hotspot level-hotspot level-1 unlocked" type="button" data-level="0" aria-label="Start Level 1"><span>1</span></button>
         <button class="menu-hotspot level-hotspot level-2 locked" type="button" data-level="1" aria-label="Start Level 2"><span>2</span></button>
         <button class="menu-hotspot level-hotspot level-3 locked" type="button" data-level="2" aria-label="Start Level 3"><span>3</span></button>
@@ -91,6 +99,6 @@
     <div id="toast" class="toast" role="status" aria-live="polite"></div>
   </main>
 
-  <script src="game.js?v=20260616-visible-buttons1"></script>
+  <script src="game.js?v=20260616-clean-menu1"></script>
 </body>
 </html>
