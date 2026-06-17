@@ -23,9 +23,12 @@ body {
   color: var(--ink);
   font-family: "Trebuchet MS", "Segoe UI", Arial, sans-serif;
   background:
-    radial-gradient(circle at 80% 8%, rgba(190, 124, 56, 0.26), transparent 22%),
-    radial-gradient(circle at 18% 22%, rgba(62, 77, 64, 0.26), transparent 24%),
-    linear-gradient(135deg, #0a0b09, #19160f 42%, #0b0c0c);
+    radial-gradient(circle at 30% 50%, rgba(101, 32, 22, 0.35), transparent 35%),
+    radial-gradient(circle at 80% 8%, rgba(190, 124, 56, 0.35), transparent 28%),
+    radial-gradient(circle at 18% 22%, rgba(62, 77, 64, 0.32), transparent 26%),
+    radial-gradient(circle at 85% 80%, rgba(40, 60, 100, 0.25), transparent 32%),
+    linear-gradient(135deg, #0a0b09 0%, #1a1410 25%, #0f0d0a 55%, #16110c 100%);
+  background-attachment: fixed;
 }
 
 button {
@@ -40,12 +43,12 @@ button {
   height: 100vh;
   overflow: hidden;
   background:
-    linear-gradient(rgba(0, 0, 0, 0.22) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0, 0, 0, 0.22) 1px, transparent 1px),
-    radial-gradient(circle at 84% 12%, rgba(187, 119, 47, 0.38), transparent 24%),
-    radial-gradient(circle at 12% 80%, rgba(31, 62, 46, 0.26), transparent 22%),
-    linear-gradient(135deg, #151811, #201c16 45%, #0a0b0b);
-  background-size: 22px 22px, 22px 22px, auto, auto, auto;
+    radial-gradient(circle at 30% 50%, rgba(101, 32, 22, 0.38), transparent 38%),
+    radial-gradient(circle at 84% 12%, rgba(187, 119, 47, 0.42), transparent 28%),
+    radial-gradient(circle at 12% 80%, rgba(31, 62, 46, 0.32), transparent 26%),
+    radial-gradient(circle at 85% 80%, rgba(40, 60, 100, 0.28), transparent 34%),
+    linear-gradient(135deg, #0d0d0d 0%, #1a1410 30%, #0f0d0a 60%, #16110c 100%);
+  background-attachment: fixed;
 }
 
 .app::before,
@@ -757,10 +760,11 @@ button {
   place-items: center;
   overflow: hidden;
   background:
-    radial-gradient(circle at 30% 50%, rgba(101, 32, 22, 0.25) 0%, transparent 30%),
-    radial-gradient(circle at 70% 20%, rgba(50, 80, 120, 0.2) 0%, transparent 35%),
-    radial-gradient(circle at 85% 80%, rgba(40, 60, 80, 0.15) 0%, transparent 40%),
-    linear-gradient(135deg, #0a0b09 0%, #1a1410 30%, #0f0d0a 60%, #16110c 100%);
+    radial-gradient(circle at 30% 50%, rgba(101, 32, 22, 0.4), transparent 38%),
+    radial-gradient(circle at 70% 20%, rgba(50, 80, 120, 0.32), transparent 40%),
+    radial-gradient(circle at 85% 80%, rgba(40, 60, 100, 0.28), transparent 42%),
+    radial-gradient(circle at 15% 15%, rgba(60, 40, 80, 0.25), transparent 30%),
+    linear-gradient(135deg, #0a0b09 0%, #1a1410 25%, #0f0d0a 55%, #16110c 100%);
   animation: menuFadeIn 640ms ease both;
 }
 
