@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Kitty Whiscape</title>
-  <link rel="stylesheet" href="style.css?v=20260616-image-menu2">
+  <link rel="stylesheet" href="style.css?v=20260616-visible-buttons1">
 </head>
 <body>
   <main class="app">
@@ -34,16 +34,29 @@
         </div>
 
         <div class="menu-runner" aria-hidden="true"></div>
+        <div class="menu-sparkle-layer" aria-hidden="true">
+          <i></i><i></i><i></i><i></i><i></i><i></i>
+        </div>
+        <div class="paw-print-layer" aria-hidden="true">
+          <i></i><i></i><i></i><i></i><i></i>
+        </div>
+        <div class="jump-cat cat-a" aria-hidden="true"></div>
+        <div class="jump-cat cat-b" aria-hidden="true"></div>
+        <div class="glowing-eyes eyes-a" aria-hidden="true"></div>
+        <div class="glowing-eyes eyes-b" aria-hidden="true"></div>
+        <div class="web-shimmer web-a" aria-hidden="true"></div>
+        <div class="web-shimmer web-b" aria-hidden="true"></div>
+        <div id="modeDescription" class="mode-description" aria-live="polite">Play the full story of Kitty escaping Nancy's mansion.</div>
 
-        <button class="menu-hotspot level-hotspot level-1 unlocked" type="button" data-level="0" aria-label="Start Level 1"></button>
-        <button class="menu-hotspot level-hotspot level-2 locked" type="button" data-level="1" aria-label="Start Level 2"></button>
-        <button class="menu-hotspot level-hotspot level-3 locked" type="button" data-level="2" aria-label="Start Level 3"></button>
-        <button class="menu-hotspot level-hotspot level-4 locked" type="button" data-level="3" aria-label="Start Level 4"></button>
-        <button class="menu-hotspot level-hotspot level-5 locked" type="button" data-level="4" aria-label="Start Level 5"></button>
+        <button class="menu-hotspot level-hotspot level-1 unlocked" type="button" data-level="0" aria-label="Start Level 1"><span>1</span></button>
+        <button class="menu-hotspot level-hotspot level-2 locked" type="button" data-level="1" aria-label="Start Level 2"><span>2</span></button>
+        <button class="menu-hotspot level-hotspot level-3 locked" type="button" data-level="2" aria-label="Start Level 3"><span>3</span></button>
+        <button class="menu-hotspot level-hotspot level-4 locked" type="button" data-level="3" aria-label="Start Level 4"><span>4</span></button>
+        <button class="menu-hotspot level-hotspot level-5 locked" type="button" data-level="4" aria-label="Start Level 5"><span>5</span></button>
 
-        <button id="playButton" class="menu-hotspot version-hotspot classic active" type="button" data-mode="classic" aria-label="Classic Story"></button>
-        <button class="menu-hotspot version-hotspot speedrun locked" type="button" data-mode="speedrun" data-locked="true" aria-label="Speedrun Mode"></button>
-        <button class="menu-hotspot version-hotspot endless locked" type="button" data-mode="endless" data-locked="true" aria-label="Endless Mansion"></button>
+        <button id="playButton" class="menu-hotspot version-hotspot classic active" type="button" data-mode="classic" aria-label="Classic Story"><span>Classic Story</span></button>
+        <button class="menu-hotspot version-hotspot speedrun locked" type="button" data-mode="speedrun" data-locked="true" aria-label="Speedrun Mode"><span>Speedrun Mode</span></button>
+        <button class="menu-hotspot version-hotspot endless locked" type="button" data-mode="endless" data-locked="true" aria-label="Endless Mansion"><span>Endless Mansion</span></button>
 
         <button id="roomsButton" class="menu-hotspot choose-hotspot" type="button" aria-label="Choose room list"></button>
         <button id="editorButton" class="menu-hotspot editor-hotspot" type="button" aria-label="Level Data"></button>
@@ -78,6 +91,6 @@
     <div id="toast" class="toast" role="status" aria-live="polite"></div>
   </main>
 
-  <script src="game.js?v=20260616-image-menu2"></script>
+  <script src="game.js?v=20260616-visible-buttons1"></script>
 </body>
 </html>

@@ -20,6 +20,7 @@ const levelEditor = document.getElementById("levelEditor");
 const closeEditor = document.getElementById("closeEditor");
 const levelJson = document.getElementById("levelJson");
 const transitionFade = document.getElementById("transitionFade");
+const modeDescription = document.getElementById("modeDescription");
 const toast = document.getElementById("toast");
 
 const VIEW_W = 1280;
@@ -52,6 +53,13 @@ let storyTypingIndex = 0;
 let classicStoryCompleted = false;
 let speedrunModeUnlocked = false;
 let selectedMode = "classic";
+let selectedLevel = 0;
+
+const MODE_DESCRIPTIONS = {
+  classic: "Play the full story of Kitty escaping Nancy's mansion.",
+  speedrun: "Race through the mansion as fast as possible.",
+  endless: "Survive an endless escape with increasing difficulty."
+};
 
 const STORY_SCENES = [
   "Hello, I'm Kitty. My owner Peter abandoned me and sent me to Nancy's mansion.",
@@ -243,6 +251,7 @@ function updateMenuLocks() {
     const unlocked = levelNumber < unlockedLevels;
     button.classList.toggle("locked", !unlocked);
     button.classList.toggle("unlocked", unlocked);
+    button.classList.toggle("selected", levelNumber === selectedLevel);
     button.setAttribute("aria-disabled", String(!unlocked));
   });
 
@@ -256,6 +265,8 @@ function updateMenuLocks() {
   document.querySelectorAll(".version-hotspot").forEach(button => {
     button.classList.toggle("active", button.dataset.mode === selectedMode);
   });
+
+  if (modeDescription) modeDescription.textContent = MODE_DESCRIPTIONS[selectedMode] || MODE_DESCRIPTIONS.classic;
 }
 
 function typeStoryScene(reset = false) {
@@ -332,7 +343,15 @@ function startLevelWithFade(index) {
     showLockedFeedback(document.querySelector(`.level-hotspot[data-level="${index}"]`));
     return;
   }
+  selectedLevel = index;
+  updateMenuLocks();
   playMenuSound("start");
+  const button = document.querySelector(`.level-hotspot[data-level="${index}"]`);
+  if (button) {
+    button.classList.remove("clicking");
+    void button.offsetWidth;
+    button.classList.add("clicking");
+  }
   transitionFade.classList.add("active");
   window.setTimeout(() => {
     startLevel(index);
@@ -1335,8 +1354,20 @@ playButton.addEventListener("click", startGame);
 roomsButton.addEventListener("click", showLevelSelect);
 storyNext.addEventListener("click", advanceStory);
 document.querySelectorAll(".level-hotspot").forEach(button => {
+  button.addEventListener("mouseenter", () => {
+    selectedLevel = Number(button.dataset.level);
+    updateMenuLocks();
+  });
   button.addEventListener("click", () => {
     startLevelWithFade(Number(button.dataset.level));
+  });
+});
+document.querySelectorAll(".version-hotspot").forEach(button => {
+  button.addEventListener("mouseenter", () => {
+    modeDescription.textContent = MODE_DESCRIPTIONS[button.dataset.mode] || MODE_DESCRIPTIONS.classic;
+  });
+  button.addEventListener("mouseleave", () => {
+    modeDescription.textContent = MODE_DESCRIPTIONS[selectedMode] || MODE_DESCRIPTIONS.classic;
   });
 });
 document.querySelectorAll("[data-locked='true']").forEach(button => {
@@ -1357,6 +1388,53 @@ document.querySelector("[data-mode='classic']").addEventListener("click", event 
   updateMenuLocks();
   if (event.currentTarget.id !== "playButton") say("Classic Story selected.", 1.2);
 });
+
+function handleMenuKeyboard(key) {
+  const menuVisible = !menu.hidden && !running && !paused;
+  if (!menuVisible) return false;
+
+  if (/^[1-5]$/.test(key)) {
+    selectedLevel = Number(key) - 1;
+    updateMenuLocks();
+    const target = document.querySelector(`.level-hotspot[data-level="${selectedLevel}"]`);
+    if (target) target.focus();
+    return true;
+  }
+
+  if (key === "enter") {
+    startLevelWithFade(selectedLevel);
+    return true;
+  }
+
+  if (key === "arrowleft" || key === "arrowright") {
+    selectedLevel += key === "arrowright" ? 1 : -1;
+    if (selectedLevel < 0) selectedLevel = 4;
+    if (selectedLevel > 4) selectedLevel = 0;
+    updateMenuLocks();
+    const target = document.querySelector(`.level-hotspot[data-level="${selectedLevel}"]`);
+    if (target) target.focus();
+    return true;
+  }
+
+  if (key === "arrowup" || key === "arrowdown") {
+    const order = ["classic", "speedrun", "endless"];
+    const current = Math.max(0, order.indexOf(selectedMode));
+    const next = key === "arrowdown" ? (current + 1) % order.length : (current + order.length - 1) % order.length;
+    const nextMode = order[next];
+    const nextButton = document.querySelector(`.version-hotspot[data-mode="${nextMode}"]`);
+    if (nextButton && nextButton.classList.contains("locked")) {
+      showLockedFeedback(nextButton);
+    } else {
+      selectedMode = nextMode;
+      updateMenuLocks();
+      if (nextButton) nextButton.focus();
+    }
+    return true;
+  }
+
+  return false;
+}
+
 backToMenu.addEventListener("click", showMainMenu);
 continueButton.addEventListener("click", () => setPaused(false));
 quitButton.addEventListener("click", quitToLevelSelect);
@@ -1388,6 +1466,10 @@ window.addEventListener("keydown", e => {
       e.preventDefault();
       advanceStory();
     }
+    return;
+  }
+  if (handleMenuKeyboard(key)) {
+    e.preventDefault();
     return;
   }
   if (key === "escape") {
