@@ -68,10 +68,9 @@ const MODE_DESCRIPTIONS = {
 };
 
 const STORY_SCENES = [
-  "Peter abandoned me... wahhh!",
-  "A cat tells Kitty about a magical cat land beyond the mansion.",
-  "The cat vanishes into soft clouds. Kitty dreams of castles, mice, and sunset skies.",
-  "Kitty reaches Nancy's mansion. A giant shadow appears. Nancy says: Uh oh... I'm gonna escape today."
+  "Peter left... He promised he'd come back.",
+  "A stranger whispers of a hidden paradise... 'Seek the Magical Cat Land, little one.'",
+  "But the path to paradise cuts straight through Evil Nancy's Domain. The escape begins."
 ];
 
 const player = {
@@ -247,6 +246,8 @@ function hidePanels() {
 function showMainMenu() {
   running = false;
   paused = false;
+  toast.classList.remove("show");
+  toast.textContent = "";
   levelSelect.hidden = true;
   pauseMenu.hidden = true;
   levelEditor.hidden = true;
@@ -346,8 +347,34 @@ function playIntroBeforeLevel(index) {
   typeStoryScene(true);
   clearInterval(storyTimer);
   storyTimer = window.setInterval(() => {
-    if (storyActive) typeStoryScene(false);
-  }, 28);
+    if (!storyActive) return;
+    storyTypingIndex = STORY_SCENES[storyIndex].length;
+    storyText.textContent = STORY_SCENES[storyIndex];
+  }, 80);
+  STORY_SCENES.forEach((_, index) => {
+    window.setTimeout(() => {
+      if (!storyActive || index === 0) return;
+      storyIndex = index;
+      typeStoryScene(true);
+    }, index * 4000);
+  });
+  window.setTimeout(() => {
+    if (storyActive) finishStoryIntro();
+  }, STORY_SCENES.length * 4000);
+}
+
+function finishStoryIntro() {
+  storyActive = false;
+  storyIntro.classList.add("leaving");
+  clearInterval(storyTimer);
+  window.setTimeout(() => {
+    storyIntro.classList.remove("active");
+    storyIntro.classList.remove("leaving");
+    storyIntro.hidden = true;
+    const levelToStart = pendingIntroLevel ?? 0;
+    pendingIntroLevel = null;
+    startLevelWithFade(levelToStart, true);
+  }, 680);
 }
 
 function showLevelSelect() {
@@ -1631,7 +1658,7 @@ function startGame() {
 
 playButton.addEventListener("click", startGame);
 roomsButton.addEventListener("click", showLevelSelect);
-storyNext.addEventListener("click", advanceStory);
+storyNext.addEventListener("click", finishStoryIntro);
 document.querySelectorAll(".level-hotspot").forEach(button => {
   button.addEventListener("mouseenter", () => {
     selectedLevel = Number(button.dataset.level);
@@ -1648,13 +1675,7 @@ document.querySelectorAll(".version-hotspot").forEach(button => {
   button.addEventListener("mouseleave", () => {
     if (modeDescription) modeDescription.textContent = MODE_DESCRIPTIONS[selectedMode] || MODE_DESCRIPTIONS.classic;
   });
-});
-document.querySelectorAll("[data-locked='true']").forEach(button => {
   button.addEventListener("click", () => {
-    if (button.classList.contains("locked")) {
-      showLockedFeedback(button);
-      return;
-    }
     selectedMode = button.dataset.mode;
     playMenuSound("select");
     updateMenuLocks();
@@ -1662,14 +1683,6 @@ document.querySelectorAll("[data-locked='true']").forEach(button => {
     setTimeout(() => button.classList.remove("clicking"), 400);
     say(`${button.getAttribute("aria-label")} selected.`, 1.2);
   });
-});
-document.querySelector("[data-mode='classic']").addEventListener("click", event => {
-  selectedMode = "classic";
-  playMenuSound("select");
-  updateMenuLocks();
-  event.currentTarget.classList.add("clicking");
-  setTimeout(() => event.currentTarget.classList.remove("clicking"), 400);
-  say("Classic Story selected.", 1.2);
 });
 
 function handleMenuKeyboard(key) {
