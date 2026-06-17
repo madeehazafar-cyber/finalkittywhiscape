@@ -4,7 +4,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Kitty Whiscape</title>
-  <link rel="stylesheet" href="style.css?v=20260616-clean-menu1">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Nunito:wght@600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css?v=20260617-polish">
 </head>
 <body>
   <main class="app">
@@ -12,10 +15,17 @@
 
     <section id="storyIntro" class="story-intro" hidden aria-label="Kitty Whiscape intro">
       <div id="storyStage" class="story-stage scene-1">
+        <div class="intro-sky-glow"></div>
+        <div class="intro-cloud intro-cloud-a"></div>
+        <div class="intro-cloud intro-cloud-b"></div>
+        <div class="intro-cloud intro-cloud-c"></div>
         <div class="intro-moon"></div>
         <div class="intro-mansion"></div>
         <div class="intro-door"></div>
+        <div class="intro-window-glow window-a"></div>
+        <div class="intro-window-glow window-b"></div>
         <div class="intro-shadow"></div>
+        <div class="intro-red-eyes"></div>
         <div class="dream-bubble">
           <div class="dream-sun"></div>
           <div class="dream-castle"></div>
@@ -24,7 +34,15 @@
           <div class="dream-mouse mouse-a"></div>
           <div class="dream-mouse mouse-b"></div>
         </div>
-        <div id="introKitty" class="story-cat kitty-pop"><span></span><span></span></div>
+        <div id="introKitty" class="story-cat kitty-pop">
+          <span class="kitty-eye eye-left"></span>
+          <span class="kitty-eye eye-right"></span>
+          <span class="kitty-tear tear-left"></span>
+          <span class="kitty-tear tear-right"></span>
+          <span class="kitty-tail"></span>
+          <span class="kitty-paw paw-left"></span>
+          <span class="kitty-paw paw-right"></span>
+        </div>
         <div id="introElder" class="story-cat elder-cat" aria-hidden="true"></div>
         <article class="speech-bubble">
           <p id="storyText"></p>
@@ -34,8 +52,26 @@
     </section>
 
     <section id="menu" class="image-menu" aria-label="Kitty Whiscape main menu">
+      <div class="menu-atmosphere" aria-hidden="true">
+        <div class="menu-moonlight"></div>
+        <div class="menu-fog fog-a"></div>
+        <div class="menu-fog fog-b"></div>
+        <div class="menu-light-rays"></div>
+        <div class="menu-parallax parallax-back"></div>
+        <div class="menu-parallax parallax-mid"></div>
+        <div class="menu-fireflies">
+          <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+        </div>
+        <div class="menu-distant-cats">
+          <span></span><span></span><span></span>
+        </div>
+      </div>
       <div class="menu-art" aria-label="Kitty Whiscape level and version selection">
         <img src="kitttty.png" alt="Kitty Whiscape haunted mansion menu">
+
+        <div class="menu-window-glow glow-a" aria-hidden="true"></div>
+        <div class="menu-window-glow glow-b" aria-hidden="true"></div>
+        <div class="menu-window-glow glow-c" aria-hidden="true"></div>
 
         <div class="title-letter-layer" aria-hidden="true">
           <span>K</span><span>i</span><span>t</span><span>t</span><span>y</span>
@@ -45,10 +81,10 @@
 
         <div class="menu-runner" aria-hidden="true"></div>
         <div class="menu-sparkle-layer" aria-hidden="true">
-          <i></i><i></i><i></i><i></i><i></i><i></i>
+          <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
         </div>
         <div class="paw-print-layer" aria-hidden="true">
-          <i></i><i></i><i></i><i></i><i></i>
+          <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
         </div>
         <div class="jump-cat cat-a" aria-hidden="true"></div>
         <div class="jump-cat cat-b" aria-hidden="true"></div>
@@ -96,9 +132,10 @@
     </section>
 
     <div id="transitionFade" class="transition-fade"></div>
+    <div id="unlockBurst" class="unlock-burst" aria-hidden="true"></div>
     <div id="toast" class="toast" role="status" aria-live="polite"></div>
   </main>
 
-  <script src="game.js?v=20260616-clean-menu1"></script>
+  <script src="game.js?v=20260617-polish"></script>
 </body>
 </html>
