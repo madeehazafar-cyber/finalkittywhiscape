@@ -265,6 +265,8 @@ function showMainMenu() {
   updateMenuLocks();
   menu.hidden = false;
   menu.classList.remove("menu-leaving");
+  menu.classList.add("menu-entering");
+  window.setTimeout(() => menu.classList.remove("menu-entering"), 5600);
 }
 
 function triggerUnlockVisual(levelNumber) {
@@ -567,6 +569,136 @@ function showLockedFeedback(button) {
 function playMenuSound(name) {
   // Sound placeholder: connect real click, locked, and unlock sounds here later.
   void name;
+}
+
+function initProceduralMenuVisuals() {
+  const menuArt = document.querySelector(".procedural-menu .menu-camera-rig");
+  const particleLayer = document.getElementById("menuParticleLayer");
+  const hoverLayer = document.getElementById("menuHoverParticles");
+  const pawTrail = document.getElementById("menuKittyPawTrail");
+  const menuKitty = document.getElementById("menuKitty");
+  if (!menuArt || !menu) return;
+
+  const parallaxLayers = [
+    { node: document.querySelector(".procedural-menu .menu-stars-layer"), depth: 0.12 },
+    { node: document.querySelector(".procedural-menu .menu-moon"), depth: 0.08 },
+    { node: document.querySelector(".procedural-menu .menu-clouds"), depth: 0.22 },
+    { node: document.querySelector(".procedural-menu .menu-ray-beams"), depth: 0.14 },
+    { node: document.querySelector(".procedural-menu .menu-mansion-scene"), depth: 0.1 },
+    { node: document.querySelector(".procedural-menu .parallax-back"), depth: 0.16 },
+    { node: document.querySelector(".procedural-menu .menu-hill.parallax-mid"), depth: 0.28 },
+    { node: document.querySelector(".procedural-menu .menu-hill.parallax-front"), depth: 0.38 },
+    { node: document.querySelectorAll(".procedural-menu .menu-fog"), depth: 0.42 },
+    { node: document.querySelector(".procedural-menu .menu-fireflies"), depth: 0.32 },
+    { node: document.querySelector(".procedural-menu .menu-float-particles"), depth: 0.26 },
+    { node: document.querySelector(".procedural-menu .menu-depth-glow"), depth: 0.18 }
+  ].flatMap(entry => {
+    if (!entry.node) return [];
+    if (typeof entry.node.length === "number") {
+      return Array.from(entry.node).map(node => ({ node, depth: entry.depth }));
+    }
+    return [entry];
+  });
+
+  let targetX = 0;
+  let targetY = 0;
+  let currentX = 0;
+  let currentY = 0;
+  let pawTimer = null;
+
+  function animateCamera() {
+    if (menu.hidden) {
+      requestAnimationFrame(animateCamera);
+      return;
+    }
+    currentX += (targetX - currentX) * 0.055;
+    currentY += (targetY - currentY) * 0.055;
+    menuArt.style.setProperty("--cam-x", `${currentX.toFixed(2)}px`);
+    menuArt.style.setProperty("--cam-y", `${currentY.toFixed(2)}px`);
+    parallaxLayers.forEach(({ node, depth }) => {
+      node.style.transform = `translate3d(${(currentX * depth).toFixed(2)}px, ${(currentY * depth).toFixed(2)}px, 0)`;
+    });
+    requestAnimationFrame(animateCamera);
+  }
+
+  window.addEventListener("mousemove", event => {
+    if (menu.hidden) return;
+    const rect = menuArt.getBoundingClientRect();
+    if (!rect.width || !rect.height) return;
+    const nx = ((event.clientX - rect.left) / rect.width - 0.5) * 2;
+    const ny = ((event.clientY - rect.top) / rect.height - 0.5) * 2;
+    targetX = nx * -14;
+    targetY = ny * -10;
+  });
+
+  function spawnMenuParticles(clientX, clientY, count = 14, layer = particleLayer, spread = 36) {
+    if (!layer) return;
+    const rect = layer.getBoundingClientRect();
+    const originX = clientX - rect.left;
+    const originY = clientY - rect.top;
+    for (let i = 0; i < count; i += 1) {
+      const spark = document.createElement("i");
+      const angle = (Math.PI * 2 * i) / count + Math.random() * 0.5;
+      const distance = 14 + Math.random() * spread;
+      spark.style.left = `${originX}px`;
+      spark.style.top = `${originY}px`;
+      spark.style.setProperty("--px", `${Math.cos(angle) * distance}px`);
+      spark.style.setProperty("--py", `${Math.sin(angle) * distance - 10}px`);
+      if (layer === hoverLayer) spark.className = "hover-spark";
+      layer.appendChild(spark);
+      window.setTimeout(() => spark.remove(), layer === hoverLayer ? 900 : 760);
+    }
+  }
+
+  function spawnKittyPawPrint() {
+    if (!pawTrail || !menuKitty || menu.hidden) return;
+    const pathRect = pawTrail.getBoundingClientRect();
+    const kittyRect = menuKitty.getBoundingClientRect();
+    if (!pathRect.width || !kittyRect.width) return;
+    const print = document.createElement("i");
+    print.style.left = `${kittyRect.left - pathRect.left + kittyRect.width * 0.38 + (Math.random() * 10 - 5)}px`;
+    print.style.top = `${kittyRect.bottom - pathRect.top - 8}px`;
+    print.style.setProperty("--paw-rot", `${-16 + Math.random() * 32}deg`);
+    pawTrail.appendChild(print);
+    window.setTimeout(() => print.remove(), 2600);
+  }
+
+  function startPawTrail() {
+    if (pawTimer) return;
+    pawTimer = window.setInterval(() => {
+      if (menu.hidden) return;
+      spawnKittyPawPrint();
+    }, 620);
+  }
+
+  function stopPawTrail() {
+    if (!pawTimer) return;
+    window.clearInterval(pawTimer);
+    pawTimer = null;
+  }
+
+  const hoverThrottle = new Map();
+  document.querySelectorAll(".procedural-menu .menu-hotspot").forEach(button => {
+    button.addEventListener("click", event => {
+      spawnMenuParticles(event.clientX, event.clientY, 16, particleLayer, 42);
+    });
+    button.addEventListener("mouseenter", event => {
+      const now = performance.now();
+      const last = hoverThrottle.get(button) || 0;
+      if (now - last < 420) return;
+      hoverThrottle.set(button, now);
+      spawnMenuParticles(event.clientX, event.clientY, 6, hoverLayer, 18);
+    });
+  });
+
+  const menuObserver = new MutationObserver(() => {
+    if (menu.hidden) stopPawTrail();
+    else startPawTrail();
+  });
+  menuObserver.observe(menu, { attributes: true, attributeFilter: ["hidden"] });
+
+  startPawTrail();
+  requestAnimationFrame(animateCamera);
 }
 
 function resizeCanvas() {
@@ -1799,6 +1931,7 @@ resetLevel(0);
 running = false;
 renderLevelSelect();
 updateMenuLocks();
+initProceduralMenuVisuals();
 showMainMenu();
 if (playButton) playButton.classList.add("important-sparkle");
 

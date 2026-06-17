@@ -6,96 +6,35 @@
   <title>Kitty Whiscape</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=2">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Nunito:wght@600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css?v=20260617-aaa-menu">
 </head>
 <body>
   <main class="app">
     <canvas id="gameCanvas" width="1280" height="720" aria-label="Kitty Whiscape canvas game"></canvas>
 
-    <section id="menu" class="landing-screen" aria-label="Kitty Whiscape main menu">
-      <div class="landing-mist"></div>
-      <header class="landing-title-wrap">
-        <h1>Kitty Whiscape</h1>
-      </header>
-
-      <div class="landing-grid">
-        <div class="visual-canvas" aria-hidden="true">
-          <div class="moon"></div>
-          <div class="menu-clouds">
-            <div class="cloud cloud-1"></div>
-            <div class="cloud cloud-2"></div>
-            <div class="cloud cloud-3"></div>
-          </div>
-          <div class="moonlight-rays">
-            <div class="ray ray-1"></div>
-            <div class="ray ray-2"></div>
-            <div class="ray ray-3"></div>
-          </div>
-          <div class="mansion-silhouette">
-            <span></span><span></span><span></span><span></span>
-          </div>
-          <div class="glowing-eyes-container">
-            <div class="glowing-eyes eyes-1"></div>
-            <div class="glowing-eyes eyes-2"></div>
-            <div class="glowing-eyes eyes-3"></div>
-          </div>
-          <div class="purple-woods"></div>
-          <div class="fog-layer fog-back"></div>
-          <div class="fog-layer fog-mid"></div>
-          <div class="gate-bars"></div>
-          <div class="menu-kitty" id="menuKitty">
-            <div class="kitty-tail"></div>
-            <div class="kitty-body">
-              <div class="kitty-paw paw-back-left"></div>
-              <div class="kitty-paw paw-back-right"></div>
-              <div class="kitty-paw paw-front-left"></div>
-              <div class="kitty-paw paw-front-right"></div>
-            </div>
-            <div class="kitty-head">
-              <div class="kitty-ear ear-left"></div>
-              <div class="kitty-ear ear-right"></div>
-              <div class="kitty-eyes">
-                <div class="kitty-eye eye-left"></div>
-                <div class="kitty-eye eye-right"></div>
-              </div>
-              <div class="kitty-nose"></div>
-            </div>
-          </div>
-          <div class="fog-layer fog-front"></div>
-          <button class="level-hotspot" data-level="0" type="button" aria-label="Kitchen Tutorial">1</button>
-          <button class="level-hotspot" data-level="1" type="button" aria-label="Ballroom Timing">2</button>
-          <button class="level-hotspot" data-level="2" type="button" aria-label="Library of Shadow">3</button>
-          <button class="level-hotspot" data-level="3" type="button" aria-label="Dungeon Descent">4</button>
-          <button class="level-hotspot" data-level="4" type="button" aria-label="Nancy's Attic">5</button>
-        </div>
-
-        <aside class="version-panel" aria-label="Version selection">
-          <p class="eyebrow">CHOOSE VERSION</p>
-          <button class="version-hotspot classic active" data-mode="classic" type="button" aria-label="Classic Edition">Classic Edition</button>
-          <button class="version-hotspot speedrun" data-mode="speedrun" type="button" aria-label="Remastered Nightmare">Remastered Nightmare</button>
-          <button class="version-hotspot endless" data-mode="endless" type="button" aria-label="Deluxe Whiscape">Deluxe Whiscape</button>
-          <p id="modeDescription" class="mode-description">Play the full story of Kitty escaping Nancy's mansion.</p>
-          <button id="playButton" class="play-cta" type="button">PLAY</button>
-          <button id="roomsButton" class="secondary-cta" type="button">Room Map</button>
-          <button id="editorButton" class="secondary-cta subtle" type="button">Level Data</button>
-        </aside>
-      </div>
-    </section>
-
-    <section id="storyIntro" class="story-intro cinematic-intro" hidden aria-label="Kitty Whiscape cinematic introduction">
+    <section id="storyIntro" class="story-intro" hidden aria-label="Kitty Whiscape intro">
       <div id="storyStage" class="story-stage scene-1">
-        <div class="rain-layer"></div>
-        <div class="intro-alley"></div>
-        <div class="intro-forest"></div>
-        <div class="intro-mansion">
-          <span></span><span></span><span></span>
+        <div class="intro-sky-glow"></div>
+        <div class="intro-cloud intro-cloud-a"></div>
+        <div class="intro-cloud intro-cloud-b"></div>
+        <div class="intro-cloud intro-cloud-c"></div>
+        <div class="intro-moon"></div>
+        <div class="intro-mansion"></div>
+        <div class="intro-door"></div>
+        <div class="intro-window-glow window-a"></div>
+        <div class="intro-window-glow window-b"></div>
+        <div class="intro-shadow"></div>
+        <div class="intro-red-eyes"></div>
+        <div class="dream-bubble">
+          <div class="dream-sun"></div>
+          <div class="dream-castle"></div>
+          <div class="dream-cloud cloud-a"></div>
+          <div class="dream-cloud cloud-b"></div>
+          <div class="dream-mouse mouse-a"></div>
+          <div class="dream-mouse mouse-b"></div>
         </div>
-        <div class="peter-shadow"></div>
-        <div class="elder-cat">
-          <span></span><span></span>
-        </div>
-        <div class="story-cat kitty-pop">
+        <div id="introKitty" class="story-cat kitty-pop">
           <span class="kitty-eye eye-left"></span>
           <span class="kitty-eye eye-right"></span>
           <span class="kitty-tear tear-left"></span>
@@ -104,11 +43,144 @@
           <span class="kitty-paw paw-left"></span>
           <span class="kitty-paw paw-right"></span>
         </div>
-        <div class="gate-foreground"></div>
-        <div class="speech-bubble">
+        <div id="introElder" class="story-cat elder-cat" aria-hidden="true"></div>
+        <article class="speech-bubble">
           <p id="storyText"></p>
-          <button id="storyNext" type="button">Skip</button>
+          <button id="storyNext" type="button">Next</button>
+        </article>
+      </div>
+    </section>
+
+    <section id="menu" class="image-menu procedural-menu" aria-label="Kitty Whiscape main menu">
+      <div class="menu-atmosphere" aria-hidden="true">
+        <div class="menu-sky-gradient"></div>
+        <div class="menu-stars-layer">
+          <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+          <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+          <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
         </div>
+        <div class="menu-moon" aria-hidden="true"></div>
+        <div class="menu-clouds">
+          <div class="menu-cloud cloud-1"></div>
+          <div class="menu-cloud cloud-2"></div>
+          <div class="menu-cloud cloud-3"></div>
+          <div class="menu-cloud cloud-4"></div>
+        </div>
+        <div class="menu-moonlight"></div>
+        <div class="menu-light-rays"></div>
+        <div class="menu-ray-beams" aria-hidden="true">
+          <span class="ray ray-1"></span>
+          <span class="ray ray-2"></span>
+          <span class="ray ray-3"></span>
+        </div>
+        <div class="menu-parallax parallax-back"></div>
+        <div class="menu-mansion-scene">
+          <div class="menu-mansion-silhouette"></div>
+          <div class="menu-window-glow glow-a"></div>
+          <div class="menu-window-glow glow-b"></div>
+          <div class="menu-window-glow glow-c"></div>
+          <div class="menu-window-glow glow-d"></div>
+        </div>
+        <div class="menu-hill parallax-mid"></div>
+        <div class="menu-hill parallax-front"></div>
+        <div class="menu-fog fog-a"></div>
+        <div class="menu-fog fog-b"></div>
+        <div class="menu-fog fog-c"></div>
+        <div class="menu-fog fog-d"></div>
+        <div class="menu-fog fog-e"></div>
+        <div class="menu-fireflies">
+          <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+        </div>
+        <div class="menu-float-particles">
+          <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+        </div>
+        <div class="menu-distant-cats">
+          <span></span><span></span><span></span><span></span>
+        </div>
+        <div class="glowing-eyes eyes-c"></div>
+        <div class="glowing-eyes eyes-d"></div>
+        <div class="glowing-eyes eyes-e"></div>
+        <div class="glowing-eyes eyes-f"></div>
+        <div class="menu-depth-glow" aria-hidden="true"></div>
+      </div>
+
+      <div class="menu-art menu-camera-rig" aria-label="Kitty Whiscape level and version selection">
+        <div class="menu-vignette" aria-hidden="true"></div>
+
+        <header class="menu-title-block">
+          <div class="title-letter-layer" aria-hidden="true">
+            <span>K</span><span>i</span><span>t</span><span>t</span><span>y</span>
+            <span class="title-space">&nbsp;</span>
+            <span>W</span><span>h</span><span>i</span><span>s</span><span>c</span><span>a</span><span>p</span><span>e</span>
+          </div>
+          <p class="menu-subtitle">Escape Nancy's Mansion</p>
+        </header>
+
+        <div class="menu-hero-stage">
+          <div class="menu-kitty-path" aria-hidden="true">
+            <div class="menu-kitty-platform"></div>
+            <div class="menu-kitty-glow"></div>
+            <div id="menuKittyPawTrail" class="menu-kitty-paw-trail"></div>
+            <div id="menuKitty" class="menu-kitty-full" aria-hidden="true">
+              <div class="kitty-sprite">
+                <span class="kitty-tail"></span>
+                <span class="kitty-torso"></span>
+                <span class="kitty-head">
+                  <span class="kitty-ear ear-left"></span>
+                  <span class="kitty-ear ear-right"></span>
+                  <span class="kitty-eye eye-left"></span>
+                  <span class="kitty-eye eye-right"></span>
+                  <span class="kitty-cheek cheek-left"></span>
+                  <span class="kitty-cheek cheek-right"></span>
+                  <span class="kitty-nose"></span>
+                </span>
+                <span class="kitty-leg leg-bl"></span>
+                <span class="kitty-leg leg-br"></span>
+                <span class="kitty-leg leg-fl"></span>
+                <span class="kitty-leg leg-fr"></span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="menu-sparkle-layer" aria-hidden="true">
+          <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+        </div>
+        <div class="jump-cat cat-a" aria-hidden="true"></div>
+        <div class="jump-cat cat-b" aria-hidden="true"></div>
+        <div class="glowing-eyes eyes-a" aria-hidden="true"></div>
+        <div class="glowing-eyes eyes-b" aria-hidden="true"></div>
+        <div class="web-shimmer web-a" aria-hidden="true"></div>
+        <div class="web-shimmer web-b" aria-hidden="true"></div>
+
+        <div class="menu-ui-stack">
+          <div class="menu-panel menu-level-panel">
+            <h2 class="menu-panel-title">Rooms</h2>
+            <div class="menu-level-grid">
+              <button class="menu-hotspot level-hotspot level-1 unlocked" type="button" data-level="0" aria-label="Start Level 1"><span>1</span></button>
+              <button class="menu-hotspot level-hotspot level-2 locked" type="button" data-level="1" aria-label="Start Level 2"><span>2</span></button>
+              <button class="menu-hotspot level-hotspot level-3 locked" type="button" data-level="2" aria-label="Start Level 3"><span>3</span></button>
+              <button class="menu-hotspot level-hotspot level-4 locked" type="button" data-level="3" aria-label="Start Level 4"><span>4</span></button>
+              <button class="menu-hotspot level-hotspot level-5 locked" type="button" data-level="4" aria-label="Start Level 5"><span>5</span></button>
+            </div>
+          </div>
+
+          <div class="menu-panel menu-mode-panel">
+            <h2 class="menu-panel-title">Game Mode</h2>
+            <button id="playButton" class="menu-hotspot version-hotspot classic active primary-play" type="button" data-mode="classic" aria-label="Play Classic Story"><span>PLAY</span></button>
+            <button class="menu-hotspot version-hotspot speedrun locked" type="button" data-mode="speedrun" data-locked="true" aria-label="Speedrun Mode"><span>Speedrun Mode</span></button>
+            <button class="menu-hotspot version-hotspot endless locked" type="button" data-mode="endless" data-locked="true" aria-label="Endless Mansion"><span>Endless Mansion</span></button>
+            <p id="modeDescription" class="mode-description">Play the full story of Kitty escaping Nancy's mansion.</p>
+          </div>
+
+          <div class="menu-panel menu-action-panel">
+            <button id="roomsButton" class="menu-hotspot choose-hotspot" type="button" aria-label="Choose room list"><span>Choose Room</span></button>
+            <button id="editorButton" class="menu-hotspot editor-hotspot" type="button" aria-label="Level Data"><span>Level Data</span></button>
+          </div>
+        </div>
+
+        <div id="menuHoverParticles" class="menu-hover-particles" aria-hidden="true"></div>
+        <div id="menuParticleLayer" class="menu-click-particles" aria-hidden="true"></div>
       </div>
     </section>
 
@@ -141,6 +213,6 @@
     <div id="toast" class="toast" role="status" aria-live="polite"></div>
   </main>
 
-  <script src="game.js?v=2"></script>
+  <script src="game.js?v=20260617-aaa-menu"></script>
 </body>
 </html>
