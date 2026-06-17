@@ -1619,10 +1619,13 @@ function loop(now) {
 
 function startGame() {
   speedrunModeUnlocked = true;
-  selectedMode = "classic";
   playMenuSound("select");
   updateMenuLocks();
   fishFound = new Set();
+  if (playButton) {
+    playButton.classList.add("clicking");
+    setTimeout(() => playButton.classList.remove("clicking"), 400);
+  }
   startLevelWithFade(0);
 }
 
@@ -1655,6 +1658,8 @@ document.querySelectorAll("[data-locked='true']").forEach(button => {
     selectedMode = button.dataset.mode;
     playMenuSound("select");
     updateMenuLocks();
+    button.classList.add("clicking");
+    setTimeout(() => button.classList.remove("clicking"), 400);
     say(`${button.getAttribute("aria-label")} selected.`, 1.2);
   });
 });
@@ -1662,7 +1667,9 @@ document.querySelector("[data-mode='classic']").addEventListener("click", event 
   selectedMode = "classic";
   playMenuSound("select");
   updateMenuLocks();
-  if (event.currentTarget.id !== "playButton") say("Classic Story selected.", 1.2);
+  event.currentTarget.classList.add("clicking");
+  setTimeout(() => event.currentTarget.classList.remove("clicking"), 400);
+  say("Classic Story selected.", 1.2);
 });
 
 function handleMenuKeyboard(key) {

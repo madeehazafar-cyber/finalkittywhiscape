@@ -73,37 +73,51 @@
         <div class="menu-window-glow glow-b" aria-hidden="true"></div>
         <div class="menu-window-glow glow-c" aria-hidden="true"></div>
 
-        <div class="title-letter-layer" aria-hidden="true">
-          <span>K</span><span>i</span><span>t</span><span>t</span><span>y</span>
-          <span>&nbsp;</span>
-          <span>W</span><span>h</span><span>i</span><span>s</span><span>c</span><span>a</span><span>p</span><span>e</span>
+        <div class="game-menu">
+          <!-- Title Section -->
+          <div class="menu-title-section">
+            <h1>
+              <div class="title-letter-layer" aria-hidden="true">
+                <span>K</span><span>i</span><span>t</span><span>t</span><span>y</span>
+                <span>&nbsp;</span>
+                <span>W</span><span>h</span><span>i</span><span>s</span><span>c</span><span>a</span><span>p</span><span>e</span>
+              </div>
+            </h1>
+            <p>Escape the Mansion</p>
+          </div>
+
+          <!-- Levels Section -->
+          <div class="levels-section">
+            <h2>Choose Your Level</h2>
+            <div class="levels-grid">
+              <button class="menu-hotspot level-hotspot level-1 unlocked" type="button" data-level="0" aria-label="Start Level 1"><span>1</span></button>
+              <button class="menu-hotspot level-hotspot level-2 locked" type="button" data-level="1" aria-label="Start Level 2"><span>2</span></button>
+              <button class="menu-hotspot level-hotspot level-3 locked" type="button" data-level="2" aria-label="Start Level 3"><span>3</span></button>
+              <button class="menu-hotspot level-hotspot level-4 locked" type="button" data-level="3" aria-label="Start Level 4"><span>4</span></button>
+              <button class="menu-hotspot level-hotspot level-5 locked" type="button" data-level="4" aria-label="Start Level 5"><span>5</span></button>
+            </div>
+          </div>
+
+          <!-- Mode Selection -->
+          <div class="mode-section">
+            <h2>Choose Mode</h2>
+            <div class="mode-buttons">
+              <button class="menu-hotspot version-hotspot classic active mode-btn" type="button" data-mode="classic" aria-label="Classic Story"><span>✓ Classic Story</span></button>
+              <button class="menu-hotspot version-hotspot speedrun locked mode-btn" type="button" data-mode="speedrun" data-locked="true" aria-label="Speedrun Mode"><span>🔒 Speedrun Mode</span></button>
+              <button class="menu-hotspot version-hotspot endless locked mode-btn" type="button" data-mode="endless" data-locked="true" aria-label="Endless Mansion"><span>🔒 Endless Mansion</span></button>
+            </div>
+          </div>
+
+          <!-- Play Button -->
+          <button id="playButton" class="menu-hotspot play-btn" type="button" aria-label="Start Game"><span>▶ PLAY NOW</span></button>
         </div>
 
-        <div class="menu-runner" aria-hidden="true"></div>
+        <button id="roomsButton" class="menu-hotspot choose-hotspot" type="button" aria-label="Choose room list"></button>
+        <button id="editorButton" class="menu-hotspot editor-hotspot" type="button" aria-label="Level Data">⚙️</button>
+
         <div class="menu-sparkle-layer" aria-hidden="true">
           <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
         </div>
-        <div class="paw-print-layer" aria-hidden="true">
-          <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
-        </div>
-        <div class="jump-cat cat-a" aria-hidden="true"></div>
-        <div class="jump-cat cat-b" aria-hidden="true"></div>
-        <div class="glowing-eyes eyes-a" aria-hidden="true"></div>
-        <div class="glowing-eyes eyes-b" aria-hidden="true"></div>
-        <div class="web-shimmer web-a" aria-hidden="true"></div>
-        <div class="web-shimmer web-b" aria-hidden="true"></div>
-        <button class="menu-hotspot level-hotspot level-1 unlocked" type="button" data-level="0" aria-label="Start Level 1"><span>1</span></button>
-        <button class="menu-hotspot level-hotspot level-2 locked" type="button" data-level="1" aria-label="Start Level 2"><span>2</span></button>
-        <button class="menu-hotspot level-hotspot level-3 locked" type="button" data-level="2" aria-label="Start Level 3"><span>3</span></button>
-        <button class="menu-hotspot level-hotspot level-4 locked" type="button" data-level="3" aria-label="Start Level 4"><span>4</span></button>
-        <button class="menu-hotspot level-hotspot level-5 locked" type="button" data-level="4" aria-label="Start Level 5"><span>5</span></button>
-
-        <button id="playButton" class="menu-hotspot version-hotspot classic active" type="button" data-mode="classic" aria-label="Classic Story"><span>Classic Story</span></button>
-        <button class="menu-hotspot version-hotspot speedrun locked" type="button" data-mode="speedrun" data-locked="true" aria-label="Speedrun Mode"><span>Speedrun Mode</span></button>
-        <button class="menu-hotspot version-hotspot endless locked" type="button" data-mode="endless" data-locked="true" aria-label="Endless Mansion"><span>Endless Mansion</span></button>
-
-        <button id="roomsButton" class="menu-hotspot choose-hotspot" type="button" aria-label="Choose room list"></button>
-        <button id="editorButton" class="menu-hotspot editor-hotspot" type="button" aria-label="Level Data"></button>
       </div>
     </section>
 
