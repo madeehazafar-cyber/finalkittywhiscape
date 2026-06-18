@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Nunito:wght@600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=20260618-borderless-menu">
+  <link rel="stylesheet" href="style.css?v=20260618-minimal-game-menu">
 </head>
 <body>
   <main class="app">
@@ -206,6 +206,10 @@
           <div class="menu-panel menu-mode-panel">
             <h2 class="menu-panel-title">Game Mode</h2>
             <button id="playButton" class="menu-hotspot version-hotspot classic active primary-play" type="button" data-mode="classic" aria-label="Play Classic Story"><span>PLAY</span></button>
+            <div class="difficulty-toggle" aria-label="Difficulty">
+              <button class="difficulty-choice active" type="button" data-difficulty="easy">Easy</button>
+              <button class="difficulty-choice" type="button" data-difficulty="hard">Hard</button>
+            </div>
             <button class="menu-hotspot version-hotspot speedrun locked" type="button" data-mode="speedrun" data-locked="true" aria-label="Speedrun Mode"><span>Speedrun Mode</span></button>
             <button class="menu-hotspot version-hotspot endless locked" type="button" data-mode="endless" data-locked="true" aria-label="Endless Mansion"><span>Endless Mansion</span></button>
             <p id="modeDescription" class="mode-description">Play the full story of Kitty escaping Nancy's mansion.</p>

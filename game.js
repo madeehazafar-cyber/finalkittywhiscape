@@ -91,6 +91,8 @@ const MODE_DESCRIPTIONS = {
   endless: "Survive an endless escape with increasing difficulty."
 };
 
+const INTRO_WATCHED_KEY = "kittyWhiscapeIntroWatched";
+
 const STORY_BEATS = [
   { scene: 1, speaker: "kitty", text: "Peter... wait..." },
   { scene: 1, speaker: "kitty", text: "Peter abandoned me... wahhh!" },
@@ -476,6 +478,14 @@ function saveUnlockedLevels(count) {
   localStorage.setItem("kittyWhiscapeUnlocked", String(unlockedLevels));
 }
 
+function hasWatchedIntro() {
+  return localStorage.getItem(INTRO_WATCHED_KEY) === "true";
+}
+
+function markIntroWatched() {
+  localStorage.setItem(INTRO_WATCHED_KEY, "true");
+}
+
 function readFishFound() {
   try {
     const parsed = JSON.parse(localStorage.getItem("kittyWhiscapeFish") || "[]");
@@ -601,6 +611,7 @@ function advanceStory() {
 }
 
 function playIntroBeforeLevel(index) {
+  markIntroWatched();
   pendingIntroLevel = index;
   storyIndex = 0;
   storyActive = true;
@@ -692,7 +703,7 @@ function startLevelWithFade(index, skipIntro = false) {
   }
   selectedLevel = index;
   updateMenuLocks();
-  if (index === 0 && !skipIntro) {
+  if (index === 0 && !skipIntro && !hasWatchedIntro()) {
     playIntroBeforeLevel(index);
     return;
   }
@@ -2544,8 +2555,7 @@ function startGame() {
     playButton.classList.add("clicking");
     setTimeout(() => playButton.classList.remove("clicking"), 400);
   }
-  const targetLevel = Math.min(selectedLevel, unlockedLevels - 1);
-  startLevelWithFade(targetLevel, targetLevel === 0);
+  showLevelSelect();
 }
 
 playButton.addEventListener("click", startGame);
@@ -2576,6 +2586,15 @@ document.querySelectorAll(".version-hotspot").forEach(button => {
     button.classList.add("clicking");
     setTimeout(() => button.classList.remove("clicking"), 400);
     say(`${button.getAttribute("aria-label")} selected.`, 1.2);
+  });
+});
+
+document.querySelectorAll(".difficulty-choice").forEach(button => {
+  button.addEventListener("click", () => {
+    document.querySelectorAll(".difficulty-choice").forEach(choice => {
+      choice.classList.toggle("active", choice === button);
+    });
+    playMenuSound("select");
   });
 });
 
