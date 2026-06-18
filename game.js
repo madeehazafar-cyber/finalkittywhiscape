@@ -3087,7 +3087,9 @@ document.querySelectorAll(".version-hotspot").forEach(button => {
     updateMenuLocks();
     button.classList.add("clicking");
     setTimeout(() => button.classList.remove("clicking"), 400);
+    if (button === playButton) return;
     say(`${button.getAttribute("aria-label")} selected.`, 1.2);
+    startLevelWithFade(selectedLevel, true);
   });
 });
 
