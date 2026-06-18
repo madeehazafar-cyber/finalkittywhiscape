@@ -27,7 +27,6 @@ const transitionFade = document.getElementById("transitionFade");
 const unlockBurst = document.getElementById("unlockBurst");
 const modeDescription = document.getElementById("modeDescription");
 const toast = document.getElementById("toast");
-const loadingMessage = document.getElementById("loadingMessage");
 const menuKitty = document.getElementById("menuKitty");
 
 const HOTSPOT_COORDS = [
@@ -63,7 +62,6 @@ let levelStartFishFound = new Set();
 let gameWon = false;
 let unlockedLevels = 1;
 let paused = false;
-let isStartingLevel = false;
 let storyActive = false;
 let storyIndex = 0;
 let storyTypingTimer = 0;
@@ -505,24 +503,7 @@ function hidePanels() {
   levelEditor.hidden = true;
 }
 
-function setLoadingMessage(text) {
-  if (!loadingMessage) return;
-  loadingMessage.textContent = text;
-  loadingMessage.hidden = false;
-}
-
-function clearLoadingMessage() {
-  if (!loadingMessage) return;
-  loadingMessage.hidden = true;
-  loadingMessage.textContent = "";
-}
-
 function showMainMenu() {
-  if (isStartingLevel) {
-    console.warn("[Kitty Whiscape] Ignored showMainMenu() during level startup.");
-    return;
-  }
-  clearLoadingMessage();
   running = false;
   paused = false;
   toast.classList.remove("show");
@@ -660,11 +641,6 @@ function finishStoryIntro() {
 }
 
 function showLevelSelect() {
-  if (isStartingLevel) {
-    console.warn("[Kitty Whiscape] Ignored showLevelSelect() during level startup.");
-    return;
-  }
-  clearLoadingMessage();
   running = false;
   paused = false;
   player.grapple = null;
@@ -693,59 +669,13 @@ function renderLevelSelect() {
   });
 }
 
-function validateLevelData(room, index) {
-  if (!room || typeof room !== "object") throw new Error(`Level ${index + 1} is missing.`);
-  const requiredArrays = ["start", "platforms", "stars", "yarn", "fishCrates", "enemies", "webPoints"];
-  requiredArrays.forEach(key => {
-    if (!Array.isArray(room[key])) throw new Error(`Level ${index + 1} is missing array: ${key}.`);
-  });
-  if (room.start.length < 2 || room.start.some(value => !Number.isFinite(value))) {
-    throw new Error(`Level ${index + 1} has an invalid start position.`);
-  }
-  if (room.stars.length !== 3) throw new Error(`Level ${index + 1} must define exactly 3 stars.`);
-  room.platforms.forEach((platform, platformIndex) => {
-    if (!Array.isArray(platform) || platform.length < 4 || platform.some(value => !Number.isFinite(value))) {
-      throw new Error(`Level ${index + 1} has an invalid platform at index ${platformIndex}.`);
-    }
-  });
-}
-
 function startLevel(index) {
-  setLoadingMessage(`Loading ${LEVELS[index]?.name || "room"}...`);
-  isStartingLevel = true;
-  try {
-    if (!Number.isInteger(index) || index < 0 || index >= LEVELS.length) {
-      throw new Error(`Invalid level index: ${index}`);
-    }
-    if (index >= unlockedLevels) {
-      clearLoadingMessage();
-      showLockedFeedback(document.querySelector(`.level-hotspot[data-level="${index}"]`));
-      return;
-    }
-    clearInterval(storyTimer);
-    storyActive = false;
-    pendingIntroLevel = null;
-    storyIntro.classList.remove("active", "leaving");
-    storyIntro.hidden = true;
-    menu.classList.remove("menu-leaving", "menu-entering");
-    transitionFade.classList.remove("active");
-    hidePanels();
-    paused = false;
-    gameWon = false;
-    running = true;
-    levelStartFishFound = new Set(fishFound);
-    resetLevel(index);
-    running = true;
-    clearLoadingMessage();
-  } catch (error) {
-    running = false;
-    paused = false;
-    console.error("[Kitty Whiscape] startLevel failed", { index, level: LEVELS[index], error });
-    setLoadingMessage("Room failed to load. Check the console for details.");
-  } finally {
-    isStartingLevel = false;
-    transitionFade.classList.remove("active");
-  }
+  if (index >= unlockedLevels) return;
+  hidePanels();
+  paused = false;
+  running = true;
+  levelStartFishFound = new Set(fishFound);
+  resetLevel(index);
 }
 
 function pulseMenuButton(button) {
@@ -800,68 +730,55 @@ function cloneLevel(source) {
 }
 
 function resetLevel(index = levelIndex) {
-  try {
-    if (!Number.isInteger(index) || index < 0 || index >= LEVELS.length) {
-      throw new Error(`Invalid reset level index: ${index}`);
-    }
-    validateLevelData(LEVELS[index], index);
-    levelIndex = index;
-    level = cloneLevel(LEVELS[levelIndex]);
-    objects = {
-      platforms: level.platforms.map(([x, y, w, h]) => ({ x, y, w, h })),
-      stars: level.stars.map(([x, y]) => ({ x, y, r: 18, taken: false })),
-      yarn: level.yarn.map(([x, y]) => ({ x, y, homeX: x, homeY: y, r: 16, taken: false, respawn: 0, alpha: 1 })),
-      crates: level.fishCrates.map(([x, y], index) => ({
-        x,
-        y,
-        w: 44,
-        h: 44,
-        broken: fishFound.has(`${levelIndex}:${index}`),
-        id: `${levelIndex}:${index}`
-      })),
-      enemies: level.enemies.map(([x, y, patrol]) => ({ x, y, w: 42, h: 36, baseX: x, patrol, vx: 1.3, alive: true })),
-      webPoints: [
-        ...level.webPoints.map(([x, y, kind = "normal"]) => ({ x, y, kind, used: false, glow: 0 })),
-        ...(level.shelfWebPoints || []).map(([x, y], index) => ({ x, y, kind: "shelf", shelfIndex: index, used: false, glow: 0 }))
-      ],
-      shelves: (level.shelves || []).map(([x, y]) => ({ x, y, startY: y, w: 120, h: 190, falling: false, vy: 0, spent: false })),
-      crystals: (level.crystals || []).map(([x, y]) => ({ x, y, r: 24, charged: true, activated: false })),
-      attackTargets: (level.attackTargets || []).map(([x, y, kind]) => ({ x, y, kind, r: 28, used: false })),
-      ghostHints: (level.ghostHints || []).map(([x, y, w, h]) => ({ x, y, w, h })),
-      projectiles: [],
-      particles: []
-    };
-    if (level.mirror) {
-      objects.mirror = { x: level.mirror[0], y: level.mirror[1], w: 86, h: 148, broken: false };
-    }
-    objects.boss = makeBoss(level.boss);
-    player.x = level.start[0];
-    player.y = level.start[1];
-    player.spawnX = player.x;
-    player.spawnY = player.y;
-    player.vx = 0;
-    player.vy = 0;
-    player.jumpsUsed = 0;
-    player.hearts = 3;
-    player.yarn = 1;
-    player.stars = 0;
-    player.fish = 0;
-    player.grapple = null;
-    player.invuln = 0;
-    gameWon = false;
-    camera.x = 0;
-    camera.y = 0;
-    message = "";
-    messageTimer = 0;
-    levelIntroTimer = 1.75;
-    bossIntroTimer = objects.boss ? 2.15 : 0;
-    victoryTimer = 0;
-    toast.classList.remove("show");
-    say(`${level.name}: ${level.prompt}`, 4.5);
-  } catch (error) {
-    console.error("[Kitty Whiscape] resetLevel failed", { index, level: LEVELS[index], error });
-    throw error;
+  levelIndex = index;
+  level = cloneLevel(LEVELS[levelIndex]);
+  objects = {
+    platforms: level.platforms.map(([x, y, w, h]) => ({ x, y, w, h })),
+    stars: level.stars.map(([x, y]) => ({ x, y, r: 18, taken: false })),
+    yarn: level.yarn.map(([x, y]) => ({ x, y, r: 16, taken: false })),
+    crates: level.fishCrates.map(([x, y], index) => ({
+      x,
+      y,
+      w: 44,
+      h: 44,
+      broken: fishFound.has(`${levelIndex}:${index}`),
+      id: `${levelIndex}:${index}`
+    })),
+    enemies: level.enemies.map(([x, y, patrol]) => ({ x, y, w: 42, h: 36, baseX: x, patrol, vx: 1.3, alive: true })),
+    webPoints: [
+      ...level.webPoints.map(([x, y, kind = "normal"]) => ({ x, y, kind, used: false, glow: 0 })),
+      ...(level.shelfWebPoints || []).map(([x, y], index) => ({ x, y, kind: "shelf", shelfIndex: index, used: false, glow: 0 }))
+    ],
+    shelves: (level.shelves || []).map(([x, y]) => ({ x, y, startY: y, w: 120, h: 190, falling: false, vy: 0, spent: false })),
+    crystals: (level.crystals || []).map(([x, y]) => ({ x, y, r: 24, charged: true, activated: false })),
+    attackTargets: (level.attackTargets || []).map(([x, y, kind]) => ({ x, y, kind, r: 28, used: false })),
+    projectiles: [],
+    particles: []
+  };
+  if (level.mirror) {
+    objects.mirror = { x: level.mirror[0], y: level.mirror[1], w: 86, h: 148, broken: false };
   }
+  objects.boss = makeBoss(level.boss);
+  player.x = level.start[0];
+  player.y = level.start[1];
+  player.spawnX = player.x;
+  player.spawnY = player.y;
+  player.vx = 0;
+  player.vy = 0;
+  player.jumpsUsed = 0;
+  player.hearts = 3;
+  player.yarn = 1;
+  player.stars = 0;
+  player.fish = 0;
+  player.grapple = null;
+  player.invuln = 0;
+  gameWon = false;
+  camera.x = 0;
+  camera.y = 0;
+  levelIntroTimer = 1.75;
+  bossIntroTimer = objects.boss ? 2.15 : 0;
+  victoryTimer = 0;
+  say(`${level.name}: ${level.prompt}`, 4.5);
 }
 
 function makeBoss(data) {
@@ -3145,8 +3062,8 @@ function startGame() {
   startLevelWithFade(0);
 }
 
-if (playButton) playButton.addEventListener("click", startGame);
-if (roomsButton) roomsButton.addEventListener("click", showLevelSelect);
+playButton.addEventListener("click", startGame);
+roomsButton.addEventListener("click", showLevelSelect);
 storyNext.addEventListener("click", advanceStory);
 document.querySelectorAll(".level-hotspot").forEach(button => {
   button.addEventListener("mouseenter", () => {
@@ -3187,7 +3104,7 @@ function handleMenuKeyboard(key) {
   }
 
   if (key === "enter") {
-    showLevelSelect();
+    startLevelWithFade(selectedLevel);
     return true;
   }
 
@@ -3232,15 +3149,10 @@ window.addEventListener("resize", resizeCanvas);
 window.addEventListener("mousemove", e => screenToWorld(e.clientX, e.clientY));
 window.addEventListener("contextmenu", e => {
   e.preventDefault();
-  if (isStartingLevel) return;
   screenToWorld(e.clientX, e.clientY);
   fireYarn();
 });
 window.addEventListener("mousedown", e => {
-  if (isStartingLevel) {
-    e.preventDefault();
-    return;
-  }
   if (e.button === 2) {
     e.preventDefault();
     fireYarn();
@@ -3260,10 +3172,6 @@ window.addEventListener("keydown", e => {
     return;
   }
   if (handleMenuKeyboard(key)) {
-    e.preventDefault();
-    return;
-  }
-  if (isStartingLevel) {
     e.preventDefault();
     return;
   }
