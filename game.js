@@ -2210,14 +2210,14 @@ function drawPlayer() {
 
   // Tail (behind body)
   ctx.save();
-  ctx.translate(-16, 8);
-  ctx.rotate(tailAngle - 0.3);
+  ctx.translate(-15, 7);
+  ctx.rotate(tailAngle - 0.15);
   ctx.strokeStyle = "#fff0cf";
-  ctx.lineWidth = 7;
+  ctx.lineWidth = 6.5;
   ctx.lineCap = "round";
   ctx.beginPath();
   ctx.moveTo(0, 0);
-  ctx.quadraticCurveTo(-14, -8, -24, 4);
+  ctx.quadraticCurveTo(-18, -16, -31, -2);
   ctx.stroke();
   ctx.restore();
 
@@ -2230,38 +2230,38 @@ function drawPlayer() {
   // Ears
   ctx.fillStyle = "#fff0cf";
   ctx.save();
-  ctx.translate(-10, -22);
-  ctx.rotate(-0.25 + earTwitchL);
+  ctx.translate(-11, -18);
+  ctx.rotate(-0.48 + earTwitchL);
   ctx.beginPath();
-  ctx.moveTo(0, 14);
-  ctx.lineTo(-6, -8);
-  ctx.lineTo(6, -8);
+  ctx.moveTo(1, 10);
+  ctx.lineTo(-9, -5);
+  ctx.lineTo(7, -3);
   ctx.closePath();
   ctx.fill();
   ctx.fillStyle = "#f0a6a6";
   ctx.beginPath();
-  ctx.moveTo(0, 10);
-  ctx.lineTo(-3, -2);
-  ctx.lineTo(3, -2);
+  ctx.moveTo(1, 7);
+  ctx.lineTo(-4, -1);
+  ctx.lineTo(4, 0);
   ctx.closePath();
   ctx.fill();
   ctx.restore();
 
   ctx.save();
-  ctx.translate(10, -22);
-  ctx.rotate(0.25 + earTwitchR);
+  ctx.translate(11, -18);
+  ctx.rotate(0.48 + earTwitchR);
   ctx.fillStyle = "#fff0cf";
   ctx.beginPath();
-  ctx.moveTo(0, 14);
-  ctx.lineTo(-6, -8);
-  ctx.lineTo(6, -8);
+  ctx.moveTo(-1, 10);
+  ctx.lineTo(-7, -3);
+  ctx.lineTo(9, -5);
   ctx.closePath();
   ctx.fill();
   ctx.fillStyle = "#f0a6a6";
   ctx.beginPath();
-  ctx.moveTo(0, 10);
-  ctx.lineTo(-3, -2);
-  ctx.lineTo(3, -2);
+  ctx.moveTo(-1, 7);
+  ctx.lineTo(-4, 0);
+  ctx.lineTo(4, -1);
   ctx.closePath();
   ctx.fill();
   ctx.restore();
@@ -2292,6 +2292,24 @@ function drawPlayer() {
   ctx.closePath();
   ctx.fill();
 
+  ctx.strokeStyle = "rgba(82,48,31,0.7)";
+  ctx.lineWidth = 1.4;
+  ctx.lineCap = "round";
+  ctx.beginPath();
+  ctx.moveTo(-4, 6);
+  ctx.lineTo(-16, 2);
+  ctx.moveTo(-4, 8);
+  ctx.lineTo(-16, 9);
+  ctx.moveTo(4, 6);
+  ctx.lineTo(16, 2);
+  ctx.moveTo(4, 8);
+  ctx.lineTo(16, 9);
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.arc(-2, 8, 3, 0, Math.PI * 0.85);
+  ctx.arc(2, 8, 3, Math.PI * 0.15, Math.PI);
+  ctx.stroke();
+
   // Paws
   ctx.fillStyle = "#fff0cf";
   ctx.fillRect(-14, 16 - pawLiftL, 9, 10 - pawLiftL * 0.3);
@@ -2309,6 +2327,41 @@ function drawGrapple() {
   ctx.moveTo(player.x + player.w / 2, player.y + player.h / 2);
   ctx.lineTo(gp.x, gp.y);
   ctx.stroke();
+}
+
+function getWrappedHudLines(text, maxWidth, maxLines = 2) {
+  const words = String(text).split(/\s+/).filter(Boolean);
+  const lines = [];
+  let line = "";
+  let consumed = 0;
+
+  for (const word of words) {
+    const test = line ? `${line} ${word}` : word;
+    if (ctx.measureText(test).width <= maxWidth || !line) {
+      line = test;
+      consumed += 1;
+    } else {
+      lines.push(line);
+      line = word;
+      consumed += 1;
+      if (lines.length === maxLines) break;
+    }
+  }
+
+  if (lines.length < maxLines && line) lines.push(line);
+  if (!lines.length) return [String(text)];
+
+  const originalWordCount = words.length;
+  if (consumed < originalWordCount || lines.length > maxLines) {
+    lines.length = maxLines;
+    let last = lines[lines.length - 1] || "";
+    while (last.length > 1 && ctx.measureText(`${last}...`).width > maxWidth) {
+      last = last.slice(0, -1).trimEnd();
+    }
+    lines[lines.length - 1] = `${last}...`;
+  }
+
+  return lines.slice(0, maxLines);
 }
 
 function drawHud() {
@@ -2347,21 +2400,27 @@ function drawHud() {
   ctx.fillText("A/D Move | W Jump | S Fast Fall | E/RMB Grapple | Space/LMB Attack | ESC Pause", VIEW_W - 760, 50);
   if (messageTimer > 0 && message) {
     const msgAlpha = Math.min(1, messageTimer);
+    const boxW = 760;
+    const boxH = 64;
+    const boxX = (VIEW_W - boxW) / 2;
+    const boxY = VIEW_H - 108;
     ctx.fillStyle = `rgba(5,8,13,${0.72 * msgAlpha})`;
     if (ctx.roundRect) {
       ctx.beginPath();
-      ctx.roundRect(330, VIEW_H - 86, 620, 46, 10);
+      ctx.roundRect(boxX, boxY, boxW, boxH, 10);
       ctx.fill();
       ctx.strokeStyle = `rgba(215,184,107,${0.4 * msgAlpha})`;
       ctx.lineWidth = 1;
       ctx.stroke();
     } else {
-      ctx.fillRect(330, VIEW_H - 86, 620, 46);
+      ctx.fillRect(boxX, boxY, boxW, boxH);
     }
     ctx.fillStyle = `rgba(255,248,232,${msgAlpha})`;
     ctx.textAlign = "center";
-    ctx.font = "bold 17px Nunito, Trebuchet MS, sans-serif";
-    ctx.fillText(message, VIEW_W / 2, VIEW_H - 56);
+    ctx.font = "bold 16px Nunito, Trebuchet MS, sans-serif";
+    const lines = getWrappedHudLines(message, boxW - 44, 2);
+    const startY = boxY + boxH / 2 - (lines.length - 1) * 10 + 6;
+    lines.forEach((line, i) => ctx.fillText(line, VIEW_W / 2, startY + i * 21));
     ctx.textAlign = "left";
   }
 }
