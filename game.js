@@ -1953,24 +1953,45 @@ function wrapCanvasTextLines(text, maxWidth, maxLines = 2) {
 
 function drawTutorialPrompts() {
   if (!level.tutorials) return;
-  ctx.font = "bold 17px Trebuchet MS";
+  ctx.font = "800 16px Nunito, Trebuchet MS, sans-serif";
   ctx.textAlign = "center";
   for (const note of level.tutorials) {
     const visible = Math.abs((player.x + player.w / 2) - note.x) < 520;
     ctx.globalAlpha = visible ? 1 : 0.38;
-    const w = 500;
-    const lines = wrapCanvasTextLines(note.text, w - 42, 3);
-    const h = 30 + lines.length * 22;
+    const w = 520;
+    const lines = wrapCanvasTextLines(note.text, w - 54, 3);
+    const h = 34 + lines.length * 22;
     const x = note.x;
     const y = 585;
-    ctx.fillStyle = "rgba(18, 10, 13, 0.78)";
-    ctx.fillRect(x - w / 2, y - h + 12, w, h);
-    ctx.strokeStyle = "rgba(247, 199, 109, 0.72)";
-    ctx.lineWidth = 3;
-    ctx.strokeRect(x - w / 2, y - h + 12, w, h);
+    const boxX = x - w / 2;
+    const boxY = y - h + 12;
+
+    ctx.save();
+    ctx.shadowColor = "rgba(0,0,0,0.42)";
+    ctx.shadowBlur = 22;
+    ctx.fillStyle = "rgba(7, 8, 14, 0.84)";
+    ctx.strokeStyle = "rgba(255, 226, 151, 0.58)";
+    ctx.lineWidth = 1.6;
+    if (ctx.roundRect) {
+      ctx.beginPath();
+      ctx.roundRect(boxX, boxY, w, h, 12);
+      ctx.fill();
+      ctx.shadowBlur = 0;
+      ctx.stroke();
+    } else {
+      ctx.fillRect(boxX, boxY, w, h);
+      ctx.shadowBlur = 0;
+      ctx.strokeRect(boxX, boxY, w, h);
+    }
+    ctx.restore();
+
+    ctx.fillStyle = "rgba(255, 248, 232, 0.96)";
+    ctx.shadowColor = "rgba(0,0,0,0.62)";
+    ctx.shadowBlur = 8;
     ctx.fillStyle = "#fff4c2";
     const textStartY = y - h + 35;
     lines.forEach((line, i) => ctx.fillText(line, x, textStartY + i * 22));
+    ctx.shadowBlur = 0;
   }
   ctx.globalAlpha = 1;
   ctx.textAlign = "left";

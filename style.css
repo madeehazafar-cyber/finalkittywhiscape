@@ -7146,187 +7146,227 @@ body {
   82%, 100% { transform: skewX(-16deg) translateX(360%); opacity: 0; }
 }
 
-/* Opening page animation: camera zooms through one glowing mansion window. */
-.mansion-window-reveal {
+/* Opening page animation: Nancy shadow intro, then the menu reveals. */
+.nancy-shadow-reveal {
   position: absolute;
   inset: 0;
   z-index: 80;
-  display: grid;
-  place-items: center;
   pointer-events: none;
   overflow: hidden;
   background:
-    radial-gradient(circle at 50% 42%, rgba(255, 224, 145, 0.04), transparent 16%),
+    radial-gradient(circle at 50% 42%, rgba(130, 20, 34, 0.08), transparent 18%),
     #000;
-  animation: revealOverlayExit 3.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: nancyRevealExit 3.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-.mansion-window-reveal::before,
-.mansion-window-reveal::after {
+.nancy-shadow-reveal::before,
+.nancy-shadow-reveal::after {
   content: "";
   position: absolute;
   inset: -12%;
   pointer-events: none;
 }
 
-.mansion-window-reveal::before {
+.nancy-shadow-reveal::before {
   background:
-    radial-gradient(circle at 50% 45%, rgba(255, 226, 151, 0.16), transparent 10%),
-    linear-gradient(115deg, transparent 0 43%, rgba(255, 235, 178, 0.07) 47%, transparent 56% 100%);
+    radial-gradient(circle at 50% 38%, rgba(255, 30, 52, 0.18), transparent 8%),
+    radial-gradient(ellipse at 50% 62%, rgba(53, 14, 34, 0.72), transparent 34%);
   opacity: 0;
-  animation: revealMoonTrace 3.2s ease-out forwards;
+  animation: nancyDarkPulse 3.2s ease-out forwards;
 }
 
-.mansion-window-reveal::after {
+.nancy-shadow-reveal::after {
   background:
-    radial-gradient(ellipse at 50% 50%, transparent 0 18%, rgba(0,0,0,0.58) 48%, rgba(0,0,0,0.98) 76%),
-    linear-gradient(180deg, rgba(0,0,0,0.9), transparent 38%, rgba(0,0,0,0.95));
-  animation: revealVignettePulse 3.45s ease-out forwards;
+    radial-gradient(ellipse at 50% 50%, transparent 0 18%, rgba(0,0,0,0.72) 50%, rgba(0,0,0,1) 78%),
+    linear-gradient(180deg, rgba(0,0,0,1), transparent 34%, rgba(0,0,0,1));
+  animation: nancyVignetteExit 3.6s ease-out forwards;
 }
 
-.reveal-mansion {
-  position: relative;
-  width: min(58vw, 620px);
-  height: min(42vh, 380px);
-  transform-origin: 50% 43%;
-  opacity: 0;
-  filter: drop-shadow(0 35px 55px rgba(0,0,0,0.92));
-  animation: revealMansionZoom 3.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-}
-
-.reveal-mansion::before {
-  content: "";
-  position: absolute;
-  left: 16%;
-  right: 16%;
-  bottom: 4%;
-  height: 58%;
-  background:
-    linear-gradient(90deg, transparent 0 10%, rgba(255, 232, 160, 0.05) 10.4% 10.8%, transparent 11.2% 89%, rgba(255, 232, 160, 0.05) 89.4% 89.8%, transparent 90.2%),
-    linear-gradient(180deg, #0b0b10, #020204);
-  border: 1px solid rgba(255, 232, 160, 0.1);
-  box-shadow: inset 0 0 60px rgba(0,0,0,0.8);
-}
-
-.reveal-roof {
-  position: absolute;
-  left: 10%;
-  right: 10%;
-  bottom: 61%;
-  height: 26%;
-  background: linear-gradient(180deg, #151018, #030305);
-  clip-path: polygon(50% 0, 100% 100%, 0 100%);
-}
-
-.reveal-tower {
-  position: absolute;
-  bottom: 4%;
-  width: 15%;
-  height: 78%;
-  background: linear-gradient(180deg, #101018, #020204);
-  border: 1px solid rgba(255, 232, 160, 0.08);
-}
-
-.tower-left {
-  left: 8%;
-}
-
-.tower-right {
-  right: 8%;
-}
-
-.reveal-tower::before {
-  content: "";
-  position: absolute;
-  left: -20%;
-  right: -20%;
-  top: -24%;
-  height: 26%;
-  background: #0a0a0f;
-  clip-path: polygon(50% 0, 100% 100%, 0 100%);
-}
-
-.reveal-window {
+.nancy-intro-eyes {
   position: absolute;
   left: 50%;
-  top: 42%;
-  width: clamp(34px, 5.6vw, 62px);
-  height: clamp(52px, 8vw, 88px);
-  border-radius: 999px 999px 4px 4px;
-  border: 2px solid rgba(255, 241, 190, 0.44);
-  background:
-    radial-gradient(circle at 50% 38%, #fff8d6 0 10%, #ffe39a 24%, #c77535 54%, rgba(54, 22, 16, 0.92) 100%);
-  box-shadow:
-    0 0 20px rgba(255, 224, 145, 0),
-    inset 0 0 18px rgba(255,255,255,0.18);
+  top: 38%;
+  z-index: 3;
+  width: clamp(78px, 9vw, 132px);
+  height: clamp(22px, 2.5vw, 34px);
   transform: translate(-50%, -50%);
-  animation: revealWindowIgnite 3.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  opacity: 0;
+  animation: nancyEyesOpen 3.6s steps(1, end) forwards;
 }
 
-.reveal-window::before,
-.reveal-window::after {
+.nancy-intro-eyes::before,
+.nancy-intro-eyes::after {
   content: "";
   position: absolute;
-  background: rgba(34, 16, 10, 0.65);
+  top: 0;
+  width: 34%;
+  height: 100%;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 50% 50%, #fff5c7 0 8%, #ff2d45 18%, #9b0614 56%, rgba(74, 0, 8, 0.4) 100%);
+  box-shadow:
+    0 0 16px rgba(255, 34, 52, 0.9),
+    0 0 44px rgba(255, 0, 24, 0.55),
+    0 0 120px rgba(255, 200, 90, 0.18);
 }
 
-.reveal-window::before {
-  left: 50%;
-  top: 8%;
-  bottom: 0;
-  width: 2px;
-  transform: translateX(-50%);
-}
-
-.reveal-window::after {
+.nancy-intro-eyes::before {
   left: 0;
-  right: 0;
-  top: 48%;
-  height: 2px;
+  transform: rotate(6deg);
 }
 
-@keyframes revealOverlayExit {
+.nancy-intro-eyes::after {
+  right: 0;
+  transform: rotate(-6deg);
+}
+
+.nancy-intro-shadow {
+  position: absolute;
+  left: 50%;
+  top: 52%;
+  z-index: 2;
+  width: clamp(190px, 25vw, 360px);
+  height: clamp(320px, 48vh, 560px);
+  border-radius: 48% 48% 12% 12%;
+  background:
+    radial-gradient(ellipse at 50% 16%, rgba(43, 8, 28, 0.9) 0 24%, rgba(9, 3, 9, 0.98) 48%, rgba(0,0,0,0) 72%),
+    linear-gradient(180deg, rgba(5, 2, 8, 0.98), rgba(0,0,0,0));
+  filter: blur(1px) drop-shadow(0 0 44px rgba(255, 0, 34, 0.18));
+  opacity: 0;
+  transform: translate(-50%, -44%) scale(0.58);
+  animation: nancyShadowGrow 3.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.nancy-intro-shadow::before,
+.nancy-intro-shadow::after {
+  content: "";
+  position: absolute;
+  top: 30%;
+  width: 56%;
+  height: 28%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, rgba(0,0,0,0), rgba(7, 2, 9, 0.95));
+  filter: blur(3px);
+}
+
+.nancy-intro-shadow::before {
+  right: 72%;
+  transform: rotate(28deg);
+}
+
+.nancy-intro-shadow::after {
+  left: 72%;
+  transform: rotate(-28deg) scaleX(-1);
+}
+
+.nancy-shadow-wipe {
+  position: absolute;
+  inset: -10%;
+  z-index: 4;
+  background:
+    linear-gradient(104deg, transparent 0 26%, rgba(0,0,0,0.96) 40%, rgba(20, 2, 10, 1) 52%, rgba(0,0,0,0.96) 64%, transparent 78%),
+    radial-gradient(ellipse at 50% 50%, rgba(255, 0, 34, 0.1), transparent 34%);
+  transform: translateX(-120%) skewX(-8deg);
+  animation: nancyShadowSweep 3.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes nancyRevealExit {
   0%, 74% { opacity: 1; visibility: visible; }
   100% { opacity: 0; visibility: hidden; }
 }
 
-@keyframes revealMoonTrace {
-  0% { opacity: 0; transform: scale(1.08); }
-  24% { opacity: 0.34; }
-  58% { opacity: 0.58; transform: scale(1); }
-  100% { opacity: 0; transform: scale(1.35); }
+@keyframes nancyDarkPulse {
+  0% { opacity: 0; transform: scale(0.9); }
+  28% { opacity: 0.78; }
+  58% { opacity: 0.96; transform: scale(1); }
+  100% { opacity: 0; transform: scale(1.26); }
 }
 
-@keyframes revealVignettePulse {
-  0% { opacity: 1; transform: scale(1); }
-  58% { opacity: 0.94; }
-  82% { opacity: 0.5; transform: scale(1.25); }
-  100% { opacity: 0; transform: scale(1.8); }
+@keyframes nancyVignetteExit {
+  0%, 62% { opacity: 1; transform: scale(1); }
+  82% { opacity: 0.68; transform: scale(1.18); }
+  100% { opacity: 0; transform: scale(1.5); }
 }
 
-@keyframes revealMansionZoom {
-  0% { opacity: 0; transform: scale(0.54) translateY(28px); filter: blur(5px) drop-shadow(0 35px 55px rgba(0,0,0,0.92)); }
-  24% { opacity: 1; transform: scale(0.72) translateY(10px); filter: blur(0) drop-shadow(0 35px 55px rgba(0,0,0,0.92)); }
-  62% { opacity: 1; transform: scale(1) translateY(0); }
-  100% { opacity: 0; transform: scale(6.4) translateY(-2px); filter: blur(8px) drop-shadow(0 35px 55px rgba(0,0,0,0.92)); }
+@keyframes nancyEyesOpen {
+  0%, 16% { opacity: 0; transform: translate(-50%, -50%) scaleY(0.05); }
+  22%, 37% { opacity: 1; transform: translate(-50%, -50%) scaleY(1); }
+  38%, 42% { opacity: 0.2; transform: translate(-50%, -50%) scaleY(0.08); }
+  43%, 66% { opacity: 1; transform: translate(-50%, -50%) scaleY(1.04); }
+  67%, 100% { opacity: 0; transform: translate(-50%, -50%) scale(1.42); }
 }
 
-@keyframes revealWindowIgnite {
-  0%, 22% { box-shadow: 0 0 0 rgba(255,224,145,0), inset 0 0 18px rgba(255,255,255,0.08); filter: brightness(0.65); }
-  34% { box-shadow: 0 0 26px rgba(255,224,145,0.56), 0 0 80px rgba(255,194,93,0.26), inset 0 0 20px rgba(255,255,255,0.2); filter: brightness(1.15); }
-  58% { box-shadow: 0 0 42px rgba(255,224,145,0.82), 0 0 160px rgba(255,194,93,0.42), inset 0 0 24px rgba(255,255,255,0.28); filter: brightness(1.35); }
-  100% { box-shadow: 0 0 120px rgba(255,244,196,0.95), 0 0 320px rgba(255,194,93,0.7), inset 0 0 28px rgba(255,255,255,0.4); filter: brightness(2.2); }
+@keyframes nancyShadowGrow {
+  0% { opacity: 0; transform: translate(-50%, -38%) scale(0.42); filter: blur(8px) drop-shadow(0 0 0 rgba(255,0,34,0)); }
+  28% { opacity: 0.72; transform: translate(-50%, -42%) scale(0.7); }
+  58% { opacity: 0.96; transform: translate(-50%, -46%) scale(1); filter: blur(1px) drop-shadow(0 0 44px rgba(255,0,34,0.18)); }
+  100% { opacity: 0; transform: translate(-50%, -48%) scale(1.55); filter: blur(12px) drop-shadow(0 0 90px rgba(255,0,34,0.3)); }
+}
+
+@keyframes nancyShadowSweep {
+  0%, 52% { transform: translateX(-120%) skewX(-8deg); opacity: 0; }
+  62% { opacity: 1; }
+  78% { transform: translateX(8%) skewX(-8deg); opacity: 1; }
+  100% { transform: translateX(120%) skewX(-8deg); opacity: 0; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .mansion-window-reveal {
+  .nancy-shadow-reveal,
+  .nancy-intro-eyes,
+  .nancy-intro-shadow,
+  .nancy-shadow-wipe,
+  .nancy-shadow-reveal::before,
+  .nancy-shadow-reveal::after {
     animation-duration: 900ms;
   }
+}
 
-  .reveal-mansion,
-  .reveal-window,
-  .mansion-window-reveal::before,
-  .mansion-window-reveal::after {
-    animation-duration: 900ms;
-  }
+/* Cleaner textboxes: softer glass, clearer type, less chunky borders. */
+.toast {
+  border: 1px solid rgba(255, 226, 151, 0.42) !important;
+  border-radius: 14px !important;
+  padding: 13px 20px !important;
+  color: #fff8e8 !important;
+  line-height: 1.35;
+  letter-spacing: 0.01em;
+  overflow-wrap: anywhere;
+  background:
+    linear-gradient(145deg, rgba(255, 232, 160, 0.08), transparent 42%),
+    rgba(5, 7, 12, 0.9) !important;
+  box-shadow:
+    0 18px 48px rgba(0, 0, 0, 0.48),
+    0 0 24px rgba(255, 226, 151, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12) !important;
+  backdrop-filter: blur(14px) saturate(1.18);
+}
+
+.story-stage .speech-bubble {
+  border-radius: 22px 22px 22px 10px !important;
+  border: 1px solid rgba(255, 226, 151, 0.46) !important;
+  background:
+    radial-gradient(circle at 18% 0%, rgba(255, 242, 194, 0.14), transparent 44%),
+    linear-gradient(145deg, rgba(10, 10, 17, 0.86), rgba(2, 2, 6, 0.94)) !important;
+  box-shadow:
+    0 18px 54px rgba(0, 0, 0, 0.58),
+    0 0 24px rgba(255, 215, 126, 0.11),
+    inset 0 1px 0 rgba(255, 246, 210, 0.12) !important;
+}
+
+.story-stage .speech-bubble p {
+  color: #fff9df !important;
+  font-family: "Nunito", "Trebuchet MS", sans-serif !important;
+  font-size: clamp(0.98rem, 1.35vw, 1.22rem) !important;
+  font-weight: 800;
+  line-height: 1.36 !important;
+  letter-spacing: 0.005em;
+  overflow-wrap: anywhere;
+}
+
+.story-stage .speech-bubble button {
+  border-radius: 999px !important;
+  border: 1px solid rgba(255, 226, 151, 0.5) !important;
+  background:
+    linear-gradient(135deg, rgba(255, 232, 160, 0.2), rgba(95, 54, 21, 0.34)) !important;
+  color: #fff0b8 !important;
+  box-shadow: 0 0 14px rgba(255, 226, 151, 0.12);
 }
