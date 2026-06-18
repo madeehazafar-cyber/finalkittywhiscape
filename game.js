@@ -103,8 +103,6 @@ const player = {
   vy: 0,
   face: 1,
   grounded: false,
-  jumpsUsed: 0,
-  maxJumps: 2,
   coyote: 0,
   jumpBuffer: 0,
   hearts: 3,
@@ -119,142 +117,200 @@ const player = {
 
 const LEVELS = [
   {
-    id: "kitchen",
-    name: "Kitchen Tutorial",
+    id: "entrance",
+    name: "Entrance Hall Tutorial",
     theme: "kitchen",
-    width: 3300,
+    width: 3800,
     height: 1080,
     start: [110, 770],
-    exit: [3120, 730],
-    prompt: "Follow the mansion notes: move, double jump, then grapple across the glowing yarn gaps.",
+    exit: [3600, 730],
+    prompt: "Learn the split yarn controls: E/Right Mouse grapples hooks, Space/Left Mouse shoots yarn attacks.",
     tutorials: [
-      { x: 150, text: "Press A/D to move." },
-      { x: 620, text: "Press W to jump. Press W again to double jump!" },
-      { x: 1260, text: "See the glowing yarn? Stand near it. Press E or Right Mouse Button to shoot your yarn and grapple across!" },
-      { x: 2080, text: "Practice: use yarn points to cross these safe gaps." }
+      { x: 180, text: "Press A/D to move." },
+      { x: 660, text: "Press W to jump." },
+      { x: 1260, text: "See the glowing yarn point? Stand near it. Press E or Right Mouse Button to shoot your yarn and grapple across!" },
+      { x: 2050, text: "Press Left Mouse Button or Space to shoot yarn at objects." }
     ],
     platforms: [
-      [0, 920, 900, 160], [1080, 920, 420, 160], [1700, 920, 420, 160], [2320, 920, 420, 160], [2940, 920, 360, 160],
-      [380, 790, 280, 34], [780, 760, 240, 34], [1220, 720, 260, 34], [1820, 730, 260, 34], [2440, 740, 260, 34],
-      [1420, 590, 210, 30], [2040, 600, 210, 30], [2660, 610, 210, 30]
+      [0, 920, 900, 160], [1160, 920, 420, 160], [1840, 920, 420, 160], [2520, 920, 420, 160], [3200, 920, 600, 160],
+      [430, 790, 260, 34], [1320, 720, 260, 34], [2020, 720, 260, 34], [2700, 720, 260, 34]
     ],
-    stars: [[520, 742], [1430, 672], [2670, 562]],
-    yarn: [[250, 870], [760, 870], [1110, 870], [1360, 672], [1700, 870], [1980, 552], [2320, 870], [2600, 562], [2960, 870]],
-    fishCrates: [[580, 724], [2720, 564]],
-    enemies: [[2580, 884, 70]],
-    webPoints: [[1040, 670], [1320, 630], [1620, 650], [1940, 540], [2240, 650], [2560, 550], [2880, 650]]
+    stars: [[520, 742], [1400, 672], [2760, 672]],
+    yarn: [[250, 870], [880, 870], [1200, 870], [1740, 870], [2380, 870], [3060, 870]],
+    fishCrates: [[2120, 674]],
+    enemies: [],
+    webPoints: [[1060, 650], [1700, 640], [2380, 650], [3060, 650]]
   },
   {
-    id: "ballroom",
-    name: "Ballroom Timing",
-    theme: "ballroom",
-    width: 3600,
-    height: 1180,
-    start: [100, 860],
-    exit: [3400, 700],
-    prompt: "Ballroom: time your jumps around slow enemies, then use clear grapple shots to reach the balcony.",
+    id: "kitchen",
+    name: "Kitchen of Whiskers",
+    theme: "kitchen",
+    width: 4100,
+    height: 1120,
+    start: [100, 820],
+    exit: [3900, 760],
+    prompt: "Boss room: use yarn attacks to drop the chandelier on Whiskers after collecting all stars.",
     platforms: [
-      [0, 1010, 680, 170], [820, 1010, 480, 170], [1460, 960, 460, 220], [2080, 900, 460, 280], [2720, 900, 420, 280], [3280, 840, 320, 340],
-      [420, 820, 270, 34], [900, 730, 270, 34], [1380, 650, 270, 34], [1880, 570, 270, 34], [2380, 620, 270, 34], [2880, 720, 270, 34]
+      [0, 980, 720, 140], [1020, 980, 460, 140], [1780, 940, 460, 180], [2520, 900, 500, 220], [3320, 940, 780, 180],
+      [760, 770, 260, 34], [1500, 690, 260, 34], [2260, 610, 260, 34], [3040, 710, 260, 34]
     ],
-    stars: [[440, 774], [1900, 524], [2920, 672]],
-    yarn: [[240, 960], [700, 960], [1000, 684], [1500, 604], [2000, 524], [2500, 574], [3000, 674], [3340, 790]],
-    fishCrates: [[1260, 964], [2860, 674]],
-    enemies: [[900, 974, 90], [2120, 864, 95], [2920, 864, 90]],
-    webPoints: [[760, 690], [1180, 600], [1640, 520], [2140, 470], [2640, 540], [3100, 640], [3380, 600]]
+    stars: [[780, 724], [2260, 564], [3420, 894]],
+    yarn: [[260, 930], [960, 720], [1620, 640], [2380, 560], [3060, 660], [3500, 890]],
+    fishCrates: [[1380, 934], [3120, 664]],
+    enemies: [[1120, 944, 100], [2680, 864, 110]],
+    webPoints: [[900, 650], [1640, 570], [2380, 490], [3180, 610]],
+    attackTargets: [[2300, 350, "chandelier"]],
+    boss: { type: "whiskers", name: "Whiskers", x: 2800, y: 846, arena: [2280, 520, 850, 420], hp: 1 }
   },
   {
     id: "library",
-    name: "Library of Shadow",
+    name: "Library Stacks",
     theme: "library",
-    width: 3900,
-    height: 1280,
-    start: [110, 970],
-    exit: [3700, 820],
-    prompt: "Shadow is the only real threat here. Lure him under each shelf and drop all three bookshelves to defeat him.",
+    width: 4300,
+    height: 1320,
+    start: [100, 970],
+    exit: [4100, 860],
+    prompt: "Regular room: hooks cross the wide shelves; yarn attacks clear enemies and fish crates.",
     platforms: [
-      [0, 1120, 620, 160], [1120, 1120, 430, 160], [1980, 1120, 450, 160], [2820, 1120, 460, 160], [3500, 1040, 400, 240],
-      [520, 900, 240, 34], [1110, 780, 240, 34], [1480, 660, 240, 34], [1910, 790, 240, 34], [2320, 920, 240, 34],
-      [2840, 820, 250, 34], [3260, 720, 250, 34], [3600, 880, 230, 34],
-      [1480, 1000, 220, 30], [2040, 1000, 220, 30], [2600, 1000, 220, 30]
+      [0, 1120, 660, 200], [980, 1120, 460, 200], [1760, 1040, 460, 280], [2520, 960, 460, 360], [3300, 1040, 460, 280], [3940, 1000, 360, 320],
+      [520, 900, 250, 34], [1320, 760, 250, 34], [2100, 640, 250, 34], [2860, 740, 250, 34], [3560, 830, 250, 34]
     ],
-    stars: [[540, 854], [1500, 614], [3280, 674]],
-    yarn: [[280, 1070], [640, 854], [1040, 1070], [1210, 734], [1600, 614], [2040, 1070], [2260, 1070], [2880, 1070], [3160, 774], [3540, 990]],
-    fishCrates: [[1550, 954]],
-    enemies: [[2040, 1084, 85], [2920, 1084, 90]],
-    webPoints: [[850, 720], [1160, 650], [1420, 540], [1760, 660], [2180, 760], [2560, 840], [3060, 690], [3440, 610], [3700, 720]],
-    shelves: [[1500, 790], [2060, 790], [2620, 790]],
-    shelfWebPoints: [[1560, 700], [2120, 700], [2680, 700]],
-    boss: {
-      type: "shadow",
-      name: "Shadow",
-      x: 3180,
-      y: 1066,
-      arena: [900, 760, 2500, 360],
-      hp: 3
-    }
+    stars: [[540, 854], [2120, 594], [3580, 784]],
+    yarn: [[280, 1070], [840, 1070], [1260, 710], [1900, 990], [2180, 590], [2740, 910], [3340, 990], [3980, 950]],
+    fishCrates: [[1420, 714]],
+    enemies: [[1860, 1004, 100], [3360, 1004, 110]],
+    webPoints: [[820, 760], [1500, 620], [2240, 520], [3000, 620], [3720, 720]]
+  },
+  {
+    id: "ballroom",
+    name: "Duchess' Ballroom",
+    theme: "ballroom",
+    width: 4400,
+    height: 1220,
+    start: [100, 880],
+    exit: [4200, 740],
+    prompt: "Boss room: use yarn attacks to smash the mirror, then hit stunned Duchess.",
+    platforms: [
+      [0, 1020, 680, 200], [980, 1020, 480, 200], [1760, 960, 520, 260], [2540, 900, 520, 320], [3340, 960, 520, 260], [4020, 900, 380, 320],
+      [620, 800, 260, 34], [1400, 680, 260, 34], [2180, 560, 260, 34], [2960, 660, 260, 34], [3660, 780, 260, 34]
+    ],
+    stars: [[640, 754], [2200, 514], [3680, 734]],
+    yarn: [[260, 970], [900, 970], [1540, 630], [2300, 510], [3100, 610], [3760, 730], [4120, 850]],
+    fishCrates: [[1340, 974], [3720, 734]],
+    enemies: [[1160, 984, 90], [2600, 864, 100]],
+    webPoints: [[860, 680], [1620, 560], [2400, 450], [3160, 560], [3860, 680]],
+    mirror: [3560, 760],
+    boss: { type: "duchess", name: "Duchess", x: 3260, y: 918, arena: [2880, 570, 820, 450], hp: 3 }
   },
   {
     id: "dungeon",
-    name: "Dungeon Descent",
+    name: "Dungeon Drop",
     theme: "dungeon",
-    width: 3400,
-    height: 1680,
+    width: 4300,
+    height: 1760,
     start: [120, 310],
-    exit: [3100, 1400],
-    prompt: "Dungeon: descend in readable steps. Each long drop has a visible web point and recovery ledge.",
+    exit: [4040, 1460],
+    prompt: "Regular vertical room: every long drop has one required hook and a recovery ledge.",
     platforms: [
-      [0, 460, 560, 120], [650, 560, 420, 90], [1160, 690, 410, 90], [1660, 840, 410, 90], [2120, 1010, 420, 90], [2540, 1200, 420, 90], [2920, 1500, 480, 180],
-      [480, 680, 220, 32], [850, 800, 220, 32], [1240, 940, 220, 32], [1640, 1080, 220, 32], [2020, 1230, 220, 32], [2400, 1370, 220, 32], [2760, 1430, 220, 32]
+      [0, 460, 620, 120], [920, 560, 480, 90], [1700, 720, 480, 90], [2480, 900, 480, 90], [3260, 1140, 480, 90], [3860, 1520, 440, 240],
+      [600, 760, 230, 32], [1360, 920, 230, 32], [2140, 1100, 230, 32], [2920, 1320, 230, 32], [3540, 1420, 230, 32]
     ],
-    stars: [[300, 410], [1280, 642], [2780, 1384]],
-    yarn: [[220, 410], [620, 632], [900, 752], [1320, 642], [1740, 792], [2180, 962], [2600, 1152], [2960, 1452]],
-    fishCrates: [[900, 754]],
-    enemies: [[1710, 804, 90], [2960, 1464, 90]],
-    webPoints: [[560, 390], [820, 520], [1120, 610], [1500, 720], [1900, 880], [2320, 1040], [2700, 1220], [3040, 1340], [3200, 1320]]
+    stars: [[300, 410], [2140, 1052], [3560, 1374]],
+    yarn: [[220, 410], [740, 712], [1260, 872], [1960, 672], [2300, 1052], [3080, 1272], [3920, 1472]],
+    fishCrates: [[1420, 874]],
+    enemies: [[1760, 684, 90], [3300, 1104, 100]],
+    webPoints: [[720, 390], [1500, 520], [2280, 700], [3060, 900], [3680, 1200]]
+  },
+  {
+    id: "garden",
+    name: "Moonlit Garden",
+    theme: "attic",
+    width: 4500,
+    height: 1260,
+    start: [100, 900],
+    exit: [4300, 820],
+    prompt: "Boss room: Shadow patrols the garden; drop all three trellises with yarn attacks.",
+    platforms: [
+      [0, 1040, 680, 220], [1040, 1040, 480, 220], [1840, 980, 480, 280], [2640, 920, 520, 340], [3440, 980, 520, 280], [4100, 940, 400, 320],
+      [640, 820, 260, 34], [1440, 700, 260, 34], [2240, 620, 260, 34], [3040, 700, 260, 34], [3740, 800, 260, 34]
+    ],
+    stars: [[660, 774], [2260, 574], [3760, 754]],
+    yarn: [[260, 990], [900, 990], [1540, 650], [2340, 570], [3140, 650], [3840, 750], [4200, 890]],
+    fishCrates: [[1120, 994], [3820, 754]],
+    enemies: [[1220, 1004, 90], [3500, 944, 100]],
+    webPoints: [[900, 700], [1700, 580], [2500, 500], [3300, 580], [3980, 700]],
+    shelves: [[1600, 780], [2400, 760], [3200, 780]],
+    boss: { type: "shadow", name: "Shadow", x: 3380, y: 926, arena: [1280, 700, 2300, 340], hp: 3 }
+  },
+  {
+    id: "tower",
+    name: "Crooked Tower",
+    theme: "library",
+    width: 4200,
+    height: 1880,
+    start: [120, 1420],
+    exit: [3960, 360],
+    prompt: "Regular ascent: tight hooks and attack shots prepare Kitty for the attic.",
+    platforms: [
+      [0, 1580, 620, 300], [900, 1460, 420, 90], [1640, 1320, 420, 90], [2380, 1160, 420, 90], [3120, 960, 420, 90], [3740, 760, 420, 90], [3880, 460, 320, 90],
+      [520, 1280, 230, 32], [1260, 1120, 230, 32], [2000, 960, 230, 32], [2740, 780, 230, 32], [3380, 600, 230, 32]
+    ],
+    stars: [[540, 1234], [2020, 914], [3900, 414]],
+    yarn: [[260, 1530], [760, 1232], [1360, 1072], [2100, 912], [2840, 732], [3480, 552], [4000, 414]],
+    fishCrates: [[1320, 1074]],
+    enemies: [[1700, 1284, 90], [3160, 924, 100]],
+    webPoints: [[760, 1300], [1500, 1130], [2240, 970], [2980, 790], [3600, 610], [3980, 500]]
   },
   {
     id: "attic",
     name: "Nancy's Attic",
     theme: "attic",
-    width: 3400,
-    height: 1040,
-    start: [110, 750],
-    exit: [3180, 680],
-    prompt: "Attic finale: platforms are wide, crystals are reachable, and the chandelier has extra setup web points.",
+    width: 4600,
+    height: 1120,
+    start: [110, 810],
+    exit: [4380, 760],
+    prompt: "Final boss: reflect Nancy's orbs with yarn attacks on crystals, then swing the chandelier into her.",
     platforms: [
-      [0, 900, 720, 140], [840, 900, 520, 140], [1480, 900, 560, 140], [2160, 900, 520, 140], [2800, 900, 600, 140],
-      [520, 720, 250, 34], [900, 620, 260, 34], [1320, 540, 260, 34], [1740, 500, 280, 34], [2160, 580, 260, 34], [2580, 700, 260, 34]
+      [0, 960, 760, 160], [1080, 960, 520, 160], [1880, 960, 520, 160], [2680, 960, 520, 160], [3480, 960, 520, 160], [4200, 960, 400, 160],
+      [660, 760, 260, 34], [1480, 640, 260, 34], [2300, 560, 280, 34], [3120, 640, 260, 34], [3840, 760, 260, 34]
     ],
-    stars: [[560, 674], [1360, 494], [2580, 654]],
-    yarn: [[250, 850], [760, 850], [1010, 574], [1440, 494], [1860, 454], [2240, 534], [2680, 654], [2920, 850], [3160, 850]],
-    fishCrates: [[580, 654], [2310, 854]],
-    enemies: [[2240, 864, 80]],
-    webPoints: [[760, 610], [1120, 520], [1500, 430], [1860, 360], [2220, 460], [2600, 580], [2960, 650], [2020, 250], [2200, 260, "nancyChandelier"]],
-    crystals: [[1760, 800], [1980, 800], [2200, 800]],
-    boss: {
-      type: "nancy",
-      name: "Nancy",
-      x: 2300,
-      y: 820,
-      arena: [1720, 260, 860, 640],
-      hp: 8
-    }
+    stars: [[680, 714], [2320, 514], [3860, 714]],
+    yarn: [[260, 910], [980, 910], [1580, 594], [2400, 514], [3220, 594], [3940, 714], [4300, 910]],
+    fishCrates: [[1540, 594], [3540, 914]],
+    enemies: [[1160, 924, 90], [3560, 924, 100]],
+    webPoints: [[940, 650], [1760, 520], [2580, 450], [3400, 520], [4100, 650]],
+    attackTargets: [[2520, 280, "nancyChandelier"]],
+    crystals: [[2160, 860], [2380, 860], [2600, 860]],
+    boss: { type: "nancy", name: "Nancy", x: 3300, y: 880, arena: [2080, 360, 1500, 600], hp: 8 }
   }
 ];
 
 const TOTAL_FISH = LEVELS.reduce((sum, l) => sum + l.fishCrates.length, 0);
 let objects = {};
 unlockedLevels = readUnlockedLevels();
+fishFound = readFishFound();
 
 function readUnlockedLevels() {
   const saved = Number(localStorage.getItem("kittyWhiscapeUnlocked") || "1");
-  return Math.max(1, Math.min(LEVELS?.length || 5, Number.isFinite(saved) ? saved : 1));
+  return Math.max(1, Math.min(LEVELS?.length || 8, Number.isFinite(saved) ? saved : 1));
 }
 
 function saveUnlockedLevels(count) {
   unlockedLevels = Math.max(unlockedLevels, Math.min(LEVELS.length, count));
   localStorage.setItem("kittyWhiscapeUnlocked", String(unlockedLevels));
+}
+
+function readFishFound() {
+  try {
+    const parsed = JSON.parse(localStorage.getItem("kittyWhiscapeFish") || "[]");
+    return new Set(Array.isArray(parsed) ? parsed : []);
+  } catch {
+    return new Set();
+  }
+}
+
+function saveFishFound() {
+  localStorage.setItem("kittyWhiscapeFish", JSON.stringify([...fishFound]));
 }
 
 function hidePanels() {
@@ -412,10 +468,11 @@ function renderLevelSelect() {
     const button = document.createElement("button");
     const unlocked = index < unlockedLevels;
     const justUnlocked = unlocked && index === unlockedLevels - 1 && index > 0;
+    const bossBadge = room.boss ? " <em>☠ Boss</em>" : "";
     button.type = "button";
     button.className = `room-button ${unlocked ? "unlocked" : "locked"}${justUnlocked ? " just-unlocked" : ""}`;
     button.disabled = !unlocked;
-    button.innerHTML = `<strong>${index + 1}. ${room.name}</strong><span>${unlocked ? room.prompt : "Locked"}</span>`;
+    button.innerHTML = `<strong>${index + 1}. ${room.name}${bossBadge}</strong><span>${unlocked ? room.prompt : "Locked"}</span>`;
     button.addEventListener("click", () => startLevel(index));
     levelMap.appendChild(button);
   });
@@ -462,6 +519,7 @@ function startLevelWithFade(index, skipIntro = false) {
 
 function quitToLevelSelect() {
   fishFound = new Set(levelStartFishFound);
+  saveFishFound();
   showLevelSelect();
 }
 
@@ -502,6 +560,7 @@ function resetLevel(index = levelIndex) {
     ],
     shelves: (level.shelves || []).map(([x, y]) => ({ x, y, startY: y, w: 120, h: 190, falling: false, vy: 0, spent: false })),
     crystals: (level.crystals || []).map(([x, y]) => ({ x, y, r: 24, charged: true })),
+    attackTargets: (level.attackTargets || []).map(([x, y, kind]) => ({ x, y, kind, r: 28, used: false })),
     projectiles: [],
     particles: []
   };
@@ -520,7 +579,6 @@ function resetLevel(index = levelIndex) {
   player.stars = 0;
   player.fish = 0;
   player.grapple = null;
-  player.jumpsUsed = 0;
   player.invuln = 0;
   gameWon = false;
   camera.x = 0;
@@ -766,13 +824,11 @@ function handleInput() {
   if (fastFall && !player.grounded) player.vy += 0.52;
 
   const canGroundJump = player.grounded || player.coyote > 0;
-  const canAirJump = !canGroundJump && player.jumpsUsed < player.maxJumps;
-  if (player.jumpBuffer > 0 && (canGroundJump || canAirJump)) {
+  if (player.jumpBuffer > 0 && canGroundJump) {
     player.vy = -14.4;
     player.grounded = false;
     player.jumpBuffer = 0;
     player.coyote = 0;
-    player.jumpsUsed = canGroundJump ? 1 : player.jumpsUsed + 1;
     puff(player.x + player.w / 2, player.y + player.h, "#fff5cf", 8);
   }
 }
@@ -807,7 +863,6 @@ function updatePlayer(dt) {
   player.vx *= player.grounded ? FRICTION : AIR_FRICTION;
   if (player.grounded) {
     player.coyote = 0.12;
-    player.jumpsUsed = 0;
   }
 
   if (player.y > level.height + 160) hurtPlayer("Kitty fell. Restarting the room.");
@@ -877,7 +932,6 @@ function hurtPlayer(text) {
     player.y = player.spawnY;
     player.vx = 0;
     player.vy = 0;
-    player.jumpsUsed = 0;
   }
 }
 
@@ -919,8 +973,78 @@ function updateEnemies(dt) {
     p.y += p.vy;
     p.life -= dt;
     if (p.kind === "orb" && rectsOverlap(player, { x: p.x - 12, y: p.y - 12, w: 24, h: 24 })) hurtPlayer("Nancy's orb burned a heart.");
+    if (p.kind === "yarnAttack") resolveYarnAttackHit(p);
   }
   objects.projectiles = objects.projectiles.filter(p => p.life > 0);
+}
+
+function resolveYarnAttackHit(p) {
+  const hitBox = { x: p.x - 10, y: p.y - 10, w: 20, h: 20 };
+  for (const enemy of objects.enemies) {
+    if (enemy.alive && rectsOverlap(hitBox, enemy)) {
+      enemy.alive = false;
+      p.life = 0;
+      puff(enemy.x + enemy.w / 2, enemy.y + enemy.h / 2, "#ff8dbd", 18);
+      say("Enemy tangled!");
+      return;
+    }
+  }
+  for (const crate of objects.crates) {
+    if (!crate.broken && rectsOverlap(hitBox, crate)) {
+      breakCrate(crate);
+      p.life = 0;
+      return;
+    }
+  }
+  for (let i = 0; i < objects.shelves.length; i++) {
+    const shelf = objects.shelves[i];
+    const trigger = { x: shelf.x + shelf.w / 2 - 40, y: shelf.y - 90, w: 80, h: 100 };
+    if (!shelf.spent && !shelf.falling && rectsOverlap(hitBox, trigger)) {
+      dropShelf(shelf);
+      p.life = 0;
+      return;
+    }
+  }
+  if (objects.mirror && !objects.mirror.broken && rectsOverlap(hitBox, objects.mirror)) {
+    smashMirror();
+    p.life = 0;
+    return;
+  }
+  for (const crystal of objects.crystals) {
+    if (crystal.charged && distance(p.x, p.y, crystal.x, crystal.y) < 42) {
+      reflectNancyOrb(crystal);
+      p.life = 0;
+      return;
+    }
+  }
+  for (const target of objects.attackTargets) {
+    if (!target.used && distance(p.x, p.y, target.x, target.y) < target.r + 10) {
+      if (target.kind === "chandelier") {
+        dropWhiskersChandelier(target);
+        target.used = true;
+      }
+      if (target.kind === "nancyChandelier") {
+        swingNancyChandelier(target);
+      }
+      p.life = 0;
+      return;
+    }
+  }
+  const boss = objects.boss;
+  if (boss && !boss.defeated && rectsOverlap(hitBox, boss)) {
+    if (boss.type === "duchess") {
+      hitDuchess();
+    } else if (boss.type === "shadow") {
+      say("Shadow only falls to dropped shelves.");
+    } else if (boss.type === "whiskers") {
+      say("Drop the chandelier with a yarn attack!");
+    } else if (boss.type === "nancy") {
+      say("Nancy shrugs off direct yarn. Use the attic traps!");
+    } else {
+      damageBoss(1, "Yarn attack hit!");
+    }
+    p.life = 0;
+  }
 }
 
 function updateBoss(dt) {
@@ -1043,46 +1167,43 @@ function fireYarn() {
   const py = player.y + player.h / 2;
   const target = nearestInteractive(px, py);
   if (!target) {
-    say("Move closer to a glowing yarn point or boss object.");
+    say("Move closer to a metal hook, then press E or Right Mouse to grapple.");
     return;
   }
   player.yarn -= 1;
   if (target.type === "web") {
-    if (target.obj.kind === "shelf") {
-      dropShelf(objects.shelves[target.obj.shelfIndex]);
-      return;
-    }
     player.grapple = { point: target.obj, time: 2.2 };
     puff(target.obj.x, target.obj.y, "#ff9ecb", 14);
-    if (target.obj.kind === "chandelier") dropWhiskersChandelier(target.obj);
-    if (target.obj.kind === "nancyChandelier") swingNancyChandelier(target.obj);
   }
-  if (target.type === "crate") breakCrate(target.obj);
-  if (target.type === "shelf") dropShelf(target.obj);
-  if (target.type === "mirror") smashMirror();
-  if (target.type === "duchess") hitDuchess();
-  if (target.type === "crystal") reflectNancyOrb(target.obj);
+}
+
+function shootYarnAttack() {
+  if (!running || paused || gameWon) return;
+  if (player.yarn <= 0) {
+    say("No yarn ammo. Collect yarn balls before attacking.");
+    return;
+  }
+  player.yarn -= 1;
+  const cx = player.x + player.w / 2;
+  const cy = player.y + player.h / 2;
+  const dx = mouse.worldX - cx;
+  const dy = mouse.worldY - cy;
+  const d = Math.max(1, Math.hypot(dx, dy));
+  objects.projectiles.push({
+    kind: "yarnAttack",
+    x: cx,
+    y: cy,
+    vx: dx / d * 12,
+    vy: dy / d * 12,
+    life: 1.25
+  });
+  say("Yarn attack fired.");
 }
 
 function nearestInteractive(px, py) {
   const choices = [];
   for (const point of objects.webPoints) {
-    if (point.kind === "shelf" && (objects.shelves[point.shelfIndex]?.spent || objects.shelves[point.shelfIndex]?.falling)) continue;
     choices.push({ type: "web", obj: point, d: distance(px, py, point.x, point.y), limit: 370 });
-  }
-  for (const crate of objects.crates) {
-    if (!crate.broken) choices.push({ type: "crate", obj: crate, d: distance(px, py, crate.x + 22, crate.y + 22), limit: 230 });
-  }
-  if (objects.mirror && !objects.mirror.broken) {
-    const m = objects.mirror;
-    choices.push({ type: "mirror", obj: m, d: distance(px, py, m.x + m.w / 2, m.y + m.h / 2), limit: 360 });
-  }
-  if (objects.boss && objects.boss.type === "duchess" && objects.boss.stunned > 0 && !objects.boss.defeated) {
-    const b = objects.boss;
-    choices.push({ type: "duchess", obj: b, d: distance(px, py, b.x + b.w / 2, b.y + b.h / 2), limit: 360 });
-  }
-  for (const crystal of objects.crystals) {
-    if (crystal.charged) choices.push({ type: "crystal", obj: crystal, d: distance(px, py, crystal.x, crystal.y), limit: 420 });
   }
   choices.sort((a, b) => a.d - b.d);
   return choices.find(c => c.d <= c.limit) || null;
@@ -1093,6 +1214,7 @@ function breakCrate(crate) {
   if (!fishFound.has(crate.id)) {
     fishFound.add(crate.id);
     player.fish += 1;
+    saveFishFound();
   }
   puff(crate.x + 22, crate.y + 22, "#7dd3fc", 20);
   say(`Hidden fish found! Total fish: ${fishFound.size}/${TOTAL_FISH}`);
@@ -1191,6 +1313,7 @@ function winGame() {
   speedrunModeUnlocked = true;
   updateMenuLocks();
   saveUnlockedLevels(LEVELS.length);
+  saveFishFound();
   say(`Nancy defeated. Hidden fish found: ${fishFound.size}/${TOTAL_FISH}.`, 9);
 }
 
@@ -1359,6 +1482,7 @@ function drawWorld() {
   for (const shelf of objects.shelves) if (!shelf.spent) drawShelf(shelf);
   if (objects.mirror) drawMirror(objects.mirror);
   for (const crystal of objects.crystals) drawCrystal(crystal);
+  for (const target of objects.attackTargets) if (!target.used || target.kind === "nancyChandelier") drawAttackTarget(target);
   for (const star of objects.stars) if (!star.taken) drawEmoji("⭐", star.x, star.y, 30);
   for (const y of objects.yarn) if (!y.taken) drawYarnBall(y.x, y.y, 16);
   for (const point of objects.webPoints) drawWebPoint(point);
@@ -1460,7 +1584,7 @@ function drawShelf(s) {
   ctx.fillRect(s.x, s.y, s.w, s.h);
   ctx.fillStyle = "#f59e0b";
   for (let i = 0; i < 5; i++) ctx.fillRect(s.x + 14 + i * 19, s.y + 24, 12, 132);
-  drawYarnBall(s.x + s.w / 2, s.y + 10, 13);
+  drawAttackAnchor(s.x + s.w / 2, s.y - 12, "shelf");
 }
 
 function drawMirror(m) {
@@ -1493,7 +1617,7 @@ function drawCrystal(c) {
   ctx.lineTo(c.x - 22, c.y);
   ctx.closePath();
   ctx.fill();
-  drawYarnBall(c.x, c.y - 42, 11);
+  drawAttackAnchor(c.x, c.y - 42, "crystal");
 }
 
 function drawWebPoint(p) {
@@ -1503,7 +1627,70 @@ function drawWebPoint(p) {
   ctx.scale(pulse, pulse);
   ctx.shadowColor = "#ff8dbd";
   ctx.shadowBlur = 18;
-  drawYarnBall(0, 0, p.kind === "normal" ? 15 : 20);
+  ctx.strokeStyle = "#ffd6ea";
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.moveTo(-16, -15);
+  ctx.quadraticCurveTo(0, -25, 16, -15);
+  ctx.moveTo(-12, -6);
+  ctx.quadraticCurveTo(0, -13, 12, -6);
+  ctx.stroke();
+  ctx.shadowColor = "#ddd6fe";
+  ctx.shadowBlur = 10;
+  ctx.strokeStyle = "#d1d5db";
+  ctx.lineWidth = 5;
+  ctx.beginPath();
+  ctx.moveTo(0, -22);
+  ctx.lineTo(0, 2);
+  ctx.arc(9, 2, 9, Math.PI, Math.PI * 2);
+  ctx.stroke();
+  ctx.fillStyle = "#f8fafc";
+  ctx.beginPath();
+  ctx.arc(0, -24, 5, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.restore();
+}
+
+function drawAttackAnchor(x, y, kind) {
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.shadowColor = kind === "crystal" ? "#67e8f9" : "#fbbf24";
+  ctx.shadowBlur = 12;
+  ctx.strokeStyle = kind === "crystal" ? "#bae6fd" : "#fef3c7";
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.arc(0, 0, 12, 0, Math.PI * 2);
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(-9, 0);
+  ctx.lineTo(9, 0);
+  ctx.moveTo(0, -9);
+  ctx.lineTo(0, 9);
+  ctx.stroke();
+  ctx.restore();
+}
+
+function drawAttackTarget(target) {
+  ctx.save();
+  const sway = Math.sin(performance.now() / 420 + target.x) * 4;
+  ctx.translate(target.x + sway, target.y);
+  ctx.strokeStyle = target.kind === "nancyChandelier" ? "#c4b5fd" : "#fef3c7";
+  ctx.lineWidth = 3;
+  ctx.shadowColor = "#fbbf24";
+  ctx.shadowBlur = 14;
+  ctx.beginPath();
+  ctx.moveTo(0, -46);
+  ctx.lineTo(0, -4);
+  ctx.stroke();
+  ctx.fillStyle = "#4c1d95";
+  ctx.fillRect(-34, -4, 68, 10);
+  ctx.fillStyle = "#fef3c7";
+  for (let i = -2; i <= 2; i++) {
+    ctx.beginPath();
+    ctx.arc(i * 15, 10, 5, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  drawAttackAnchor(0, -48, target.kind);
   ctx.restore();
 }
 
@@ -1530,6 +1717,14 @@ function drawEnemy(e) {
 }
 
 function drawProjectile(p) {
+  if (p.kind === "yarnAttack") {
+    ctx.save();
+    ctx.shadowColor = "#ff8dbd";
+    ctx.shadowBlur = 14;
+    drawYarnBall(p.x, p.y, 10);
+    ctx.restore();
+    return;
+  }
   ctx.fillStyle = "#a78bfa";
   ctx.shadowColor = "#ddd6fe";
   ctx.shadowBlur = 16;
@@ -1727,7 +1922,7 @@ function drawHud() {
   if (boss) drawBossBar(boss);
   ctx.font = "600 15px Nunito, Trebuchet MS, sans-serif";
   ctx.fillStyle = "rgba(219,234,254,0.75)";
-  ctx.fillText("Move A/D or Arrows | Double Jump W/Space | Grapple E or Right Mouse | Restart R", VIEW_W - 745, 50);
+  ctx.fillText("A/D Move | W Jump | S Fast Fall | E/RMB Grapple | Space/LMB Attack | ESC Pause", VIEW_W - 760, 50);
   if (messageTimer > 0 && message) {
     const msgAlpha = Math.min(1, messageTimer);
     ctx.fillStyle = `rgba(5,8,13,${0.72 * msgAlpha})`;
@@ -1802,7 +1997,6 @@ function startGame() {
   speedrunModeUnlocked = true;
   playMenuSound("select");
   updateMenuLocks();
-  fishFound = new Set();
   if (playButton) {
     playButton.classList.add("clicking");
     setTimeout(() => playButton.classList.remove("clicking"), 400);
@@ -1843,7 +2037,7 @@ function handleMenuKeyboard(key) {
   const menuVisible = !menu.hidden && !running && !paused;
   if (!menuVisible) return false;
 
-  if (/^[1-5]$/.test(key)) {
+  if (/^[1-8]$/.test(key)) {
     selectedLevel = Number(key) - 1;
     updateMenuLocks();
     const target = document.querySelector(`.level-hotspot[data-level="${selectedLevel}"]`);
@@ -1858,8 +2052,8 @@ function handleMenuKeyboard(key) {
 
   if (key === "arrowleft" || key === "arrowright") {
     selectedLevel += key === "arrowright" ? 1 : -1;
-    if (selectedLevel < 0) selectedLevel = 4;
-    if (selectedLevel > 4) selectedLevel = 0;
+    if (selectedLevel < 0) selectedLevel = LEVELS.length - 1;
+    if (selectedLevel > LEVELS.length - 1) selectedLevel = 0;
     updateMenuLocks();
     const target = document.querySelector(`.level-hotspot[data-level="${selectedLevel}"]`);
     if (target) target.focus();
@@ -1908,6 +2102,10 @@ window.addEventListener("mousedown", e => {
     e.preventDefault();
     fireYarn();
   }
+  if (e.button === 0 && running && !paused) {
+    screenToWorld(e.clientX, e.clientY);
+    shootYarnAttack();
+  }
 });
 window.addEventListener("keydown", e => {
   const key = e.key.toLowerCase();
@@ -1930,8 +2128,9 @@ window.addEventListener("keydown", e => {
   if (paused) return;
   keys.add(key);
   if (["arrowup", "arrowdown", "arrowleft", "arrowright", " "].includes(e.key)) e.preventDefault();
-  if (key === "w" || key === "arrowup" || key === " ") player.jumpBuffer = 0.16;
+  if (key === "w" || key === "arrowup") player.jumpBuffer = 0.16;
   if (key === "e") fireYarn();
+  if (key === " ") shootYarnAttack();
   if (key === "r" && running) resetLevel(levelIndex);
 });
 window.addEventListener("keyup", e => keys.delete(e.key.toLowerCase()));
