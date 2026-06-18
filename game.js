@@ -274,6 +274,8 @@ const player = {
   grounded: false,
   coyote: 0,
   jumpBuffer: 0,
+  jumpsUsed: 0,
+  maxJumps: 2,
   hearts: 3,
   yarn: 0,
   stars: 0,
@@ -760,6 +762,7 @@ function resetLevel(index = levelIndex) {
   player.spawnY = player.y;
   player.vx = 0;
   player.vy = 0;
+  player.jumpsUsed = 0;
   player.hearts = 3;
   player.yarn = 1;
   player.stars = 0;
@@ -1029,11 +1032,13 @@ function handleInput() {
   if (fastFall && !player.grounded) player.vy += 0.52;
 
   const canGroundJump = player.grounded || player.coyote > 0;
-  if (player.jumpBuffer > 0 && canGroundJump) {
-    player.vy = -14.4;
+  const canAirJump = !canGroundJump && player.jumpsUsed < player.maxJumps;
+  if (player.jumpBuffer > 0 && (canGroundJump || canAirJump)) {
+    player.vy = canGroundJump ? -14.4 : -13.2;
     player.grounded = false;
     player.jumpBuffer = 0;
     player.coyote = 0;
+    player.jumpsUsed = canGroundJump ? 1 : player.jumpsUsed + 1;
     puff(player.x + player.w / 2, player.y + player.h, "#fff5cf", 8);
   }
 }
@@ -1068,6 +1073,7 @@ function updatePlayer(dt) {
   player.vx *= player.grounded ? FRICTION : AIR_FRICTION;
   if (player.grounded) {
     player.coyote = 0.12;
+    player.jumpsUsed = 0;
   }
 
   if (player.y > level.height + 160) hurtPlayer("Kitty fell. Restarting the room.");
