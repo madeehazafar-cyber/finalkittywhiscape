@@ -1852,6 +1852,253 @@ function drawBackground() {
     ctx.fill();
     ctx.shadowBlur = 0;
   }
+
+  drawLevelAtmosphere(t);
+}
+
+function drawLevelAtmosphere(t) {
+  const id = level?.id;
+  ctx.save();
+
+  if (id === "entrance") {
+    drawMoonWindows(t, 0.18);
+    drawDustBeams(t, "#ffe8a0", 0.12);
+  } else if (id === "kitchen") {
+    drawChandelierGlow(t);
+    drawHeatShimmer(t);
+  } else if (id === "library") {
+    drawBookWall(t, "#3b2b3f", "#c084fc", 0.55);
+    drawFloatingPages(t, "#f7dfaa", 0.28);
+  } else if (id === "shadow-library") {
+    drawBookWall(t, "#161025", "#8b5cf6", 0.36);
+    drawPurpleFog(t);
+    drawWatchingEyes(t, 6, "#ef4444");
+  } else if (id === "dungeon") {
+    drawDustBeams(t, "#d8b36a", 0.17);
+    drawRopeLines(t);
+  } else if (id === "duchess-ballroom") {
+    drawVelvetCurtains(t);
+    drawMirrorSparkles(t);
+  } else if (id === "tower") {
+    drawStormWindows(t);
+  } else if (id === "attic") {
+    drawNancyThroneRoom(t);
+  }
+
+  ctx.restore();
+}
+
+function drawMoonWindows(t, strength = 0.16) {
+  for (let wx = 180; wx < level.width; wx += 520) {
+    const sx = wx - camera.x * 0.45;
+    if (sx < -120 || sx > VIEW_W + 120) continue;
+    const glow = strength + Math.sin(t * 1.3 + wx) * 0.025;
+    ctx.fillStyle = `rgba(255,232,160,${glow})`;
+    ctx.shadowColor = "rgba(255,232,160,0.55)";
+    ctx.shadowBlur = 28;
+    ctx.fillRect(sx, 95, 46, 92);
+    ctx.fillRect(sx + 12, 110, 22, 60);
+    ctx.shadowBlur = 0;
+    ctx.strokeStyle = "rgba(255,248,232,0.12)";
+    ctx.strokeRect(sx, 95, 46, 92);
+  }
+}
+
+function drawDustBeams(t, color, alpha) {
+  ctx.globalAlpha = alpha;
+  for (let i = 0; i < 4; i++) {
+    const x = 120 + i * 330 - camera.x * 0.08 + Math.sin(t * 0.35 + i) * 18;
+    const beam = ctx.createLinearGradient(x, 0, x + 180, VIEW_H);
+    beam.addColorStop(0, color);
+    beam.addColorStop(1, "rgba(255,255,255,0)");
+    ctx.fillStyle = beam;
+    ctx.beginPath();
+    ctx.moveTo(x, 0);
+    ctx.lineTo(x + 90, 0);
+    ctx.lineTo(x + 280, VIEW_H);
+    ctx.lineTo(x + 60, VIEW_H);
+    ctx.closePath();
+    ctx.fill();
+  }
+  ctx.globalAlpha = 1;
+}
+
+function drawChandelierGlow(t) {
+  const sx = 2300 - camera.x;
+  if (sx > -200 && sx < VIEW_W + 200) {
+    ctx.save();
+    ctx.translate(sx, 270);
+    ctx.rotate(Math.sin(t * 1.5) * 0.035);
+    ctx.strokeStyle = "rgba(255,226,151,0.5)";
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.moveTo(0, -180);
+    ctx.lineTo(0, 0);
+    ctx.stroke();
+    ctx.fillStyle = "rgba(255,214,118,0.18)";
+    ctx.shadowColor = "rgba(255,214,118,0.72)";
+    ctx.shadowBlur = 40;
+    ctx.beginPath();
+    ctx.ellipse(0, 0, 130, 38, 0, 0, Math.PI * 2);
+    ctx.fill();
+    for (let i = -2; i <= 2; i++) {
+      ctx.fillStyle = "rgba(255,236,180,0.75)";
+      ctx.beginPath();
+      ctx.arc(i * 42, -8 + Math.sin(t * 3 + i) * 3, 8, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.restore();
+    ctx.shadowBlur = 0;
+  }
+}
+
+function drawHeatShimmer(t) {
+  ctx.fillStyle = "rgba(255,160,90,0.045)";
+  for (let i = 0; i < 5; i++) {
+    const x = (i * 270 - camera.x * 0.18 + Math.sin(t * 1.8 + i) * 20) % (VIEW_W + 120);
+    ctx.fillRect(x, 250, 34, VIEW_H * 0.48);
+  }
+}
+
+function drawBookWall(t, shelfColor, bookColor, alpha) {
+  ctx.globalAlpha = alpha;
+  for (let x = -120; x < VIEW_W + 160; x += 210) {
+    const sx = x - (camera.x * 0.16 % 210);
+    ctx.fillStyle = shelfColor;
+    ctx.fillRect(sx, 120, 150, 330);
+    ctx.fillStyle = "rgba(0,0,0,0.22)";
+    ctx.fillRect(sx, 200, 150, 8);
+    ctx.fillRect(sx, 312, 150, 8);
+    for (let b = 0; b < 8; b++) {
+      const h = 70 + ((b * 17) % 42);
+      ctx.fillStyle = b % 3 === 0 ? bookColor : "rgba(247,223,170,0.5)";
+      ctx.fillRect(sx + 12 + b * 16, 205 + (96 - h), 10, h);
+    }
+  }
+  ctx.globalAlpha = 1;
+}
+
+function drawFloatingPages(t, color, alpha) {
+  ctx.globalAlpha = alpha;
+  ctx.fillStyle = color;
+  for (let i = 0; i < 12; i++) {
+    const x = (i * 330 - camera.x * 0.28 + Math.sin(t * 0.9 + i) * 38) % (VIEW_W + 180) - 80;
+    const y = 120 + (i * 73) % 420 + Math.cos(t * 0.8 + i) * 18;
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.rotate(Math.sin(t + i) * 0.22);
+    ctx.fillRect(-10, -7, 22, 15);
+    ctx.restore();
+  }
+  ctx.globalAlpha = 1;
+}
+
+function drawPurpleFog(t) {
+  for (let i = 0; i < 4; i++) {
+    const y = VIEW_H * 0.42 + i * 62;
+    const x = (t * 22 * (i + 1) - camera.x * 0.12) % (VIEW_W + 260) - 160;
+    const fog = ctx.createRadialGradient(x, y, 20, x, y, 260);
+    fog.addColorStop(0, "rgba(139,92,246,0.15)");
+    fog.addColorStop(1, "rgba(139,92,246,0)");
+    ctx.fillStyle = fog;
+    ctx.fillRect(0, y - 120, VIEW_W, 240);
+  }
+}
+
+function drawWatchingEyes(t, count, color) {
+  for (let i = 0; i < count; i++) {
+    const blink = Math.sin(t * 1.7 + i * 2.4) > 0.72;
+    if (!blink) continue;
+    const x = (i * 370 - camera.x * 0.18) % (VIEW_W + 160) - 80;
+    const y = 170 + (i * 97) % 280;
+    ctx.fillStyle = color;
+    ctx.shadowColor = color;
+    ctx.shadowBlur = 16;
+    ctx.fillRect(x, y, 14, 5);
+    ctx.fillRect(x + 30, y, 14, 5);
+    ctx.shadowBlur = 0;
+  }
+}
+
+function drawRopeLines(t) {
+  ctx.strokeStyle = "rgba(216,179,106,0.22)";
+  ctx.lineWidth = 3;
+  for (let x = 180; x < level.width; x += 520) {
+    const sx = x - camera.x * 0.42;
+    if (sx < -80 || sx > VIEW_W + 80) continue;
+    ctx.beginPath();
+    ctx.moveTo(sx, 0);
+    ctx.bezierCurveTo(sx + Math.sin(t + x) * 18, 180, sx - 20, 420, sx + 10, VIEW_H);
+    ctx.stroke();
+  }
+}
+
+function drawVelvetCurtains(t) {
+  const sway = Math.sin(t * 0.8) * 12;
+  ctx.fillStyle = "rgba(89,18,42,0.45)";
+  ctx.beginPath();
+  ctx.moveTo(0, 0);
+  ctx.bezierCurveTo(90 + sway, 180, 40, 420, 130, VIEW_H);
+  ctx.lineTo(0, VIEW_H);
+  ctx.closePath();
+  ctx.fill();
+  ctx.beginPath();
+  ctx.moveTo(VIEW_W, 0);
+  ctx.bezierCurveTo(VIEW_W - 90 - sway, 180, VIEW_W - 40, 420, VIEW_W - 130, VIEW_H);
+  ctx.lineTo(VIEW_W, VIEW_H);
+  ctx.closePath();
+  ctx.fill();
+}
+
+function drawMirrorSparkles(t) {
+  for (let i = 0; i < 18; i++) {
+    const x = (i * 241 - camera.x * 0.2 + Math.sin(t * 1.2 + i) * 22) % (VIEW_W + 120);
+    const y = 130 + (i * 53) % 430;
+    const a = 0.18 + Math.sin(t * 4 + i) * 0.14;
+    ctx.fillStyle = `rgba(255,235,190,${a})`;
+    ctx.fillRect(x, y, 3, 3);
+  }
+}
+
+function drawStormWindows(t) {
+  const flash = Math.sin(t * 1.4) > 0.93 ? 0.2 : 0;
+  if (flash) {
+    ctx.fillStyle = `rgba(210,230,255,${flash})`;
+    ctx.fillRect(0, 0, VIEW_W, VIEW_H);
+  }
+  for (let wx = 260; wx < level.width; wx += 430) {
+    const sx = wx - camera.x * 0.35;
+    if (sx < -60 || sx > VIEW_W + 60) continue;
+    ctx.fillStyle = `rgba(185,210,255,${0.08 + flash})`;
+    ctx.fillRect(sx, 92, 34, 82);
+  }
+  ctx.strokeStyle = "rgba(180,210,255,0.08)";
+  for (let i = 0; i < 9; i++) {
+    const x = (i * 190 - camera.x * 0.22 + t * 380) % (VIEW_W + 120) - 60;
+    ctx.beginPath();
+    ctx.moveTo(x, 0);
+    ctx.lineTo(x - 90, VIEW_H);
+    ctx.stroke();
+  }
+}
+
+function drawNancyThroneRoom(t) {
+  const center = VIEW_W / 2 - camera.x * 0.04;
+  const grd = ctx.createRadialGradient(center, 220, 20, center, 220, 520);
+  grd.addColorStop(0, "rgba(239,68,68,0.2)");
+  grd.addColorStop(0.45, "rgba(88,28,135,0.12)");
+  grd.addColorStop(1, "rgba(0,0,0,0)");
+  ctx.fillStyle = grd;
+  ctx.fillRect(0, 0, VIEW_W, VIEW_H);
+  ctx.fillStyle = "rgba(8,3,10,0.42)";
+  ctx.beginPath();
+  ctx.moveTo(center - 150, VIEW_H);
+  ctx.lineTo(center - 88, 230);
+  ctx.lineTo(center + 88, 230);
+  ctx.lineTo(center + 150, VIEW_H);
+  ctx.closePath();
+  ctx.fill();
+  drawWatchingEyes(t + 1.5, 5, "#ff3347");
 }
 
 function drawWorld() {
