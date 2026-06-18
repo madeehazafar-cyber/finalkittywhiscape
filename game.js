@@ -2615,13 +2615,9 @@ function handleMenuKeyboard(key) {
     const next = key === "arrowdown" ? (current + 1) % order.length : (current + order.length - 1) % order.length;
     const nextMode = order[next];
     const nextButton = document.querySelector(`.version-hotspot[data-mode="${nextMode}"]`);
-    if (nextButton && nextButton.classList.contains("locked")) {
-      showLockedFeedback(nextButton);
-    } else {
-      selectedMode = nextMode;
-      updateMenuLocks();
-      if (nextButton) nextButton.focus();
-    }
+    selectedMode = nextMode;
+    updateMenuLocks();
+    if (nextButton) nextButton.focus();
     return true;
   }
 
