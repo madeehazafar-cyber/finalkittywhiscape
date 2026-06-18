@@ -1034,7 +1034,7 @@ function handleInput() {
   const canGroundJump = player.grounded || player.coyote > 0;
   const canAirJump = !canGroundJump && player.jumpsUsed < player.maxJumps;
   if (player.jumpBuffer > 0 && (canGroundJump || canAirJump)) {
-    player.vy = canGroundJump ? -14.4 : -13.2;
+    player.vy = canGroundJump ? -14.4 : -14.0;
     player.grounded = false;
     player.jumpBuffer = 0;
     player.coyote = 0;
@@ -1072,7 +1072,7 @@ function updatePlayer(dt) {
   collideAxis("y");
   player.vx *= player.grounded ? FRICTION : AIR_FRICTION;
   if (player.grounded) {
-    player.coyote = 0.12;
+    player.coyote = 0.18;
     player.jumpsUsed = 0;
   }
 
@@ -2551,7 +2551,7 @@ window.addEventListener("keydown", e => {
   if (paused) return;
   keys.add(key);
   if (["arrowup", "arrowdown", "arrowleft", "arrowright", " "].includes(e.key)) e.preventDefault();
-  if (key === "w" || key === "arrowup") player.jumpBuffer = 0.16;
+  if (key === "w" || key === "arrowup") player.jumpBuffer = 0.24;
   if (key === "e") fireYarn();
   if (key === " ") shootYarnAttack();
   if (key === "r" && running) resetLevel(levelIndex);
