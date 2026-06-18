@@ -2537,7 +2537,8 @@ function startGame() {
     playButton.classList.add("clicking");
     setTimeout(() => playButton.classList.remove("clicking"), 400);
   }
-  startLevelWithFade(0);
+  const targetLevel = Math.min(selectedLevel, unlockedLevels - 1);
+  startLevelWithFade(targetLevel, targetLevel === 0);
 }
 
 playButton.addEventListener("click", startGame);
@@ -2548,8 +2549,10 @@ document.querySelectorAll(".level-hotspot").forEach(button => {
     selectedLevel = Number(button.dataset.level);
     updateMenuLocks();
   });
-  button.addEventListener("click", () => {
-    startLevelWithFade(Number(button.dataset.level));
+  button.addEventListener("click", event => {
+    event.preventDefault();
+    event.stopPropagation();
+    startLevelWithFade(Number(button.dataset.level), true);
   });
 });
 document.querySelectorAll(".version-hotspot").forEach(button => {
