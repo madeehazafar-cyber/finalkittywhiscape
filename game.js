@@ -668,7 +668,7 @@ function renderLevelSelect() {
     button.className = `room-button ${unlocked ? "unlocked" : "locked"}${justUnlocked ? " just-unlocked" : ""}`;
     button.disabled = !unlocked;
     button.innerHTML = `<strong>${index + 1}. ${room.name}${bossBadge}</strong><span>${unlocked ? room.prompt : "Locked"}</span>`;
-    button.addEventListener("click", () => startLevel(index));
+    button.addEventListener("click", () => startLevelWithFade(index));
     levelMap.appendChild(button);
   });
 }
@@ -2586,15 +2586,6 @@ document.querySelectorAll(".version-hotspot").forEach(button => {
     button.classList.add("clicking");
     setTimeout(() => button.classList.remove("clicking"), 400);
     say(`${button.getAttribute("aria-label")} selected.`, 1.2);
-  });
-});
-
-document.querySelectorAll(".difficulty-choice").forEach(button => {
-  button.addEventListener("click", () => {
-    document.querySelectorAll(".difficulty-choice").forEach(choice => {
-      choice.classList.toggle("active", choice === button);
-    });
-    playMenuSound("select");
   });
 });
 
