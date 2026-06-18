@@ -76,6 +76,9 @@ let visualTime = 0;
 let lastUnlockLevel = -1;
 let cutsceneAudio = null;
 let currentAudioScene = 0;
+let levelIntroTimer = 0;
+let bossIntroTimer = 0;
+let victoryTimer = 0;
 
 const MODE_DESCRIPTIONS = {
   classic: "Play the full story of Kitty escaping Nancy's mansion.",
@@ -772,6 +775,9 @@ function resetLevel(index = levelIndex) {
   gameWon = false;
   camera.x = 0;
   camera.y = 0;
+  levelIntroTimer = 1.75;
+  bossIntroTimer = objects.boss ? 2.15 : 0;
+  victoryTimer = 0;
   say(`${level.name}: ${level.prompt}`, 4.5);
 }
 
@@ -1047,6 +1053,8 @@ function updatePlayer(dt) {
   player.jumpBuffer -= dt;
   player.coyote -= dt;
   player.invuln -= dt;
+  const wasGrounded = player.grounded;
+  const fallSpeed = player.vy;
   handleInput();
 
   if (player.grapple) {
@@ -1071,6 +1079,19 @@ function updatePlayer(dt) {
   player.grounded = false;
   collideAxis("y");
   player.vx *= player.grounded ? FRICTION : AIR_FRICTION;
+  if (!wasGrounded && player.grounded && fallSpeed > 6) {
+    puff(player.x + player.w / 2, player.y + player.h, "rgba(255,232,160,0.85)", 10);
+  }
+  if (player.grounded && Math.abs(player.vx) > 5.2 && Math.random() < 0.35) {
+    objects.particles.push({
+      x: player.x + player.w / 2 - player.face * 18,
+      y: player.y + player.h - 4,
+      vx: -player.face * (1.2 + Math.random() * 1.2),
+      vy: -0.4 - Math.random() * 0.8,
+      life: 0.22 + Math.random() * 0.18,
+      color: "rgba(255,232,160,0.55)"
+    });
+  }
   if (player.grounded) {
     player.coyote = 0.18;
     player.jumpsUsed = 0;
@@ -1408,7 +1429,8 @@ function damageBoss(amount, text) {
   if (!boss || boss.defeated) return;
   boss.hp -= amount;
   boss.stunned = Math.max(boss.stunned, 0.9);
-  shake = 10;
+  shake = Math.max(shake, 12);
+  puff(boss.x + boss.w / 2, boss.y + boss.h / 2, boss.type === "nancy" ? "#ff4d6d" : "#ffe8a0", 18);
   say(`${text} ${boss.name} HP: ${Math.max(0, boss.hp)}`);
   if (boss.hp <= 0) defeatBoss(`${boss.name} defeated! Boss Defeated! Exit unlocked.`);
 }
@@ -1684,6 +1706,7 @@ function winGame() {
   gameWon = true;
   running = false;
   paused = false;
+  victoryTimer = 0.01;
   classicStoryCompleted = true;
   speedrunModeUnlocked = true;
   updateMenuLocks();
@@ -1708,6 +1731,9 @@ function updateCamera() {
 function update(dt) {
   if (!running || paused) return;
   messageTimer -= dt;
+  levelIntroTimer = Math.max(0, levelIntroTimer - dt);
+  bossIntroTimer = Math.max(0, bossIntroTimer - dt);
+  victoryTimer += gameWon ? dt : 0;
   shake = Math.max(0, shake - dt * 30);
   updatePlayer(dt);
   updateEnemies(dt);
@@ -1748,6 +1774,8 @@ function draw() {
   drawWorld();
   ctx.restore();
   drawHud();
+  drawBossIntroCard();
+  drawLevelIntroOverlay();
   if (gameWon) drawWinOverlay();
 }
 
@@ -1854,6 +1882,95 @@ function drawBackground() {
   }
 
   drawLevelAtmosphere(t);
+}
+
+function drawLevelIntroOverlay() {
+  if (levelIntroTimer <= 0 || !level) return;
+  const progress = 1 - levelIntroTimer / 1.75;
+  const alpha = Math.max(0, Math.min(1, levelIntroTimer / 0.45));
+  const doorOpen = Math.min(1, progress * 1.35);
+  const leftW = VIEW_W / 2 * (1 - doorOpen);
+  const rightW = VIEW_W / 2 * (1 - doorOpen);
+
+  ctx.save();
+  ctx.globalAlpha = Math.min(1, alpha + 0.15);
+  ctx.fillStyle = "rgba(0,0,0,0.72)";
+  ctx.fillRect(0, 0, VIEW_W, VIEW_H);
+
+  const panel = ctx.createLinearGradient(0, 0, 0, VIEW_H);
+  panel.addColorStop(0, "#160f12");
+  panel.addColorStop(0.5, "#050406");
+  panel.addColorStop(1, "#21130d");
+  ctx.fillStyle = panel;
+  ctx.fillRect(0, 0, leftW, VIEW_H);
+  ctx.fillRect(VIEW_W - rightW, 0, rightW, VIEW_H);
+  ctx.strokeStyle = "rgba(255,226,151,0.42)";
+  ctx.lineWidth = 2;
+  if (leftW > 6) ctx.strokeRect(leftW - 10, 0, 10, VIEW_H);
+  if (rightW > 6) ctx.strokeRect(VIEW_W - rightW, 0, 10, VIEW_H);
+
+  const glow = ctx.createRadialGradient(VIEW_W / 2, VIEW_H / 2, 20, VIEW_W / 2, VIEW_H / 2, 420);
+  glow.addColorStop(0, `rgba(255,226,151,${0.24 * alpha})`);
+  glow.addColorStop(1, "rgba(255,226,151,0)");
+  ctx.fillStyle = glow;
+  ctx.fillRect(0, 0, VIEW_W, VIEW_H);
+
+  ctx.globalAlpha = Math.min(1, alpha * 1.4);
+  ctx.textAlign = "center";
+  ctx.fillStyle = "#fff4c2";
+  ctx.shadowColor = "rgba(255,226,151,0.55)";
+  ctx.shadowBlur = 20;
+  ctx.font = "bold 44px Cinzel, Trebuchet MS, serif";
+  ctx.fillText(level.name, VIEW_W / 2, VIEW_H / 2 - 12);
+  ctx.shadowBlur = 0;
+  ctx.fillStyle = "rgba(255,248,232,0.76)";
+  ctx.font = "800 14px Nunito, Trebuchet MS, sans-serif";
+  ctx.fillText("THE DOOR OPENS", VIEW_W / 2, VIEW_H / 2 + 26);
+  ctx.textAlign = "left";
+  ctx.restore();
+}
+
+function drawBossIntroCard() {
+  if (bossIntroTimer <= 0 || !objects.boss || objects.boss.defeated) return;
+  const alpha = Math.min(1, bossIntroTimer / 0.45);
+  const boss = objects.boss;
+  ctx.save();
+  ctx.globalAlpha = alpha;
+  ctx.fillStyle = "rgba(0,0,0,0.34)";
+  ctx.fillRect(0, 0, VIEW_W, VIEW_H);
+  const w = 560;
+  const h = 112;
+  const x = (VIEW_W - w) / 2;
+  const y = 96 + Math.sin(visualTime * 2) * 3;
+  ctx.fillStyle = "rgba(5,6,12,0.86)";
+  if (ctx.roundRect) {
+    ctx.beginPath();
+    ctx.roundRect(x, y, w, h, 18);
+    ctx.fill();
+  } else {
+    ctx.fillRect(x, y, w, h);
+  }
+  ctx.strokeStyle = boss.type === "nancy" ? "rgba(255,70,90,0.72)" : "rgba(255,226,151,0.58)";
+  ctx.lineWidth = 2;
+  if (ctx.roundRect) {
+    ctx.beginPath();
+    ctx.roundRect(x, y, w, h, 18);
+    ctx.stroke();
+  } else {
+    ctx.strokeRect(x, y, w, h);
+  }
+  ctx.textAlign = "center";
+  ctx.fillStyle = "#fff4c2";
+  ctx.font = "bold 34px Cinzel, Trebuchet MS, serif";
+  ctx.shadowColor = boss.type === "nancy" ? "rgba(255,70,90,0.7)" : "rgba(255,226,151,0.45)";
+  ctx.shadowBlur = 18;
+  ctx.fillText(boss.name, VIEW_W / 2, y + 50);
+  ctx.shadowBlur = 0;
+  ctx.fillStyle = "rgba(255,248,232,0.7)";
+  ctx.font = "800 13px Nunito, Trebuchet MS, sans-serif";
+  ctx.fillText("BOSS ROOM", VIEW_W / 2, y + 78);
+  ctx.textAlign = "left";
+  ctx.restore();
 }
 
 function drawLevelAtmosphere(t) {
@@ -2020,6 +2137,76 @@ function drawWatchingEyes(t, count, color) {
   }
 }
 
+function drawForegroundRoomProps() {
+  const id = level?.id;
+  const t = visualTime;
+  ctx.save();
+
+  if (id === "entrance" || id === "kitchen") {
+    for (let x = 340; x < level.width; x += 760) {
+      const sway = Math.sin(t + x) * 8;
+      ctx.fillStyle = "rgba(82,32,38,0.34)";
+      ctx.beginPath();
+      ctx.moveTo(x, 80);
+      ctx.bezierCurveTo(x + 60 + sway, 230, x - 40, 440, x + 70, 680);
+      ctx.lineTo(x - 32, 680);
+      ctx.bezierCurveTo(x + 18, 420, x - 70, 230, x - 20, 80);
+      ctx.closePath();
+      ctx.fill();
+    }
+  }
+
+  if (id === "library" || id === "shadow-library") {
+    for (let x = 220; x < level.width; x += 620) {
+      ctx.fillStyle = id === "shadow-library" ? "rgba(16,9,31,0.52)" : "rgba(26,20,36,0.42)";
+      ctx.fillRect(x, 110, 110, 520);
+      ctx.fillStyle = id === "shadow-library" ? "rgba(139,92,246,0.18)" : "rgba(255,226,151,0.11)";
+      ctx.fillRect(x + 14, 145, 82, 10);
+      ctx.fillRect(x + 14, 285, 82, 10);
+      ctx.fillRect(x + 14, 425, 82, 10);
+    }
+  }
+
+  if (id === "dungeon" || id === "tower") {
+    ctx.strokeStyle = id === "tower" ? "rgba(191,219,254,0.18)" : "rgba(216,179,106,0.22)";
+    ctx.lineWidth = 5;
+    for (let x = 180; x < level.width; x += 520) {
+      const wiggle = Math.sin(t * 1.4 + x) * 12;
+      ctx.beginPath();
+      ctx.moveTo(x, 0);
+      ctx.bezierCurveTo(x + wiggle, 160, x - wiggle, 360, x + wiggle, 720);
+      ctx.stroke();
+    }
+  }
+
+  if (id === "duchess-ballroom") {
+    for (let x = 280; x < level.width; x += 700) {
+      ctx.fillStyle = "rgba(255,232,190,0.12)";
+      ctx.fillRect(x, 130, 96, 220);
+      ctx.strokeStyle = "rgba(255,226,151,0.38)";
+      ctx.strokeRect(x, 130, 96, 220);
+      ctx.fillStyle = `rgba(255,255,255,${0.08 + Math.sin(t * 3 + x) * 0.035})`;
+      ctx.fillRect(x + 18, 154, 24, 160);
+    }
+  }
+
+  if (id === "attic") {
+    for (let x = 320; x < level.width; x += 680) {
+      ctx.fillStyle = "rgba(239,68,68,0.11)";
+      ctx.beginPath();
+      ctx.ellipse(x, 170 + Math.sin(t + x) * 8, 34, 10, 0, 0, Math.PI * 2);
+      ctx.ellipse(x + 62, 170 + Math.sin(t + x) * 8, 34, 10, 0, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.fillStyle = "rgba(12,4,14,0.38)";
+    ctx.fillRect(2000, 250, 260, 710);
+    ctx.fillStyle = "rgba(255,226,151,0.12)";
+    ctx.fillRect(2084, 320, 92, 170);
+  }
+
+  ctx.restore();
+}
+
 function drawRopeLines(t) {
   ctx.strokeStyle = "rgba(216,179,106,0.22)";
   ctx.lineWidth = 3;
@@ -2103,6 +2290,7 @@ function drawNancyThroneRoom(t) {
 
 function drawWorld() {
   drawRoomDecor();
+  drawForegroundRoomProps();
   drawTutorialPrompts();
   for (const p of objects.platforms) drawPlatform(p);
   drawExit();
@@ -2111,7 +2299,7 @@ function drawWorld() {
   if (objects.mirror) drawMirror(objects.mirror);
   for (const crystal of objects.crystals) drawCrystal(crystal);
   for (const target of objects.attackTargets) if (!target.used || target.kind === "nancyChandelier") drawAttackTarget(target);
-  for (const star of objects.stars) if (!star.taken) drawEmoji("⭐", star.x, star.y, 30);
+  for (const star of objects.stars) if (!star.taken) drawStarCollectible(star.x, star.y);
   for (const y of objects.yarn) if (!y.taken) drawYarnBall(y.x, y.y, 16);
   for (const point of objects.webPoints) drawWebPoint(point);
   for (const enemy of objects.enemies) if (enemy.alive) drawEnemy(enemy);
@@ -2269,12 +2457,27 @@ function drawRoomDecor() {
 }
 
 function drawPlatform(p) {
-  ctx.fillStyle = "#2c2030";
+  const skins = {
+    kitchen: ["#3a2530", "#d7b86b", "rgba(255,210,120,0.22)"],
+    library: ["#241d32", "#8b5cf6", "rgba(196,132,252,0.18)"],
+    dungeon: ["#1c2529", "#9ca3af", "rgba(216,179,106,0.16)"],
+    ballroom: ["#3b1732", "#f9a8d4", "rgba(255,232,190,0.2)"],
+    attic: ["#261827", "#ef4444", "rgba(255,226,151,0.12)"]
+  };
+  const skin = skins[level?.theme || "kitchen"] || skins.kitchen;
+  ctx.fillStyle = skin[0];
   ctx.fillRect(p.x, p.y, p.w, p.h);
-  ctx.fillStyle = "#6ee7b7";
+  ctx.fillStyle = skin[1];
   ctx.fillRect(p.x, p.y, p.w, 8);
-  ctx.fillStyle = "rgba(0,0,0,0.22)";
-  for (let x = p.x; x < p.x + p.w; x += TILE) ctx.fillRect(x, p.y + 10, 3, p.h - 10);
+  ctx.fillStyle = skin[2];
+  ctx.fillRect(p.x, p.y + 8, p.w, 10);
+  ctx.fillStyle = "rgba(0,0,0,0.24)";
+  for (let x = p.x; x < p.x + p.w; x += TILE) {
+    ctx.fillRect(x, p.y + 12, 3, p.h - 12);
+    ctx.fillRect(x + 8, p.y + p.h - 14, TILE - 14, 3);
+  }
+  ctx.strokeStyle = "rgba(255,248,232,0.08)";
+  ctx.strokeRect(p.x + 0.5, p.y + 0.5, p.w - 1, p.h - 1);
 }
 
 function drawExit() {
@@ -2425,7 +2628,55 @@ function drawAttackTarget(target) {
   ctx.restore();
 }
 
+function levelAccentColor() {
+  const accents = {
+    entrance: "#ffe8a0",
+    kitchen: "#fbbf24",
+    library: "#c084fc",
+    "shadow-library": "#8b5cf6",
+    dungeon: "#d8b36a",
+    "duchess-ballroom": "#f9a8d4",
+    tower: "#bfdbfe",
+    attic: "#ff4d6d"
+  };
+  return accents[level?.id] || "#ffe8a0";
+}
+
+function drawStarCollectible(x, y) {
+  const t = visualTime;
+  const accent = levelAccentColor();
+  ctx.save();
+  ctx.translate(x, y + Math.sin(t * 2.8 + x) * 4);
+  ctx.rotate(Math.sin(t * 1.7 + y) * 0.15);
+  ctx.shadowColor = accent;
+  ctx.shadowBlur = 18;
+  ctx.fillStyle = "#fff4c2";
+  ctx.beginPath();
+  for (let i = 0; i < 10; i++) {
+    const r = i % 2 === 0 ? 18 : 8;
+    const a = -Math.PI / 2 + i * Math.PI / 5;
+    ctx.lineTo(Math.cos(a) * r, Math.sin(a) * r);
+  }
+  ctx.closePath();
+  ctx.fill();
+  ctx.strokeStyle = accent;
+  ctx.lineWidth = 2;
+  ctx.stroke();
+  ctx.globalAlpha = 0.55;
+  ctx.strokeStyle = "#fff8e8";
+  ctx.beginPath();
+  ctx.moveTo(-26, 0);
+  ctx.lineTo(26, 0);
+  ctx.moveTo(0, -26);
+  ctx.lineTo(0, 26);
+  ctx.stroke();
+  ctx.restore();
+}
+
 function drawYarnBall(x, y, r) {
+  ctx.save();
+  ctx.shadowColor = levelAccentColor();
+  ctx.shadowBlur = 10 + Math.sin(visualTime * 4 + x) * 3;
   ctx.strokeStyle = "#ff8dbd";
   ctx.lineWidth = 4;
   ctx.beginPath();
@@ -2437,6 +2688,7 @@ function drawYarnBall(x, y, r) {
   ctx.moveTo(x - r * 0.6, y + r * 0.4);
   ctx.quadraticCurveTo(x, y - r * 0.2, x + r * 0.6, y + r * 0.4);
   ctx.stroke();
+  ctx.restore();
 }
 
 function drawEnemy(e) {
@@ -2742,19 +2994,29 @@ function drawHud() {
 
 function drawWinOverlay() {
   const t = visualTime;
-  ctx.fillStyle = "rgba(5,8,13,0.78)";
+  ctx.fillStyle = "rgba(5,8,13,0.82)";
   ctx.fillRect(0, 0, VIEW_W, VIEW_H);
 
   // Gold particle celebration
-  for (let i = 0; i < 24; i++) {
-    const px = VIEW_W / 2 + Math.sin(t * 2 + i * 1.7) * (120 + i * 8);
-    const py = 260 + Math.cos(t * 1.8 + i * 2.1) * (80 + i * 5);
-    const alpha = 0.4 + Math.sin(t * 3 + i) * 0.3;
+  for (let i = 0; i < 54; i++) {
+    const radius = 90 + i * 5.5 + Math.sin(t * 2 + i) * 18;
+    const px = VIEW_W / 2 + Math.sin(t * 1.35 + i * 1.7) * radius;
+    const py = 270 + Math.cos(t * 1.18 + i * 2.1) * (radius * 0.48);
+    const alpha = 0.28 + Math.sin(t * 3 + i) * 0.22;
     ctx.fillStyle = `rgba(255,224,145,${alpha})`;
+    ctx.shadowColor = "rgba(255,224,145,0.65)";
+    ctx.shadowBlur = 12;
     ctx.beginPath();
     ctx.arc(px, py, 2 + (i % 3), 0, Math.PI * 2);
     ctx.fill();
   }
+  ctx.shadowBlur = 0;
+
+  const halo = ctx.createRadialGradient(VIEW_W / 2, 280, 20, VIEW_W / 2, 280, 330);
+  halo.addColorStop(0, "rgba(255,224,145,0.2)");
+  halo.addColorStop(1, "rgba(255,224,145,0)");
+  ctx.fillStyle = halo;
+  ctx.fillRect(0, 0, VIEW_W, VIEW_H);
 
   ctx.fillStyle = "#fff4c2";
   ctx.textAlign = "center";
