@@ -46,13 +46,6 @@ const GRAVITY = 0.72;
 const FRICTION = 0.82;
 const AIR_FRICTION = 0.96;
 const MAX_FALL = 18;
-const PLATFORM_WIDTH_SCALE = 0.84;
-const GRAPPLE_PULL_STRENGTH = 380;
-const GRAPPLE_MAX_PULL = 1.45;
-const GRAPPLE_UPWARD_BIAS = 0.08;
-const GRAPPLE_AIR_FRICTION = 0.985;
-const YARN_RESPAWN_MIN = 5;
-const YARN_RESPAWN_SPREAD = 3;
 
 const keys = new Set();
 const mouse = { x: 0, y: 0, worldX: 0, worldY: 0 };
@@ -83,7 +76,6 @@ let visualTime = 0;
 let lastUnlockLevel = -1;
 let cutsceneAudio = null;
 let currentAudioScene = 0;
-let tutorialState = { step: 0, moved: false, jumped: false, grappled: false, nearHook: false };
 
 const MODE_DESCRIPTIONS = {
   classic: "Play the full story of Kitty escaping Nancy's mansion.",
@@ -303,10 +295,10 @@ const LEVELS = [
     exit: [3600, 730],
     prompt: "Learn the split yarn controls: E/Right Mouse grapples hooks, Space/Left Mouse shoots yarn attacks.",
     tutorials: [
-      { step: 0, text: "Press A/D to move." },
-      { step: 1, text: "Press W to jump." },
-      { step: 2, text: "Stand near the glowing yarn and press E to grapple!" },
-      { step: 3, text: "Press Left Mouse Button or Space to shoot yarn at objects." }
+      { x: 180, text: "Press A/D to move." },
+      { x: 660, text: "Press W to jump." },
+      { x: 1260, text: "See the glowing yarn point? Stand near it. Press E or Right Mouse Button to shoot your yarn and grapple across!" },
+      { x: 2050, text: "Press Left Mouse Button or Space to shoot yarn at objects." }
     ],
     platforms: [
       [0, 920, 900, 160], [1160, 920, 420, 160], [1840, 920, 420, 160], [2520, 920, 420, 160], [3200, 920, 600, 160],
@@ -429,15 +421,14 @@ const LEVELS = [
     exit: [3960, 360],
     prompt: "Regular ascent: tight hooks and attack shots prepare Kitty for the attic.",
     platforms: [
-      [0, 1580, 620, 300], [900, 1460, 390, 90], [1600, 1320, 390, 90], [2300, 1160, 390, 90], [3000, 960, 390, 90], [3660, 760, 390, 90], [3880, 460, 320, 90],
-      [520, 1280, 210, 32], [1190, 1120, 210, 32], [1880, 960, 210, 32], [2580, 780, 210, 32], [3260, 600, 210, 32]
+      [0, 1580, 620, 300], [900, 1460, 420, 90], [1640, 1320, 420, 90], [2380, 1160, 420, 90], [3120, 960, 420, 90], [3740, 760, 420, 90], [3880, 460, 320, 90],
+      [520, 1280, 230, 32], [1260, 1120, 230, 32], [2000, 960, 230, 32], [2740, 780, 230, 32], [3380, 600, 230, 32]
     ],
-    stars: [[540, 1234], [1900, 914], [3900, 414]],
-    yarn: [[260, 1530], [740, 1232], [1220, 1072], [1920, 912], [2620, 732], [3300, 552], [4000, 414]],
+    stars: [[540, 1234], [2020, 914], [3900, 414]],
+    yarn: [[260, 1530], [760, 1232], [1360, 1072], [2100, 912], [2840, 732], [3480, 552], [4000, 414]],
     fishCrates: [[1320, 1074]],
     enemies: [[1700, 1284, 90], [3160, 924, 100]],
-    webPoints: [[700, 1330], [1160, 1190], [1540, 1040], [2220, 890], [2920, 710], [3560, 560], [3980, 500]],
-    ghostHints: [[1010, 1390, 220, 36], [1710, 1250, 220, 36], [2410, 1090, 220, 36], [3100, 890, 220, 36]]
+    webPoints: [[760, 1300], [1500, 1130], [2240, 970], [2980, 790], [3600, 610], [3980, 500]]
   },
   {
     id: "attic",
@@ -668,20 +659,13 @@ function renderLevelSelect() {
     button.className = `room-button ${unlocked ? "unlocked" : "locked"}${justUnlocked ? " just-unlocked" : ""}`;
     button.disabled = !unlocked;
     button.innerHTML = `<strong>${index + 1}. ${room.name}${bossBadge}</strong><span>${unlocked ? room.prompt : "Locked"}</span>`;
-    button.addEventListener("click", () => startLevelWithFade(index));
+    button.addEventListener("click", () => startLevel(index));
     levelMap.appendChild(button);
   });
 }
 
 function startLevel(index) {
   if (index >= unlockedLevels) return;
-  clearInterval(storyTimer);
-  storyActive = false;
-  pendingIntroLevel = null;
-  storyIntro.classList.remove("active", "leaving");
-  storyIntro.hidden = true;
-  menu.classList.remove("menu-leaving", "menu-entering");
-  transitionFade.classList.remove("active");
   hidePanels();
   paused = false;
   running = true;
@@ -740,19 +724,13 @@ function cloneLevel(source) {
   return JSON.parse(JSON.stringify(source));
 }
 
-function tunePlatform([x, y, w, h]) {
-  if (w <= 140) return { x, y, w, h };
-  const scaledW = Math.max(120, Math.round(w * PLATFORM_WIDTH_SCALE));
-  return { x: x + Math.round((w - scaledW) / 2), y, w: scaledW, h };
-}
-
 function resetLevel(index = levelIndex) {
   levelIndex = index;
   level = cloneLevel(LEVELS[levelIndex]);
   objects = {
-    platforms: level.platforms.map(tunePlatform),
+    platforms: level.platforms.map(([x, y, w, h]) => ({ x, y, w, h })),
     stars: level.stars.map(([x, y]) => ({ x, y, r: 18, taken: false })),
-    yarn: level.yarn.map(([x, y]) => ({ x, y, homeX: x, homeY: y, r: 16, taken: false, respawn: 0, alpha: 1 })),
+    yarn: level.yarn.map(([x, y]) => ({ x, y, r: 16, taken: false })),
     crates: level.fishCrates.map(([x, y], index) => ({
       x,
       y,
@@ -769,7 +747,6 @@ function resetLevel(index = levelIndex) {
     shelves: (level.shelves || []).map(([x, y]) => ({ x, y, startY: y, w: 120, h: 190, falling: false, vy: 0, spent: false })),
     crystals: (level.crystals || []).map(([x, y]) => ({ x, y, r: 24, charged: true, activated: false })),
     attackTargets: (level.attackTargets || []).map(([x, y, kind]) => ({ x, y, kind, r: 28, used: false })),
-    ghostHints: (level.ghostHints || []).map(([x, y, w, h]) => ({ x, y, w, h })),
     projectiles: [],
     particles: []
   };
@@ -789,13 +766,10 @@ function resetLevel(index = levelIndex) {
   player.fish = 0;
   player.grapple = null;
   player.invuln = 0;
-  tutorialState = { step: 0, moved: false, jumped: false, grappled: false, nearHook: false };
   gameWon = false;
   camera.x = 0;
   camera.y = 0;
-  message = "";
-  messageTimer = 0;
-  toast.classList.remove("show");
+  say(`${level.name}: ${level.prompt}`, 4.5);
 }
 
 function makeBoss(data) {
@@ -1046,12 +1020,10 @@ function handleInput() {
   if (left) {
     player.vx -= player.grounded ? 0.72 : 0.46;
     player.face = -1;
-    tutorialState.moved = true;
   }
   if (right) {
     player.vx += player.grounded ? 0.72 : 0.46;
     player.face = 1;
-    tutorialState.moved = true;
   }
   player.vx = Math.max(-7.2, Math.min(7.2, player.vx));
   if (fastFall && !player.grounded) player.vy += 0.52;
@@ -1062,39 +1034,7 @@ function handleInput() {
     player.grounded = false;
     player.jumpBuffer = 0;
     player.coyote = 0;
-    tutorialState.jumped = true;
     puff(player.x + player.w / 2, player.y + player.h, "#fff5cf", 8);
-  }
-}
-
-function updateTutorialProgress() {
-  if (levelIndex !== 0) return;
-  if (tutorialState.step === 0 && tutorialState.moved) tutorialState.step = 1;
-  if (tutorialState.step === 1 && tutorialState.jumped) tutorialState.step = 2;
-  if (tutorialState.step === 2) {
-    const px = player.x + player.w / 2;
-    const py = player.y + player.h / 2;
-    const nearFirstHook = objects.webPoints.some(point => distance(px, py, point.x, point.y) < 390);
-    tutorialState.nearHook = nearFirstHook;
-  }
-  if (tutorialState.step === 3 && player.x > 2300) tutorialState.step = 4;
-}
-
-function updateYarnRespawns(dt) {
-  for (const y of objects.yarn) {
-    if (!y.taken) {
-      y.alpha = Math.min(1, y.alpha + dt * 2.5);
-      continue;
-    }
-    if (player.yarn > 0) continue;
-    y.respawn -= dt;
-    if (y.respawn <= 0) {
-      y.taken = false;
-      y.alpha = 0;
-      y.x = y.homeX;
-      y.y = y.homeY;
-      puff(y.x, y.y, "#ff8dbd", 10);
-    }
   }
 }
 
@@ -1111,12 +1051,11 @@ function updatePlayer(dt) {
     const dx = gp.x - cx;
     const dy = gp.y - cy;
     const dist = Math.max(1, Math.hypot(dx, dy));
-    const pull = Math.min(GRAPPLE_MAX_PULL, GRAPPLE_PULL_STRENGTH / dist);
+    const pull = Math.min(1.15, 280 / dist);
     player.vx += (dx / dist) * pull;
-    player.vy += (dy / dist) * pull - GRAPPLE_UPWARD_BIAS;
-    player.vx *= GRAPPLE_AIR_FRICTION;
+    player.vy += (dy / dist) * pull - 0.04;
     player.grapple.time -= dt;
-    if (dist < 38 || player.grapple.time <= 0) player.grapple = null;
+    if (dist < 48 || player.grapple.time <= 0) player.grapple = null;
   }
 
   player.vy += GRAVITY;
@@ -1138,9 +1077,8 @@ function updatePlayer(dt) {
     puff(player.x, player.y, "#ffd166", 14);
     say(`${player.stars}/3 stars collected`);
   });
-  collectNear(objects.yarn, item => {
+  collectNear(objects.yarn, () => {
     player.yarn += 1;
-    if (item) item.respawn = YARN_RESPAWN_MIN + Math.random() * YARN_RESPAWN_SPREAD;
     puff(player.x, player.y, "#ff9ecb", 12);
     say(`Yarn ammo +1. You have ${player.yarn}.`);
   });
@@ -1566,8 +1504,6 @@ function fireYarn() {
   player.yarn -= 1;
   if (target.type === "web") {
     player.grapple = { point: target.obj, time: 2.2 };
-    tutorialState.grappled = true;
-    if (levelIndex === 0 && tutorialState.step === 2) tutorialState.step = 3;
     puff(target.obj.x, target.obj.y, "#ff9ecb", 14);
     if (target.obj.kind === "chandelierSwing") swingNancyChandelier(target.obj);
   }
@@ -1768,8 +1704,6 @@ function update(dt) {
   messageTimer -= dt;
   shake = Math.max(0, shake - dt * 30);
   updatePlayer(dt);
-  updateTutorialProgress();
-  updateYarnRespawns(dt);
   updateEnemies(dt);
   updateBoss(dt);
   updateParticles(dt);
@@ -1917,7 +1851,6 @@ function drawBackground() {
 function drawWorld() {
   drawRoomDecor();
   drawTutorialPrompts();
-  for (const hint of objects.ghostHints) drawGhostHint(hint);
   for (const p of objects.platforms) drawPlatform(p);
   drawExit();
   for (const crate of objects.crates) if (!crate.broken) drawCrate(crate);
@@ -1926,12 +1859,7 @@ function drawWorld() {
   for (const crystal of objects.crystals) drawCrystal(crystal);
   for (const target of objects.attackTargets) if (!target.used || target.kind === "nancyChandelier") drawAttackTarget(target);
   for (const star of objects.stars) if (!star.taken) drawEmoji("⭐", star.x, star.y, 30);
-  for (const y of objects.yarn) if (!y.taken) {
-    ctx.save();
-    ctx.globalAlpha = y.alpha;
-    drawYarnBall(y.x, y.y, 16);
-    ctx.restore();
-  }
+  for (const y of objects.yarn) if (!y.taken) drawYarnBall(y.x, y.y, 16);
   for (const point of objects.webPoints) drawWebPoint(point);
   for (const enemy of objects.enemies) if (enemy.alive) drawEnemy(enemy);
   for (const p of objects.projectiles) drawProjectile(p);
@@ -1947,30 +1875,25 @@ function drawWorld() {
 }
 
 function drawTutorialPrompts() {
-  if (!level.tutorials || levelIndex !== 0 || tutorialState.step >= level.tutorials.length) return;
-  const note = level.tutorials.find(item => item.step === tutorialState.step);
-  if (!note) return;
-  if (tutorialState.step === 2 && !tutorialState.nearHook) return;
-  const x = camera.x + VIEW_W / 2;
-  const y = camera.y + VIEW_H - 96;
-  const w = Math.min(680, 130 + note.text.length * 9.4);
-  ctx.save();
-  ctx.font = "bold 20px Trebuchet MS";
+  if (!level.tutorials) return;
+  ctx.font = "bold 19px Trebuchet MS";
   ctx.textAlign = "center";
-  ctx.fillStyle = "rgba(18, 10, 13, 0.84)";
-  if (ctx.roundRect) {
-    ctx.beginPath();
-    ctx.roundRect(x - w / 2, y - 44, w, 58, 10);
-    ctx.fill();
+  for (const note of level.tutorials) {
+    const visible = Math.abs((player.x + player.w / 2) - note.x) < 520;
+    ctx.globalAlpha = visible ? 1 : 0.38;
+    const w = Math.min(520, 90 + note.text.length * 8.6);
+    const x = note.x;
+    const y = 585;
+    ctx.fillStyle = "rgba(18, 10, 13, 0.78)";
+    ctx.fillRect(x - w / 2, y - 40, w, 54);
     ctx.strokeStyle = "rgba(247, 199, 109, 0.72)";
     ctx.lineWidth = 3;
-    ctx.stroke();
-  } else {
-    ctx.fillRect(x - w / 2, y - 44, w, 58);
+    ctx.strokeRect(x - w / 2, y - 40, w, 54);
+    ctx.fillStyle = "#fff4c2";
+    ctx.fillText(note.text, x, y - 8);
   }
-  ctx.fillStyle = "#fff4c2";
-  ctx.fillText(note.text, x, y - 8);
-  ctx.restore();
+  ctx.globalAlpha = 1;
+  ctx.textAlign = "left";
 }
 
 function drawRoomDecor() {
@@ -2037,33 +1960,6 @@ function drawShelf(s) {
   ctx.fillStyle = "#f59e0b";
   for (let i = 0; i < 5; i++) ctx.fillRect(s.x + 14 + i * 19, s.y + 24, 12, 132);
   drawAttackAnchor(s.x + s.w / 2, s.y - 12, "shelf");
-}
-
-function drawGhostHint(h) {
-  ctx.save();
-  ctx.globalAlpha = 0.34 + Math.sin(performance.now() / 260) * 0.08;
-  ctx.fillStyle = "rgba(196,181,253,0.22)";
-  ctx.strokeStyle = "rgba(254,243,199,0.65)";
-  ctx.lineWidth = 2;
-  ctx.setLineDash([10, 8]);
-  if (ctx.roundRect) {
-    ctx.beginPath();
-    ctx.roundRect(h.x, h.y, h.w, h.h, 8);
-    ctx.fill();
-    ctx.stroke();
-  } else {
-    ctx.fillRect(h.x, h.y, h.w, h.h);
-    ctx.strokeRect(h.x, h.y, h.w, h.h);
-  }
-  ctx.setLineDash([]);
-  ctx.fillStyle = "rgba(254,243,199,0.8)";
-  ctx.beginPath();
-  ctx.moveTo(h.x + h.w / 2 - 18, h.y - 20);
-  ctx.lineTo(h.x + h.w / 2 + 18, h.y - 20);
-  ctx.lineTo(h.x + h.w / 2, h.y - 44);
-  ctx.closePath();
-  ctx.fill();
-  ctx.restore();
 }
 
 function drawMirror(m) {
@@ -2273,7 +2169,7 @@ function drawBossBody(b, color, eyes) {
 function drawBossBar(b) {
   const max = b.maxHp || 3;
   const x = 34;
-  const y = 132;
+  const y = 108;
   const phaseName = b.type === "nancy" ? ` Phase ${b.phase}` : "";
   const label = b.type === "shadow" ? `Shadow HP: ${Math.max(0, b.hp)}/3 bookshelves` : `${b.name}${phaseName} HP: ${Math.max(0, b.hp)}/${max}`;
   ctx.fillStyle = "rgba(0,0,0,0.5)";
@@ -2286,38 +2182,6 @@ function drawBossBar(b) {
   ctx.fillStyle = "#fff8e8";
   ctx.font = "bold 16px Trebuchet MS";
   ctx.fillText(label, x, y - 8);
-}
-
-function getTaskPrompt() {
-  if (!level) return "";
-  if (levelIndex === 0 && tutorialState.step < level.tutorials.length) {
-    if (tutorialState.step === 2 && !tutorialState.nearHook) return "Task: Reach the first glowing yarn hook.";
-    return level.tutorials[tutorialState.step]?.text || level.prompt;
-  }
-  if (player.stars < 3) return `Task: Collect ${3 - player.stars} more star${3 - player.stars === 1 ? "" : "s"} to unlock the exit.`;
-  const boss = objects.boss;
-  if (boss && !boss.defeated) {
-    if (boss.type === "whiskers") return boss.chandelierDropped ? "Task: Hit stunned Whiskers with yarn attacks." : "Task: Dodge Whiskers under the chandelier, then attack the chandelier anchor.";
-    if (boss.type === "shadow") return `Task: Drop all bookshelves on Shadow. Remaining: ${Math.max(0, boss.hp)}.`;
-    if (boss.type === "duchess") return boss.stunned > 0 ? "Task: Duchess is stunned. Hit her with yarn attacks!" : "Task: Lure Duchess to the mirror, then attack the mirror.";
-    if (boss.type === "nancy") {
-      if (boss.phase === 1) return `Task: Hit Nancy's purple orbs with yarn attacks. HP ${boss.hp}/5.`;
-      if (boss.phase === 2) return `Task: Hit the real golden Nancy. HP ${boss.hp}/4.`;
-      return boss.stunned > 0 ? `Task: Grapple the chandelier hook into Nancy. Swings left: ${boss.hp}.` : `Task: Attack all 4 crystals before Nancy's beam. Charged: ${boss.crystalsActivated}/4.`;
-    }
-    return `Task: Defeat ${boss.name} to unlock the exit.`;
-  }
-  return "Task complete: Exit unlocked.";
-}
-
-function fitHudText(text, x, y, maxWidth, startSize = 16) {
-  let size = startSize;
-  ctx.font = `bold ${size}px Nunito, Trebuchet MS, sans-serif`;
-  while (ctx.measureText(text).width > maxWidth && size > 11) {
-    size -= 1;
-    ctx.font = `bold ${size}px Nunito, Trebuchet MS, sans-serif`;
-  }
-  ctx.fillText(text, x, y);
 }
 
 function drawPlayer() {
@@ -2443,7 +2307,7 @@ function drawGrapple() {
 
 function drawHud() {
   const boss = objects.boss && !objects.boss.defeated ? objects.boss : null;
-  const hudH = boss ? 152 : 112;
+  const hudH = boss ? 126 : 82;
 
   // Glass HUD panel
   ctx.fillStyle = "rgba(5,8,13,0.55)";
@@ -2471,8 +2335,6 @@ function drawHud() {
   ctx.font = "bold 18px Nunito, Trebuchet MS, sans-serif";
   ctx.fillStyle = "rgba(255,248,232,0.85)";
   ctx.fillText(`Room ${levelIndex + 1}/${LEVELS.length}: ${level.name}`, 34, 86);
-  ctx.fillStyle = "#fff4c2";
-  fitHudText(getTaskPrompt(), 34, 112, 650, 16);
   if (boss) drawBossBar(boss);
   ctx.font = "600 15px Nunito, Trebuchet MS, sans-serif";
   ctx.fillStyle = "rgba(219,234,254,0.75)";
@@ -2555,7 +2417,7 @@ function startGame() {
     playButton.classList.add("clicking");
     setTimeout(() => playButton.classList.remove("clicking"), 400);
   }
-  showLevelSelect();
+  startLevelWithFade(0);
 }
 
 playButton.addEventListener("click", startGame);
@@ -2566,10 +2428,8 @@ document.querySelectorAll(".level-hotspot").forEach(button => {
     selectedLevel = Number(button.dataset.level);
     updateMenuLocks();
   });
-  button.addEventListener("click", event => {
-    event.preventDefault();
-    event.stopPropagation();
-    startLevelWithFade(Number(button.dataset.level), true);
+  button.addEventListener("click", () => {
+    startLevelWithFade(Number(button.dataset.level));
   });
 });
 document.querySelectorAll(".version-hotspot").forEach(button => {
@@ -2639,7 +2499,7 @@ backToMenu.addEventListener("click", showMainMenu);
 continueButton.addEventListener("click", () => setPaused(false));
 quitButton.addEventListener("click", quitToLevelSelect);
 returnVictoryButton.addEventListener("click", showLevelSelect);
-editorButton.addEventListener("click", () => {
+editorButton?.addEventListener("click", () => {
   levelJson.value = JSON.stringify(LEVELS, null, 2);
   levelEditor.hidden = false;
 });
