@@ -74,6 +74,8 @@ let pendingIntroLevel = null;
 let storyTimer = null;
 let visualTime = 0;
 let lastUnlockLevel = -1;
+let cutsceneAudio = null;
+let currentAudioScene = 0;
 
 const MODE_DESCRIPTIONS = {
   classic: "Play the full story of Kitty escaping Nancy's mansion.",
@@ -96,6 +98,168 @@ const STORY_BEATS = [
   { scene: 8, speaker: "kitty", text: "I'm not giving up." },
   { scene: 9, speaker: "narration", text: "Run, Kitty. The mansion is pulling you in." }
 ];
+
+function createCutsceneAudio() {
+  if (!window.AudioContext && !window.webkitAudioContext) return null;
+  const AudioCtx = window.AudioContext || window.webkitAudioContext;
+  const context = new AudioCtx();
+  const master = context.createGain();
+  master.gain.value = 0.18;
+  master.connect(context.destination);
+  const active = new Set();
+
+  function track(node) {
+    active.add(node);
+    return node;
+  }
+
+  function stopTracked(node) {
+    try { node.stop(); } catch (_) {}
+    active.delete(node);
+  }
+
+  function tone(freq, duration = 0.35, type = "sine", volume = 0.2, dest = master, when = context.currentTime) {
+    const osc = context.createOscillator();
+    const gain = context.createGain();
+    osc.type = type;
+    osc.frequency.setValueAtTime(freq, when);
+    gain.gain.setValueAtTime(0.0001, when);
+    gain.gain.exponentialRampToValueAtTime(volume, when + 0.02);
+    gain.gain.exponentialRampToValueAtTime(0.0001, when + duration);
+    osc.connect(gain);
+    gain.connect(dest);
+    osc.start(when);
+    osc.stop(when + duration + 0.04);
+  }
+
+  function noise(duration = 0.6, volume = 0.14, filterFreq = 900, type = "lowpass") {
+    const samples = Math.max(1, Math.floor(context.sampleRate * duration));
+    const buffer = context.createBuffer(1, samples, context.sampleRate);
+    const data = buffer.getChannelData(0);
+    for (let i = 0; i < samples; i += 1) data[i] = Math.random() * 2 - 1;
+    const source = context.createBufferSource();
+    const filter = context.createBiquadFilter();
+    const gain = context.createGain();
+    filter.type = type;
+    filter.frequency.value = filterFreq;
+    gain.gain.setValueAtTime(volume, context.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.0001, context.currentTime + duration);
+    source.buffer = buffer;
+    source.connect(filter);
+    filter.connect(gain);
+    gain.connect(master);
+    source.start();
+  }
+
+  function loopNoise(volume = 0.035, filterFreq = 1200) {
+    const samples = context.sampleRate * 2;
+    const buffer = context.createBuffer(1, samples, context.sampleRate);
+    const data = buffer.getChannelData(0);
+    for (let i = 0; i < samples; i += 1) data[i] = Math.random() * 2 - 1;
+    const source = track(context.createBufferSource());
+    const filter = context.createBiquadFilter();
+    const gain = context.createGain();
+    source.buffer = buffer;
+    source.loop = true;
+    filter.type = "bandpass";
+    filter.frequency.value = filterFreq;
+    gain.gain.value = volume;
+    source.connect(filter);
+    filter.connect(gain);
+    gain.connect(master);
+    source.start();
+    return source;
+  }
+
+  let ambient = null;
+
+  return {
+    context,
+    resume() {
+      if (context.state === "suspended") context.resume();
+    },
+    setScene(scene) {
+      this.resume();
+      if (ambient) {
+        stopTracked(ambient);
+        ambient = null;
+      }
+      if (scene === 1) ambient = loopNoise(0.032, 2600);
+      if (scene === 2 || scene === 5) ambient = loopNoise(0.012, 700);
+      if (scene === 6 || scene === 7) ambient = loopNoise(0.02, 360);
+    },
+    beat(beat) {
+      this.resume();
+      const scene = beat.scene;
+      if (scene === 1 && beat.text.includes("wait")) {
+        noise(0.9, 0.09, 2800, "highpass");
+        tone(440, 0.18, "triangle", 0.055);
+        tone(392, 0.22, "triangle", 0.045, master, context.currentTime + 0.11);
+      } else if (scene === 1) {
+        noise(1.1, 0.16, 180, "lowpass");
+        tone(330, 0.55, "sine", 0.055);
+        tone(247, 0.55, "sine", 0.04, master, context.currentTime + 0.12);
+      } else if (scene === 2) {
+        tone(523.25, 0.16, "sine", 0.035);
+        tone(659.25, 0.18, "sine", 0.026, master, context.currentTime + 0.22);
+      } else if (scene === 3) {
+        tone(196, 0.62, "sine", 0.045);
+        tone(392, 0.32, "triangle", 0.032, master, context.currentTime + 0.08);
+      } else if (scene === 4) {
+        [659.25, 783.99, 987.77, 1318.51].forEach((freq, i) => {
+          tone(freq, 0.55, "sine", 0.035, master, context.currentTime + i * 0.08);
+        });
+      } else if (scene === 5) {
+        [880, 740, 622, 523].forEach((freq, i) => {
+          tone(freq, 0.42, "sine", 0.032, master, context.currentTime + i * 0.1);
+        });
+      } else if (scene === 6) {
+        noise(0.45, 0.22, 130, "lowpass");
+        tone(73, 1.0, "sawtooth", 0.035);
+      } else if (scene === 7) {
+        noise(0.55, 0.12, 280, "lowpass");
+        tone(110, 0.9, "sawtooth", 0.048);
+        tone(55, 1.1, "sine", 0.035);
+      } else if (scene === 8) {
+        [392, 523.25, 659.25, 783.99].forEach((freq, i) => {
+          tone(freq, 0.5, "triangle", 0.04, master, context.currentTime + i * 0.11);
+        });
+      } else if (scene === 9) {
+        noise(0.75, 0.16, 1600, "highpass");
+        tone(196, 0.34, "triangle", 0.04);
+        tone(392, 0.42, "triangle", 0.05, master, context.currentTime + 0.1);
+      }
+    },
+    stop() {
+      if (ambient) {
+        stopTracked(ambient);
+        ambient = null;
+      }
+      active.forEach(node => stopTracked(node));
+    }
+  };
+}
+
+function ensureCutsceneAudio() {
+  if (!cutsceneAudio) cutsceneAudio = createCutsceneAudio();
+  cutsceneAudio?.resume();
+  return cutsceneAudio;
+}
+
+function playCutsceneAudioForBeat(beat) {
+  const audio = ensureCutsceneAudio();
+  if (!audio) return;
+  if (beat.scene !== currentAudioScene) {
+    currentAudioScene = beat.scene;
+    audio.setScene(beat.scene);
+  }
+  audio.beat(beat);
+}
+
+function stopCutsceneAudio() {
+  cutsceneAudio?.stop();
+  currentAudioScene = 0;
+}
 
 const player = {
   x: 0,
@@ -391,6 +555,7 @@ function typeStoryScene(reset = false) {
     storyStage.classList.add(`scene-${beat.scene}`);
     storyIntro.dataset.speaker = beat.speaker;
     storyNext.textContent = storyIndex === STORY_BEATS.length - 1 ? "Start Level 1" : "Next";
+    playCutsceneAudioForBeat(beat);
   }
   if (storyTypingIndex < text.length) {
     storyTypingIndex += 1;
@@ -413,6 +578,7 @@ function advanceStory() {
     return;
   }
   storyActive = false;
+  stopCutsceneAudio();
   storyIntro.classList.add("leaving");
   clearInterval(storyTimer);
   window.setTimeout(() => {
@@ -429,6 +595,8 @@ function playIntroBeforeLevel(index) {
   pendingIntroLevel = index;
   storyIndex = 0;
   storyActive = true;
+  currentAudioScene = 0;
+  ensureCutsceneAudio();
   hidePanels();
   storyIntro.hidden = false;
   storyIntro.classList.add("active");
@@ -443,6 +611,7 @@ function playIntroBeforeLevel(index) {
 
 function finishStoryIntro() {
   storyActive = false;
+  stopCutsceneAudio();
   storyIntro.classList.add("leaving");
   clearInterval(storyTimer);
   window.setTimeout(() => {
