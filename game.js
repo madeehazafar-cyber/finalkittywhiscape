@@ -2284,58 +2284,62 @@ function drawPlayer() {
 
   // Tail (behind body)
   ctx.save();
-  ctx.translate(-15, 7);
-  ctx.rotate(tailAngle - 0.15);
+  ctx.translate(-13, 10);
+  ctx.rotate(tailAngle - 0.08);
   ctx.strokeStyle = "#fff0cf";
-  ctx.lineWidth = 6.5;
+  ctx.lineWidth = 6;
   ctx.lineCap = "round";
   ctx.beginPath();
   ctx.moveTo(0, 0);
-  ctx.quadraticCurveTo(-18, -16, -31, -2);
+  ctx.bezierCurveTo(-16, -17, -34, -8, -27, 7);
   ctx.stroke();
   ctx.restore();
 
-  // Body
+  // Body and round cat head
   ctx.fillStyle = "#fff0cf";
   ctx.beginPath();
-  ctx.ellipse(0, 0, 18, 17, 0, 0, Math.PI * 2);
+  ctx.ellipse(0, 9, 15, 17, 0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = "#fff6dc";
+  ctx.beginPath();
+  ctx.ellipse(0, -8, 17, 15, 0, 0, Math.PI * 2);
   ctx.fill();
 
   // Ears
-  ctx.fillStyle = "#fff0cf";
+  ctx.fillStyle = "#fff6dc";
   ctx.save();
-  ctx.translate(-11, -18);
-  ctx.rotate(-0.48 + earTwitchL);
+  ctx.translate(-10, -20);
+  ctx.rotate(-0.28 + earTwitchL);
   ctx.beginPath();
-  ctx.moveTo(1, 10);
-  ctx.lineTo(-9, -5);
-  ctx.lineTo(7, -3);
+  ctx.moveTo(-6, 10);
+  ctx.lineTo(-2, -8);
+  ctx.lineTo(8, 7);
   ctx.closePath();
   ctx.fill();
   ctx.fillStyle = "#f0a6a6";
   ctx.beginPath();
-  ctx.moveTo(1, 7);
-  ctx.lineTo(-4, -1);
-  ctx.lineTo(4, 0);
+  ctx.moveTo(-2, 6);
+  ctx.lineTo(0, -2);
+  ctx.lineTo(4, 5);
   ctx.closePath();
   ctx.fill();
   ctx.restore();
 
   ctx.save();
-  ctx.translate(11, -18);
-  ctx.rotate(0.48 + earTwitchR);
-  ctx.fillStyle = "#fff0cf";
+  ctx.translate(10, -20);
+  ctx.rotate(0.28 + earTwitchR);
+  ctx.fillStyle = "#fff6dc";
   ctx.beginPath();
-  ctx.moveTo(-1, 10);
-  ctx.lineTo(-7, -3);
-  ctx.lineTo(9, -5);
+  ctx.moveTo(6, 10);
+  ctx.lineTo(2, -8);
+  ctx.lineTo(-8, 7);
   ctx.closePath();
   ctx.fill();
   ctx.fillStyle = "#f0a6a6";
   ctx.beginPath();
-  ctx.moveTo(-1, 7);
-  ctx.lineTo(-4, 0);
-  ctx.lineTo(4, -1);
+  ctx.moveTo(2, 6);
+  ctx.lineTo(0, -2);
+  ctx.lineTo(-4, 5);
   ctx.closePath();
   ctx.fill();
   ctx.restore();
@@ -2343,26 +2347,26 @@ function drawPlayer() {
   // Eyes
   ctx.fillStyle = "#1f2937";
   if (blink) {
-    ctx.fillRect(-9, -5, 5, 1.5);
-    ctx.fillRect(4, -5, 5, 1.5);
+    ctx.fillRect(-9, -10, 5, 1.5);
+    ctx.fillRect(4, -10, 5, 1.5);
   } else {
     ctx.beginPath();
-    ctx.ellipse(-6.5, -3, 2.5, 3, 0, 0, Math.PI * 2);
-    ctx.ellipse(6.5, -3, 2.5, 3, 0, 0, Math.PI * 2);
+    ctx.ellipse(-6.5, -8, 2.5, 3, 0, 0, Math.PI * 2);
+    ctx.ellipse(6.5, -8, 2.5, 3, 0, 0, Math.PI * 2);
     ctx.fill();
     ctx.fillStyle = "#fff";
     ctx.beginPath();
-    ctx.arc(-7, -4, 1, 0, Math.PI * 2);
-    ctx.arc(5.5, -4, 1, 0, Math.PI * 2);
+    ctx.arc(-7, -9, 1, 0, Math.PI * 2);
+    ctx.arc(5.5, -9, 1, 0, Math.PI * 2);
     ctx.fill();
   }
 
   // Nose
   ctx.fillStyle = "#ff8dbd";
   ctx.beginPath();
-  ctx.moveTo(0, 1);
-  ctx.lineTo(-3, 5);
-  ctx.lineTo(3, 5);
+  ctx.moveTo(0, -4);
+  ctx.lineTo(-3, 0);
+  ctx.lineTo(3, 0);
   ctx.closePath();
   ctx.fill();
 
@@ -2370,18 +2374,18 @@ function drawPlayer() {
   ctx.lineWidth = 1.4;
   ctx.lineCap = "round";
   ctx.beginPath();
-  ctx.moveTo(-4, 6);
-  ctx.lineTo(-16, 2);
-  ctx.moveTo(-4, 8);
-  ctx.lineTo(-16, 9);
-  ctx.moveTo(4, 6);
-  ctx.lineTo(16, 2);
-  ctx.moveTo(4, 8);
-  ctx.lineTo(16, 9);
+  ctx.moveTo(-4, 1);
+  ctx.lineTo(-17, -3);
+  ctx.moveTo(-4, 3);
+  ctx.lineTo(-17, 4);
+  ctx.moveTo(4, 1);
+  ctx.lineTo(17, -3);
+  ctx.moveTo(4, 3);
+  ctx.lineTo(17, 4);
   ctx.stroke();
   ctx.beginPath();
-  ctx.arc(-2, 8, 3, 0, Math.PI * 0.85);
-  ctx.arc(2, 8, 3, Math.PI * 0.15, Math.PI);
+  ctx.arc(-2, 3, 3, 0, Math.PI * 0.85);
+  ctx.arc(2, 3, 3, Math.PI * 0.15, Math.PI);
   ctx.stroke();
 
   // Paws
