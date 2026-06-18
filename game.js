@@ -78,10 +78,20 @@ const MODE_DESCRIPTIONS = {
   endless: "Survive an endless escape with increasing difficulty."
 };
 
-const STORY_SCENES = [
-  "Peter left... He promised he'd come back.",
-  "A stranger whispers of a hidden paradise... 'Seek the Magical Cat Land, little one.'",
-  "But the path to paradise cuts straight through Evil Nancy's Domain. The escape begins."
+const STORY_BEATS = [
+  { scene: 1, speaker: "kitty", text: "Peter... wait..." },
+  { scene: 1, speaker: "kitty", text: "Peter abandoned me... wahhh!" },
+  { scene: 2, speaker: "narration", text: "Alone under the moonlight, Kitty kept walking." },
+  { scene: 3, speaker: "mystery", text: "There is a place beyond Nancy's mansion." },
+  { scene: 3, speaker: "mystery", text: "A magical cat land." },
+  { scene: 3, speaker: "mystery", text: "A place where no cat is abandoned." },
+  { scene: 4, speaker: "thought", text: "Is that really possible?" },
+  { scene: 5, speaker: "mystery", text: "Follow your heart." },
+  { scene: 6, speaker: "narration", text: "Nancy's mansion waited in the fog." },
+  { scene: 7, speaker: "nancy", text: "You think you can leave?" },
+  { scene: 7, speaker: "nancy", text: "No one escapes my mansion." },
+  { scene: 8, speaker: "kitty", text: "I'm not giving up." },
+  { scene: 9, speaker: "narration", text: "Run, Kitty. The mansion is pulling you in." }
 ];
 
 const player = {
@@ -311,28 +321,32 @@ function updateMenuLocks() {
 }
 
 function typeStoryScene(reset = false) {
-  const text = STORY_SCENES[storyIndex];
+  const beat = STORY_BEATS[storyIndex];
+  const text = beat.text;
   if (reset) {
     storyTypingIndex = 0;
     storyText.textContent = "";
-    storyStage.classList.remove("scene-1", "scene-2", "scene-3", "scene-4");
-    storyStage.classList.add(`scene-${storyIndex + 1}`);
-    storyNext.textContent = storyIndex === STORY_SCENES.length - 1 ? "Enter Mansion" : "Next";
+    storyStage.classList.remove("scene-1", "scene-2", "scene-3", "scene-4", "scene-5", "scene-6", "scene-7", "scene-8", "scene-9");
+    storyStage.classList.add(`scene-${beat.scene}`);
+    storyIntro.dataset.speaker = beat.speaker;
+    storyNext.textContent = storyIndex === STORY_BEATS.length - 1 ? "Start Level 1" : "Next";
   }
   if (storyTypingIndex < text.length) {
     storyTypingIndex += 1;
     storyText.textContent = text.slice(0, storyTypingIndex);
+  } else {
+    storyText.textContent = text;
   }
 }
 
 function advanceStory() {
-  const text = STORY_SCENES[storyIndex];
+  const text = STORY_BEATS[storyIndex].text;
   if (storyTypingIndex < text.length) {
     storyTypingIndex = text.length;
     storyText.textContent = text;
     return;
   }
-  if (storyIndex < STORY_SCENES.length - 1) {
+  if (storyIndex < STORY_BEATS.length - 1) {
     storyIndex += 1;
     typeStoryScene(true);
     return;
@@ -362,19 +376,8 @@ function playIntroBeforeLevel(index) {
   clearInterval(storyTimer);
   storyTimer = window.setInterval(() => {
     if (!storyActive) return;
-    storyTypingIndex = STORY_SCENES[storyIndex].length;
-    storyText.textContent = STORY_SCENES[storyIndex];
-  }, 80);
-  STORY_SCENES.forEach((_, index) => {
-    window.setTimeout(() => {
-      if (!storyActive || index === 0) return;
-      storyIndex = index;
-      typeStoryScene(true);
-    }, index * 4000);
-  });
-  window.setTimeout(() => {
-    if (storyActive) finishStoryIntro();
-  }, STORY_SCENES.length * 4000);
+    typeStoryScene();
+  }, 34);
 }
 
 function finishStoryIntro() {
@@ -690,6 +693,13 @@ function initProceduralMenuVisuals() {
       spawnMenuParticles(event.clientX, event.clientY, 6, hoverLayer, 18);
     });
   });
+
+  if (playButton) {
+    playButton.addEventListener("mouseenter", () => menu.classList.add("menu-portal-open"));
+    playButton.addEventListener("focus", () => menu.classList.add("menu-portal-open"));
+    playButton.addEventListener("mouseleave", () => menu.classList.remove("menu-portal-open"));
+    playButton.addEventListener("blur", () => menu.classList.remove("menu-portal-open"));
+  }
 
   const menuObserver = new MutationObserver(() => {
     if (menu.hidden) stopPawTrail();
@@ -1802,7 +1812,7 @@ function startGame() {
 
 playButton.addEventListener("click", startGame);
 roomsButton.addEventListener("click", showLevelSelect);
-storyNext.addEventListener("click", finishStoryIntro);
+storyNext.addEventListener("click", advanceStory);
 document.querySelectorAll(".level-hotspot").forEach(button => {
   button.addEventListener("mouseenter", () => {
     selectedLevel = Number(button.dataset.level);
