@@ -17,6 +17,9 @@ const backToMenu = document.getElementById("backToMenu");
 const pauseMenu = document.getElementById("pauseMenu");
 const continueButton = document.getElementById("continueButton");
 const quitButton = document.getElementById("quitButton");
+const victoryPanel = document.getElementById("victoryPanel");
+const victorySummary = document.getElementById("victorySummary");
+const returnVictoryButton = document.getElementById("returnVictoryButton");
 const levelEditor = document.getElementById("levelEditor");
 const closeEditor = document.getElementById("closeEditor");
 const levelJson = document.getElementById("levelJson");
@@ -149,18 +152,18 @@ const LEVELS = [
     height: 1120,
     start: [100, 820],
     exit: [3900, 760],
-    prompt: "Boss room: use yarn attacks to drop the chandelier on Whiskers after collecting all stars.",
+    prompt: "Boss room: dodge Whiskers under the chandelier, drop it with a yarn attack, then hit him 3 times.",
     platforms: [
       [0, 980, 720, 140], [1020, 980, 460, 140], [1780, 940, 460, 180], [2520, 900, 500, 220], [3320, 940, 780, 180],
       [760, 770, 260, 34], [1500, 690, 260, 34], [2260, 610, 260, 34], [3040, 710, 260, 34]
     ],
     stars: [[780, 724], [2260, 564], [3420, 894]],
-    yarn: [[260, 930], [960, 720], [1620, 640], [2380, 560], [3060, 660], [3500, 890]],
+    yarn: [[260, 930], [960, 720], [1620, 640], [2380, 560], [2700, 850], [2920, 850], [3060, 660], [3300, 890], [3500, 890], [3720, 890]],
     fishCrates: [[1380, 934], [3120, 664]],
     enemies: [[1120, 944, 100], [2680, 864, 110]],
     webPoints: [[900, 650], [1640, 570], [2380, 490], [3180, 610]],
     attackTargets: [[2300, 350, "chandelier"]],
-    boss: { type: "whiskers", name: "Whiskers", x: 2800, y: 846, arena: [2280, 520, 850, 420], hp: 1 }
+    boss: { type: "whiskers", name: "Whiskers", x: 2800, y: 846, arena: [2280, 520, 850, 420], hp: 3 }
   },
   {
     id: "library",
@@ -182,25 +185,25 @@ const LEVELS = [
     webPoints: [[820, 760], [1500, 620], [2240, 520], [3000, 620], [3720, 720]]
   },
   {
-    id: "ballroom",
-    name: "Duchess' Ballroom",
-    theme: "ballroom",
+    id: "shadow-library",
+    name: "Shadow Library",
+    theme: "library",
     width: 4400,
     height: 1220,
     start: [100, 880],
     exit: [4200, 740],
-    prompt: "Boss room: use yarn attacks to smash the mirror, then hit stunned Duchess.",
+    prompt: "Boss room: lure Shadow under each bookshelf, then hit the glowing shelf anchor with yarn attacks.",
     platforms: [
-      [0, 1020, 680, 200], [980, 1020, 480, 200], [1760, 960, 520, 260], [2540, 900, 520, 320], [3340, 960, 520, 260], [4020, 900, 380, 320],
-      [620, 800, 260, 34], [1400, 680, 260, 34], [2180, 560, 260, 34], [2960, 660, 260, 34], [3660, 780, 260, 34]
+      [0, 1020, 680, 200], [980, 1020, 480, 200], [1760, 980, 520, 240], [2540, 980, 520, 240], [3340, 1020, 520, 200], [4020, 900, 380, 320],
+      [620, 800, 260, 34], [1400, 700, 260, 34], [2180, 620, 260, 34], [2960, 700, 260, 34], [3660, 800, 260, 34]
     ],
-    stars: [[640, 754], [2200, 514], [3680, 734]],
-    yarn: [[260, 970], [900, 970], [1540, 630], [2300, 510], [3100, 610], [3760, 730], [4120, 850]],
-    fishCrates: [[1340, 974], [3720, 734]],
-    enemies: [[1160, 984, 90], [2600, 864, 100]],
-    webPoints: [[860, 680], [1620, 560], [2400, 450], [3160, 560], [3860, 680]],
-    mirror: [3560, 760],
-    boss: { type: "duchess", name: "Duchess", x: 3260, y: 918, arena: [2880, 570, 820, 450], hp: 3 }
+    stars: [[640, 754], [2200, 574], [3680, 754]],
+    yarn: [[260, 970], [900, 970], [1540, 650], [1900, 930], [2300, 590], [2700, 930], [3100, 650], [3400, 930], [3760, 750], [4120, 850]],
+    fishCrates: [[1340, 974], [3720, 754]],
+    enemies: [[1160, 984, 90]],
+    webPoints: [[900, 700], [1700, 580], [3300, 580], [3980, 700]],
+    shelves: [[1600, 760], [2400, 760], [3200, 760]],
+    boss: { type: "shadow", name: "Shadow", x: 3380, y: 926, arena: [1280, 650, 2300, 370], hp: 3 }
   },
   {
     id: "dungeon",
@@ -222,25 +225,25 @@ const LEVELS = [
     webPoints: [[720, 390], [1500, 520], [2280, 700], [3060, 900], [3680, 1200]]
   },
   {
-    id: "garden",
-    name: "Moonlit Garden",
-    theme: "attic",
+    id: "duchess-ballroom",
+    name: "Duchess' Ballroom",
+    theme: "ballroom",
     width: 4500,
     height: 1260,
     start: [100, 900],
     exit: [4300, 820],
-    prompt: "Boss room: Shadow patrols the garden; drop all three trellises with yarn attacks.",
+    prompt: "Boss room: lure Duchess to the mirror, shatter it with a yarn attack, then hit her while stunned.",
     platforms: [
       [0, 1040, 680, 220], [1040, 1040, 480, 220], [1840, 980, 480, 280], [2640, 920, 520, 340], [3440, 980, 520, 280], [4100, 940, 400, 320],
       [640, 820, 260, 34], [1440, 700, 260, 34], [2240, 620, 260, 34], [3040, 700, 260, 34], [3740, 800, 260, 34]
     ],
     stars: [[660, 774], [2260, 574], [3760, 754]],
-    yarn: [[260, 990], [900, 990], [1540, 650], [2340, 570], [3140, 650], [3840, 750], [4200, 890]],
+    yarn: [[260, 990], [900, 990], [1540, 650], [2340, 570], [2920, 870], [3140, 650], [3320, 870], [3520, 870], [3840, 750], [4200, 890]],
     fishCrates: [[1120, 994], [3820, 754]],
     enemies: [[1220, 1004, 90], [3500, 944, 100]],
     webPoints: [[900, 700], [1700, 580], [2500, 500], [3300, 580], [3980, 700]],
-    shelves: [[1600, 780], [2400, 760], [3200, 780]],
-    boss: { type: "shadow", name: "Shadow", x: 3380, y: 926, arena: [1280, 700, 2300, 340], hp: 3 }
+    mirror: [3560, 780],
+    boss: { type: "duchess", name: "Duchess", x: 3260, y: 958, arena: [2880, 620, 900, 420], hp: 3 }
   },
   {
     id: "tower",
@@ -269,19 +272,19 @@ const LEVELS = [
     height: 1120,
     start: [110, 810],
     exit: [4380, 760],
-    prompt: "Final boss: reflect Nancy's orbs with yarn attacks on crystals, then swing the chandelier into her.",
+    prompt: "Final boss: deflect orbs, find the real Nancy, charge all crystals, then grapple the chandelier hook.",
     platforms: [
       [0, 960, 760, 160], [1080, 960, 520, 160], [1880, 960, 520, 160], [2680, 960, 520, 160], [3480, 960, 520, 160], [4200, 960, 400, 160],
       [660, 760, 260, 34], [1480, 640, 260, 34], [2300, 560, 280, 34], [3120, 640, 260, 34], [3840, 760, 260, 34]
     ],
     stars: [[680, 714], [2320, 514], [3860, 714]],
-    yarn: [[260, 910], [980, 910], [1580, 594], [2400, 514], [3220, 594], [3940, 714], [4300, 910]],
+    yarn: [[260, 910], [980, 910], [1580, 594], [2100, 910], [2260, 760], [2400, 514], [2440, 910], [2620, 760], [2800, 910], [3000, 760], [3220, 594], [3260, 910], [3480, 760], [3700, 910], [3940, 714], [4300, 910]],
     fishCrates: [[1540, 594], [3540, 914]],
     enemies: [[1160, 924, 90], [3560, 924, 100]],
-    webPoints: [[940, 650], [1760, 520], [2580, 450], [3400, 520], [4100, 650]],
-    attackTargets: [[2520, 280, "nancyChandelier"]],
-    crystals: [[2160, 860], [2380, 860], [2600, 860]],
-    boss: { type: "nancy", name: "Nancy", x: 3300, y: 880, arena: [2080, 360, 1500, 600], hp: 8 }
+    webPoints: [[940, 650], [1760, 520], [2520, 220, "chandelierSwing"], [3400, 520], [4100, 650]],
+    attackTargets: [[2520, 280, "atticChandelier"]],
+    crystals: [[2160, 500], [3420, 500], [2160, 840], [3420, 840]],
+    boss: { type: "nancy", name: "Nancy", x: 3000, y: 820, arena: [2080, 360, 1500, 600], hp: 5 }
   }
 ];
 
@@ -317,6 +320,7 @@ function hidePanels() {
   menu.hidden = true;
   levelSelect.hidden = true;
   pauseMenu.hidden = true;
+  victoryPanel.hidden = true;
   levelEditor.hidden = true;
 }
 
@@ -327,6 +331,7 @@ function showMainMenu() {
   toast.textContent = "";
   levelSelect.hidden = true;
   pauseMenu.hidden = true;
+  victoryPanel.hidden = true;
   levelEditor.hidden = true;
   updateMenuLocks();
   menu.hidden = false;
@@ -456,6 +461,7 @@ function showLevelSelect() {
   player.grapple = null;
   menu.hidden = true;
   pauseMenu.hidden = true;
+  victoryPanel.hidden = true;
   levelEditor.hidden = true;
   renderLevelSelect();
   levelSelect.hidden = false;
@@ -559,7 +565,7 @@ function resetLevel(index = levelIndex) {
       ...(level.shelfWebPoints || []).map(([x, y], index) => ({ x, y, kind: "shelf", shelfIndex: index, used: false, glow: 0 }))
     ],
     shelves: (level.shelves || []).map(([x, y]) => ({ x, y, startY: y, w: 120, h: 190, falling: false, vy: 0, spent: false })),
-    crystals: (level.crystals || []).map(([x, y]) => ({ x, y, r: 24, charged: true })),
+    crystals: (level.crystals || []).map(([x, y]) => ({ x, y, r: 24, charged: true, activated: false })),
     attackTargets: (level.attackTargets || []).map(([x, y, kind]) => ({ x, y, kind, r: 28, used: false })),
     projectiles: [],
     particles: []
@@ -588,7 +594,7 @@ function resetLevel(index = levelIndex) {
 
 function makeBoss(data) {
   if (!data) return null;
-  return {
+  const boss = {
     ...data,
     w: data.type === "nancy" ? 58 : 54,
     h: data.type === "duchess" ? 66 : 54,
@@ -604,8 +610,27 @@ function makeBoss(data) {
     hits: 0,
     shelfStuns: 0,
     visibleIndex: 0,
-    orbTimer: 1.2
+    orbTimer: 1.2,
+    maxHp: data.hp,
+    phaseHp: data.hp,
+    teleportTimer: 2.2,
+    swingCooldown: 0,
+    chandelierDropped: false,
+    images: []
   };
+  if (boss.type === "nancy") {
+    boss.phaseHp = 5;
+    boss.maxHp = 5;
+    boss.phase2Hp = 4;
+    boss.phase3Hp = 3;
+    boss.hp = 5;
+    boss.baseX = data.x;
+    boss.beamTimer = 5;
+    boss.beamReady = false;
+    boss.crystalsActivated = 0;
+    boss.images = [];
+  }
+  return boss;
 }
 
 function say(text, seconds = 2.5) {
@@ -953,9 +978,7 @@ function updateEnemies(dt) {
         shelf.falling = false;
         puff(shelf.x + shelf.w / 2, shelf.y + shelf.h / 2, "#c084fc", 24);
         if (objects.boss.hp <= 0) {
-          objects.boss.defeated = true;
-          puff(objects.boss.x + objects.boss.w / 2, objects.boss.y + objects.boss.h / 2, "#fff2a8", 50);
-          say("All three bookshelves crushed Shadow! The exit is open.");
+          defeatBoss("All three bookshelves crushed Shadow! Boss Defeated! Exit unlocked.");
         } else {
           say(`Bookshelf slam! Shadow HP: ${objects.boss.hp}/3`);
         }
@@ -972,7 +995,10 @@ function updateEnemies(dt) {
     p.x += p.vx;
     p.y += p.vy;
     p.life -= dt;
-    if (p.kind === "orb" && rectsOverlap(player, { x: p.x - 12, y: p.y - 12, w: 24, h: 24 })) hurtPlayer("Nancy's orb burned a heart.");
+    if ((p.kind === "orb" || p.kind === "reflected") && rectsOverlap(player, { x: p.x - 12, y: p.y - 12, w: 24, h: 24 })) {
+      p.life = 0;
+      hurtPlayer(p.kind === "orb" ? "Nancy's orb burned a heart." : "Duchess reflected the yarn!");
+    }
     if (p.kind === "yarnAttack") resolveYarnAttackHit(p);
   }
   objects.projectiles = objects.projectiles.filter(p => p.life > 0);
@@ -980,6 +1006,25 @@ function updateEnemies(dt) {
 
 function resolveYarnAttackHit(p) {
   const hitBox = { x: p.x - 10, y: p.y - 10, w: 20, h: 20 };
+  const boss = objects.boss;
+  if (boss?.type === "nancy" && boss.phase === 1) {
+    const orb = objects.projectiles.find(o => o.kind === "orb" && distance(p.x, p.y, o.x, o.y) < 34);
+    if (orb) {
+      orb.life = 0;
+      p.life = 0;
+      damageNancyPhase1();
+      return;
+    }
+  }
+  if (boss?.type === "nancy" && boss.phase === 2) {
+    const image = boss.images.find(img => distance(p.x, p.y, img.x + boss.w / 2, img.y + boss.h / 2) < 42);
+    if (image) {
+      p.life = 0;
+      puff(image.x + boss.w / 2, image.y + boss.h / 2, "#a78bfa", 18);
+      say("That was only a mirror image. The real Nancy glows gold.");
+      return;
+    }
+  }
   for (const enemy of objects.enemies) {
     if (enemy.alive && rectsOverlap(hitBox, enemy)) {
       enemy.alive = false;
@@ -1021,25 +1066,20 @@ function resolveYarnAttackHit(p) {
     if (!target.used && distance(p.x, p.y, target.x, target.y) < target.r + 10) {
       if (target.kind === "chandelier") {
         dropWhiskersChandelier(target);
-        target.used = true;
-      }
-      if (target.kind === "nancyChandelier") {
-        swingNancyChandelier(target);
       }
       p.life = 0;
       return;
     }
   }
-  const boss = objects.boss;
   if (boss && !boss.defeated && rectsOverlap(hitBox, boss)) {
     if (boss.type === "duchess") {
       hitDuchess();
     } else if (boss.type === "shadow") {
       say("Shadow only falls to dropped shelves.");
     } else if (boss.type === "whiskers") {
-      say("Drop the chandelier with a yarn attack!");
+      hitWhiskers();
     } else if (boss.type === "nancy") {
-      say("Nancy shrugs off direct yarn. Use the attic traps!");
+      hitNancyDirect();
     } else {
       damageBoss(1, "Yarn attack hit!");
     }
@@ -1060,6 +1100,7 @@ function updateBoss(dt) {
 }
 
 function updateWhiskers(boss, dt) {
+  if (boss.stunned > 0) return;
   if (boss.state === "idle" && boss.timer <= 0) {
     boss.state = "charge";
     boss.chargeDir = player.x < boss.x ? -1 : 1;
@@ -1104,10 +1145,22 @@ function updateShadow(boss, dt) {
     boss.visibleIndex = (boss.visibleIndex + 1) % 3;
     boss.timer = 1.2;
   }
+  boss.teleportTimer -= dt;
+  if (boss.teleportTimer <= 0) {
+    boss.x = left + Math.random() * (right - left);
+    boss.vx = Math.random() > 0.5 ? 2.4 : -2.4;
+    boss.teleportTimer = 4.2 + Math.random() * 1.4;
+    puff(boss.x + boss.w / 2, boss.y + boss.h / 2, "#c084fc", 22);
+    say("Shadow slipped through the shelves. Watch the glowing eyes.");
+  }
 }
 
 function updateDuchess(boss, dt) {
   if (boss.stunned > 0) return;
+  if (objects.mirror?.broken && boss.hp > 0) {
+    objects.mirror.broken = false;
+    say("Duchess recovered. Lure her back to the mirror.");
+  }
   const dir = player.x < boss.x ? -1 : 1;
   boss.vx += dir * 0.12;
   boss.vx = Math.max(-3.4, Math.min(3.4, boss.vx));
@@ -1118,18 +1171,48 @@ function updateDuchess(boss, dt) {
 }
 
 function updateNancy(boss, dt) {
-  boss.x = boss.baseX + Math.sin(performance.now() / 650) * 150;
+  boss.swingCooldown = Math.max(0, boss.swingCooldown - dt);
   if (boss.phase === 1) {
+    boss.x = boss.baseX + Math.sin(performance.now() / 650) * 150;
     boss.orbTimer -= dt;
     if (boss.orbTimer <= 0) {
       const cx = boss.x + boss.w / 2;
       const cy = boss.y + 10;
-      const dx = player.x - cx;
-      const dy = player.y - cy;
-      const d = Math.max(1, Math.hypot(dx, dy));
-      objects.projectiles.push({ kind: "orb", x: cx, y: cy, vx: dx / d * 4.5, vy: dy / d * 4.5, life: 4 });
+      for (const offset of [-0.35, 0, 0.35]) {
+        const dx = player.x - cx;
+        const dy = player.y - cy;
+        const d = Math.max(1, Math.hypot(dx, dy));
+        const base = Math.atan2(dy, dx) + offset;
+        objects.projectiles.push({ kind: "orb", x: cx, y: cy, vx: Math.cos(base) * 4.5, vy: Math.sin(base) * 4.5, life: 4 });
+      }
       boss.orbTimer = 1.25;
-      say("Shoot a crystal while an orb is flying to reflect it.");
+      say("Hit the purple orbs with yarn attacks to deflect them!");
+    }
+  }
+  if (boss.phase === 2) {
+    boss.teleportTimer -= dt;
+    if (boss.teleportTimer <= 0 || boss.images.length === 0) {
+      const left = boss.arena[0] + 120;
+      const right = boss.arena[0] + boss.arena[2] - 180;
+      boss.x = left + Math.random() * (right - left);
+      boss.images = [
+        { x: left + Math.random() * (right - left), y: boss.y },
+        { x: left + Math.random() * (right - left), y: boss.y }
+      ];
+      boss.teleportTimer = 1.7;
+      puff(boss.x + boss.w / 2, boss.y + boss.h / 2, "#facc15", 18);
+    }
+  }
+  if (boss.phase === 3) {
+    boss.x = boss.arena[0] + boss.arena[2] / 2 - boss.w / 2 + Math.sin(performance.now() / 900) * 100;
+    if (boss.stunned <= 0) {
+      boss.beamTimer -= dt;
+      if (boss.beamTimer <= 0) {
+        boss.beamTimer = 5;
+        shake = 16;
+        hurtPlayer("Nancy's charged beam struck Kitty!");
+        say("Charge all 4 crystals with yarn attacks before the beam fires.");
+      }
     }
   }
 }
@@ -1141,16 +1224,84 @@ function damageBoss(amount, text) {
   boss.stunned = Math.max(boss.stunned, 0.9);
   shake = 10;
   say(`${text} ${boss.name} HP: ${Math.max(0, boss.hp)}`);
-  if (boss.type === "nancy" && boss.phase === 1 && boss.hp <= 5) {
-    boss.phase = 2;
-    boss.hp = 5;
-    objects.projectiles.length = 0;
-    say("Nancy phase 2: swing the chandelier into her 5 times!");
-  } else if (boss.hp <= 0) {
-    boss.defeated = true;
-    puff(boss.x + boss.w / 2, boss.y + boss.h / 2, "#fff2a8", 50);
-    say(`${boss.name} defeated! The exit is open.`);
+  if (boss.hp <= 0) defeatBoss(`${boss.name} defeated! Boss Defeated! Exit unlocked.`);
+}
+
+function defeatBoss(text) {
+  const boss = objects.boss;
+  if (!boss || boss.defeated) return;
+  boss.defeated = true;
+  boss.hp = 0;
+  boss.stunned = 0;
+  objects.projectiles.length = 0;
+  puff(boss.x + boss.w / 2, boss.y + boss.h / 2, "#fff2a8", 60);
+  say(text || "Boss Defeated! Exit unlocked.", 4);
+}
+
+function hitWhiskers() {
+  const boss = objects.boss;
+  if (!boss?.chandelierDropped || boss.stunned <= 0) {
+    say("Whiskers blocks yarn. Drop the chandelier while he charges underneath.");
+    return;
   }
+  damageBoss(1, "Yarn hit stunned Whiskers!");
+}
+
+function reflectYarnAtPlayer(source) {
+  const cx = source.x + source.w / 2;
+  const cy = source.y + source.h / 2;
+  const dx = player.x + player.w / 2 - cx;
+  const dy = player.y + player.h / 2 - cy;
+  const d = Math.max(1, Math.hypot(dx, dy));
+  objects.projectiles.push({ kind: "reflected", x: cx, y: cy, vx: dx / d * 6, vy: dy / d * 6, life: 2.8 });
+}
+
+function damageNancyPhase1() {
+  const boss = objects.boss;
+  if (!boss || boss.type !== "nancy" || boss.phase !== 1) return;
+  boss.hp -= 1;
+  boss.phaseHp = boss.hp;
+  puff(boss.x + boss.w / 2, boss.y + boss.h / 2, "#a78bfa", 26);
+  if (boss.hp <= 0) {
+    boss.phase = 2;
+    boss.hp = 4;
+    boss.maxHp = 4;
+    boss.phaseHp = 4;
+    boss.teleportTimer = 0;
+    objects.projectiles.length = 0;
+    say("Nancy Phase 2: hit the real Nancy. She has a golden aura!", 4);
+  } else {
+    say(`Orb deflected! Nancy Phase 1 HP: ${boss.hp}/5`);
+  }
+}
+
+function hitNancyDirect() {
+  const boss = objects.boss;
+  if (!boss || boss.type !== "nancy") return;
+  if (boss.phase === 2) {
+    boss.hp -= 1;
+    boss.phaseHp = boss.hp;
+    puff(boss.x + boss.w / 2, boss.y + boss.h / 2, "#facc15", 24);
+    if (boss.hp <= 0) {
+      boss.phase = 3;
+      boss.hp = 3;
+      boss.maxHp = 3;
+      boss.phaseHp = 3;
+      boss.stunned = 0;
+      boss.images = [];
+      boss.beamTimer = 5;
+      boss.crystalsActivated = 0;
+      for (const crystal of objects.crystals) {
+        crystal.activated = false;
+        crystal.charged = true;
+      }
+      say("Nancy Phase 3: charge all 4 crystals, then grapple the chandelier hook!", 5);
+    } else {
+      say(`Real Nancy hit! Phase 2 HP: ${boss.hp}/4`);
+    }
+    return;
+  }
+  say("Direct yarn will not work in this phase. Follow the glowing cues.");
 }
 
 function fireYarn() {
@@ -1174,6 +1325,7 @@ function fireYarn() {
   if (target.type === "web") {
     player.grapple = { point: target.obj, time: 2.2 };
     puff(target.obj.x, target.obj.y, "#ff9ecb", 14);
+    if (target.obj.kind === "chandelierSwing") swingNancyChandelier(target.obj);
   }
 }
 
@@ -1244,38 +1396,57 @@ function smashMirror() {
     return;
   }
   mirror.broken = true;
-  boss.stunned = 5;
+  boss.stunned = 4;
   puff(mirror.x + 40, mirror.y + 70, "#bae6fd", 34);
-  say("Mirror smashed! Duchess is stunned. Hit her with yarn 3 times.");
+  say("Mirror smashed! Duchess is stunned for 4 seconds. Hit her 3 times!");
 }
 
 function hitDuchess() {
   if (objects.boss?.type === "duchess" && objects.boss.stunned > 0) {
     damageBoss(1, "Yarn hit!");
+  } else if (objects.boss?.type === "duchess") {
+    reflectYarnAtPlayer(objects.boss);
+    say("Duchess reflected that yarn. Stun her with the mirror first.");
   }
 }
 
 function reflectNancyOrb(crystal) {
   const boss = objects.boss;
-  if (!boss || boss.type !== "nancy" || boss.phase !== 1) {
-    say("The crystal will matter during Nancy's orb phase.");
+  if (!boss || boss.type !== "nancy" || boss.phase !== 3) {
+    say("The crystals are for Nancy's final beam phase.");
     return;
   }
-  const orb = objects.projectiles.find(p => p.kind === "orb" && distance(p.x, p.y, crystal.x, crystal.y) < 260);
-  if (!orb) {
-    say("Wait until one of Nancy's orbs is close to a crystal.");
+  if (crystal.activated) {
+    say("That crystal is already charged.");
     return;
   }
+  crystal.activated = true;
   crystal.charged = false;
-  orb.life = 0;
-  damageBoss(1, "Crystal reflected an orb!");
+  boss.crystalsActivated += 1;
+  puff(crystal.x, crystal.y, "#67e8f9", 22);
+  if (boss.crystalsActivated >= 4) {
+    boss.stunned = 6;
+    boss.beamTimer = 6;
+    say("All crystals charged! Grapple the chandelier hook to swing it into Nancy!", 5);
+  } else {
+    say(`Crystal charged: ${boss.crystalsActivated}/4`);
+  }
 }
 
 function dropWhiskersChandelier(point) {
   const boss = objects.boss;
   if (!boss || boss.type !== "whiskers" || boss.defeated) return;
+  if (point.used) {
+    say("The chandelier has already fallen. Hit stunned Whiskers!");
+    return;
+  }
   if (Math.abs((boss.x + boss.w / 2) - point.x) < 190) {
-    damageBoss(1, "The chandelier dropped on Whiskers!");
+    point.used = true;
+    boss.chandelierDropped = true;
+    boss.stunned = 5;
+    shake = 18;
+    puff(point.x, point.y + 120, "#fef3c7", 40);
+    say("Chandelier dropped! Whiskers is stunned. Hit him 3 times!");
   } else {
     say("Drop the chandelier while Whiskers charges underneath it.");
   }
@@ -1283,12 +1454,29 @@ function dropWhiskersChandelier(point) {
 
 function swingNancyChandelier(point) {
   const boss = objects.boss;
-  if (!boss || boss.type !== "nancy" || boss.phase !== 2) {
-    say("Save the attic chandelier for Nancy's second phase.");
+  if (!boss || boss.type !== "nancy" || boss.phase !== 3) {
+    say("Save the chandelier hook for Nancy's final phase.");
+    return;
+  }
+  if (boss.stunned <= 0) {
+    say("Charge all 4 crystals first to stun Nancy.");
+    return;
+  }
+  if (boss.swingCooldown > 0) {
     return;
   }
   if (distance(point.x, point.y, boss.x + boss.w / 2, boss.y) < 520) {
-    damageBoss(1, "Chandelier swing connected!");
+    boss.swingCooldown = 1.1;
+    boss.hp -= 1;
+    boss.phaseHp = boss.hp;
+    shake = 18;
+    puff(boss.x + boss.w / 2, boss.y + boss.h / 2, "#fef3c7", 34);
+    if (boss.hp <= 0) {
+      defeatBoss("Nancy defeated! Total Hidden Fish Found shown below.");
+      winGame();
+    } else {
+      say(`Chandelier swing connected! Nancy Phase 3 HP: ${boss.hp}/3`);
+    }
   } else {
     say("Get Nancy closer before swinging the chandelier.");
   }
@@ -1309,12 +1497,19 @@ function nextLevel() {
 function winGame() {
   gameWon = true;
   running = false;
+  paused = false;
   classicStoryCompleted = true;
   speedrunModeUnlocked = true;
   updateMenuLocks();
   saveUnlockedLevels(LEVELS.length);
   saveFishFound();
-  say(`Nancy defeated. Hidden fish found: ${fishFound.size}/${TOTAL_FISH}.`, 9);
+  menu.hidden = true;
+  levelSelect.hidden = true;
+  pauseMenu.hidden = true;
+  levelEditor.hidden = true;
+  victorySummary.textContent = `Total Hidden Fish Found: ${fishFound.size} / ${TOTAL_FISH}`;
+  victoryPanel.hidden = false;
+  say(`Nancy defeated. Total Hidden Fish Found: ${fishFound.size}/${TOTAL_FISH}.`, 9);
 }
 
 function updateCamera() {
@@ -1605,11 +1800,18 @@ function drawMirror(m) {
   ctx.fillRect(m.x + 12, m.y + 12, m.w - 24, m.h - 24);
   ctx.fillStyle = "rgba(255,255,255,0.44)";
   ctx.fillRect(m.x + 26, m.y + 18, 12, m.h - 36);
-  drawYarnBall(m.x + m.w / 2, m.y - 12, 13);
+  drawAttackAnchor(m.x + m.w / 2, m.y - 12, "mirror");
 }
 
 function drawCrystal(c) {
-  ctx.fillStyle = c.charged ? "#67e8f9" : "#475569";
+  const boss = objects.boss;
+  const readyPulse = boss?.type === "nancy" && boss.phase === 3 && !c.activated;
+  ctx.save();
+  if (readyPulse) {
+    ctx.shadowColor = "#67e8f9";
+    ctx.shadowBlur = 18 + Math.sin(performance.now() / 120) * 6;
+  }
+  ctx.fillStyle = c.activated ? "#fef3c7" : c.charged ? "#67e8f9" : "#475569";
   ctx.beginPath();
   ctx.moveTo(c.x, c.y - 28);
   ctx.lineTo(c.x + 22, c.y);
@@ -1617,6 +1819,7 @@ function drawCrystal(c) {
   ctx.lineTo(c.x - 22, c.y);
   ctx.closePath();
   ctx.fill();
+  ctx.restore();
   drawAttackAnchor(c.x, c.y - 42, "crystal");
 }
 
@@ -1625,7 +1828,7 @@ function drawWebPoint(p) {
   ctx.save();
   ctx.translate(p.x, p.y);
   ctx.scale(pulse, pulse);
-  ctx.shadowColor = "#ff8dbd";
+  ctx.shadowColor = p.kind === "chandelierSwing" ? "#fef3c7" : "#ff8dbd";
   ctx.shadowBlur = 18;
   ctx.strokeStyle = "#ffd6ea";
   ctx.lineWidth = 3;
@@ -1637,7 +1840,7 @@ function drawWebPoint(p) {
   ctx.stroke();
   ctx.shadowColor = "#ddd6fe";
   ctx.shadowBlur = 10;
-  ctx.strokeStyle = "#d1d5db";
+  ctx.strokeStyle = p.kind === "chandelierSwing" ? "#facc15" : "#d1d5db";
   ctx.lineWidth = 5;
   ctx.beginPath();
   ctx.moveTo(0, -22);
@@ -1674,7 +1877,7 @@ function drawAttackTarget(target) {
   ctx.save();
   const sway = Math.sin(performance.now() / 420 + target.x) * 4;
   ctx.translate(target.x + sway, target.y);
-  ctx.strokeStyle = target.kind === "nancyChandelier" ? "#c4b5fd" : "#fef3c7";
+  ctx.strokeStyle = target.kind === "atticChandelier" ? "#c4b5fd" : "#fef3c7";
   ctx.lineWidth = 3;
   ctx.shadowColor = "#fbbf24";
   ctx.shadowBlur = 14;
@@ -1725,8 +1928,8 @@ function drawProjectile(p) {
     ctx.restore();
     return;
   }
-  ctx.fillStyle = "#a78bfa";
-  ctx.shadowColor = "#ddd6fe";
+  ctx.fillStyle = p.kind === "reflected" ? "#fb7185" : "#a78bfa";
+  ctx.shadowColor = p.kind === "reflected" ? "#fecdd3" : "#ddd6fe";
   ctx.shadowBlur = 16;
   ctx.beginPath();
   ctx.arc(p.x, p.y, 12, 0, Math.PI * 2);
@@ -1735,7 +1938,39 @@ function drawProjectile(p) {
 }
 
 function drawBoss(b) {
+  if (b.type === "nancy" && b.phase === 2) {
+    for (const img of b.images) {
+      ctx.save();
+      ctx.globalAlpha = 0.48;
+      drawBossBody({ ...b, x: img.x, y: img.y, stunned: 0 }, "#6d28d9", true);
+      ctx.restore();
+    }
+  }
   const color = b.type === "shadow" ? "#0f172a" : b.type === "whiskers" ? "#f97316" : b.type === "duchess" ? "#ec4899" : "#7c3aed";
+  if (b.type === "shadow") {
+    ctx.save();
+    ctx.shadowColor = "#c084fc";
+    ctx.shadowBlur = 24;
+    drawBossBody(b, color, true);
+    ctx.restore();
+    return;
+  }
+  if (b.type === "nancy" && b.phase === 2) {
+    ctx.save();
+    ctx.shadowColor = "#facc15";
+    ctx.shadowBlur = 26;
+    drawBossBody(b, color, true);
+    ctx.restore();
+    return;
+  }
+  if (b.type === "nancy" && b.phase === 3) {
+    ctx.save();
+    ctx.shadowColor = "#ef4444";
+    ctx.shadowBlur = 20 + Math.sin(performance.now() / 90) * 8;
+    drawBossBody(b, color, true);
+    ctx.restore();
+    return;
+  }
   drawBossBody(b, color, true);
 }
 
@@ -1752,10 +1987,11 @@ function drawBossBody(b, color, eyes) {
 }
 
 function drawBossBar(b) {
-  const max = b.type === "nancy" && b.phase === 2 ? 5 : b.type === "nancy" ? 8 : b.type === "whiskers" ? 1 : 3;
+  const max = b.maxHp || 3;
   const x = 34;
   const y = 108;
-  const label = b.type === "shadow" ? `Shadow HP: ${Math.max(0, b.hp)}/3 bookshelves` : `${b.name}${b.type === "nancy" ? ` Phase ${b.phase}` : ""} HP`;
+  const phaseName = b.type === "nancy" ? ` Phase ${b.phase}` : "";
+  const label = b.type === "shadow" ? `Shadow HP: ${Math.max(0, b.hp)}/3 bookshelves` : `${b.name}${phaseName} HP: ${Math.max(0, b.hp)}/${max}`;
   ctx.fillStyle = "rgba(0,0,0,0.5)";
   ctx.fillRect(x, y, 330, 22);
   ctx.fillStyle = "#ff5d73";
@@ -2082,6 +2318,7 @@ function handleMenuKeyboard(key) {
 backToMenu.addEventListener("click", showMainMenu);
 continueButton.addEventListener("click", () => setPaused(false));
 quitButton.addEventListener("click", quitToLevelSelect);
+returnVictoryButton.addEventListener("click", showLevelSelect);
 editorButton.addEventListener("click", () => {
   levelJson.value = JSON.stringify(LEVELS, null, 2);
   levelEditor.hidden = false;

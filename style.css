@@ -6268,6 +6268,36 @@ body {
   color: #fff4c2;
 }
 
+.victory-panel {
+  width: min(460px, calc(100vw - 32px));
+  display: grid;
+  gap: 16px;
+  text-align: center;
+}
+
+.victory-panel[hidden] {
+  display: none !important;
+}
+
+.victory-panel h2 {
+  margin: 0;
+  color: #fff4c2;
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 5vw, 3.2rem);
+  text-shadow: 0 0 18px rgba(139, 92, 246, 0.75);
+}
+
+.victory-panel p {
+  margin: 0;
+  color: rgba(255, 248, 232, 0.9);
+  font-size: 1.05rem;
+}
+
+.victory-panel button {
+  border-radius: 8px;
+  padding: 12px 16px;
+}
+
 .procedural-menu .version-hotspot {
   min-height: clamp(46px, 5.6vh, 62px) !important;
   margin-bottom: clamp(8px, 1vh, 12px) !important;
