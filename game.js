@@ -664,6 +664,13 @@ function renderLevelSelect() {
 
 function startLevel(index) {
   if (index >= unlockedLevels) return;
+  clearInterval(storyTimer);
+  storyActive = false;
+  pendingIntroLevel = null;
+  storyIntro.classList.remove("active", "leaving");
+  storyIntro.hidden = true;
+  menu.classList.remove("menu-leaving", "menu-entering");
+  transitionFade.classList.remove("active");
   hidePanels();
   paused = false;
   running = true;
