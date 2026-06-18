@@ -1880,23 +1880,97 @@ function drawWorld() {
   }
 }
 
+function wrapCanvasTextLines(text, maxWidth, maxLines = 2) {
+  const source = String(text);
+  const words = source.split(/\s+/).filter(Boolean);
+  const lines = [];
+  let line = "";
+  let overflow = false;
+
+  function trimToWidth(value) {
+    let trimmed = value;
+    while (trimmed.length > 1 && ctx.measureText(`${trimmed}...`).width > maxWidth) {
+      trimmed = trimmed.slice(0, -1).trimEnd();
+    }
+    return `${trimmed}...`;
+  }
+
+  for (const word of words) {
+    let currentWord = word;
+
+    while (ctx.measureText(currentWord).width > maxWidth && currentWord.length > 1) {
+      if (line) {
+        lines.push(line);
+        line = "";
+        if (lines.length === maxLines) {
+          overflow = true;
+          break;
+        }
+      }
+
+      let part = "";
+      for (const char of currentWord) {
+        if (ctx.measureText(part + char).width > maxWidth) break;
+        part += char;
+      }
+      if (!part) part = currentWord.charAt(0);
+      lines.push(part);
+      currentWord = currentWord.slice(part.length);
+      if (lines.length === maxLines) {
+        overflow = currentWord.length > 0;
+        break;
+      }
+    }
+
+    if (overflow || lines.length === maxLines) {
+      overflow = overflow || currentWord.length > 0;
+      break;
+    }
+
+    const test = line ? `${line} ${currentWord}` : currentWord;
+    if (ctx.measureText(test).width <= maxWidth || !line) {
+      line = test;
+    } else {
+      lines.push(line);
+      line = currentWord;
+      if (lines.length === maxLines) {
+        overflow = true;
+        break;
+      }
+    }
+  }
+
+  if (line && lines.length < maxLines) lines.push(line);
+  if (!lines.length) return [source];
+
+  const joined = lines.join(" ");
+  if (overflow || joined.length < source.trim().length) {
+    lines[lines.length - 1] = trimToWidth(lines[lines.length - 1]);
+  }
+
+  return lines.slice(0, maxLines);
+}
+
 function drawTutorialPrompts() {
   if (!level.tutorials) return;
-  ctx.font = "bold 19px Trebuchet MS";
+  ctx.font = "bold 17px Trebuchet MS";
   ctx.textAlign = "center";
   for (const note of level.tutorials) {
     const visible = Math.abs((player.x + player.w / 2) - note.x) < 520;
     ctx.globalAlpha = visible ? 1 : 0.38;
-    const w = Math.min(520, 90 + note.text.length * 8.6);
+    const w = 500;
+    const lines = wrapCanvasTextLines(note.text, w - 42, 3);
+    const h = 30 + lines.length * 22;
     const x = note.x;
     const y = 585;
     ctx.fillStyle = "rgba(18, 10, 13, 0.78)";
-    ctx.fillRect(x - w / 2, y - 40, w, 54);
+    ctx.fillRect(x - w / 2, y - h + 12, w, h);
     ctx.strokeStyle = "rgba(247, 199, 109, 0.72)";
     ctx.lineWidth = 3;
-    ctx.strokeRect(x - w / 2, y - 40, w, 54);
+    ctx.strokeRect(x - w / 2, y - h + 12, w, h);
     ctx.fillStyle = "#fff4c2";
-    ctx.fillText(note.text, x, y - 8);
+    const textStartY = y - h + 35;
+    lines.forEach((line, i) => ctx.fillText(line, x, textStartY + i * 22));
   }
   ctx.globalAlpha = 1;
   ctx.textAlign = "left";
@@ -2330,38 +2404,7 @@ function drawGrapple() {
 }
 
 function getWrappedHudLines(text, maxWidth, maxLines = 2) {
-  const words = String(text).split(/\s+/).filter(Boolean);
-  const lines = [];
-  let line = "";
-  let consumed = 0;
-
-  for (const word of words) {
-    const test = line ? `${line} ${word}` : word;
-    if (ctx.measureText(test).width <= maxWidth || !line) {
-      line = test;
-      consumed += 1;
-    } else {
-      lines.push(line);
-      line = word;
-      consumed += 1;
-      if (lines.length === maxLines) break;
-    }
-  }
-
-  if (lines.length < maxLines && line) lines.push(line);
-  if (!lines.length) return [String(text)];
-
-  const originalWordCount = words.length;
-  if (consumed < originalWordCount || lines.length > maxLines) {
-    lines.length = maxLines;
-    let last = lines[lines.length - 1] || "";
-    while (last.length > 1 && ctx.measureText(`${last}...`).width > maxWidth) {
-      last = last.slice(0, -1).trimEnd();
-    }
-    lines[lines.length - 1] = `${last}...`;
-  }
-
-  return lines.slice(0, maxLines);
+  return wrapCanvasTextLines(text, maxWidth, maxLines);
 }
 
 function drawHud() {
