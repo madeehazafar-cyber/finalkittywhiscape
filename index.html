@@ -194,25 +194,11 @@
         <div class="web-shimmer web-b" aria-hidden="true"></div>
 
         <div class="menu-ui-stack">
-          <div class="menu-panel menu-level-panel">
-            <h2 class="menu-panel-title">Rooms</h2>
-            <div class="menu-level-grid">
-              <button class="menu-hotspot level-hotspot level-1 unlocked" type="button" data-level="0" aria-label="Start Level 1"><span>1</span></button>
-              <button class="menu-hotspot level-hotspot level-2 locked boss-room" type="button" data-level="1" aria-label="Start Level 2 Boss"><span>2</span><em>☠</em></button>
-              <button class="menu-hotspot level-hotspot level-3 locked" type="button" data-level="2" aria-label="Start Level 3"><span>3</span></button>
-              <button class="menu-hotspot level-hotspot level-4 locked boss-room" type="button" data-level="3" aria-label="Start Level 4 Boss"><span>4</span><em>☠</em></button>
-              <button class="menu-hotspot level-hotspot level-5 locked" type="button" data-level="4" aria-label="Start Level 5"><span>5</span></button>
-              <button class="menu-hotspot level-hotspot level-6 locked boss-room" type="button" data-level="5" aria-label="Start Level 6 Boss"><span>6</span><em>☠</em></button>
-              <button class="menu-hotspot level-hotspot level-7 locked" type="button" data-level="6" aria-label="Start Level 7"><span>7</span></button>
-              <button class="menu-hotspot level-hotspot level-8 locked boss-room" type="button" data-level="7" aria-label="Start Level 8 Final Boss"><span>8</span><em>☠</em></button>
-            </div>
-          </div>
-
           <div class="menu-panel menu-mode-panel">
             <h2 class="menu-panel-title">Game Mode</h2>
-            <button id="playButton" class="menu-hotspot version-hotspot classic active primary-play" type="button" data-mode="classic" aria-label="Play Classic Story"><span>PLAY</span></button>
-            <button class="menu-hotspot version-hotspot speedrun" type="button" data-mode="speedrun" aria-label="Speedrun Mode"><span>Speedrun Mode</span></button>
-            <button class="menu-hotspot version-hotspot endless" type="button" data-mode="endless" aria-label="Endless Mansion"><span>Endless Mansion</span></button>
+            <button class="menu-hotspot version-hotspot classic active" type="button" data-mode="classic" aria-label="Classic Mode"><span>Classic</span></button>
+            <button class="menu-hotspot version-hotspot speedrun" type="button" data-mode="speedrun" aria-label="Speedrun Mode"><span>Speedrun</span></button>
+            <button class="menu-hotspot version-hotspot endless" type="button" data-mode="endless" aria-label="Endless Mode"><span>Endless</span></button>
             <p id="modeDescription" class="mode-description">Play the full story of Kitty escaping Nancy's mansion.</p>
           </div>
 
@@ -265,9 +251,10 @@
 
     <div id="transitionFade" class="transition-fade"></div>
     <div id="unlockBurst" class="unlock-burst" aria-hidden="true"></div>
+    <div id="loadingMessage" class="loading-message" role="status" aria-live="polite" hidden>Loading room...</div>
     <div id="toast" class="toast" role="status" aria-live="polite"></div>
   </main>
 
-  <script src="game.js?v=20260618-cutscene-sound"></script>
+  <script src="game.js?v=20260618-cutscene-sound-menu-room-flow-startup-fix"></script>
 </body>
 </html>
